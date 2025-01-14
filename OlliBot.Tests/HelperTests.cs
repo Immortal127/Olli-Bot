@@ -24,7 +24,7 @@ namespace OlliBot.Tests
         {
 
             // Act
-            var result = Helpers.HasURL(input);
+            bool result = Helpers.HasURL(input);
 
             // Assert
             Assert.Equal(expected, result);

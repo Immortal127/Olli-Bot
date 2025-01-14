@@ -17,29 +17,29 @@ namespace OlliBot.Modules
                 var emoteCounts = new Dictionary<GuildEmote, int>();
 
                 //only emotes that are available
-                var emoteList = Context.Guild.Emotes;
+                IReadOnlyCollection<GuildEmote> emotes = Context.Guild.Emotes;
 
-                if (emoteList.Count==0)
+                if (emotes.Count==0)
                 {
                     await Context.Interaction.RespondAsync("No emotes found", ephemeral: true);
                     return;
                 }
 
                 //only text channels
-                var channelList = Context.Guild.Channels.OfType<SocketTextChannel>().Where(ch => ch.GetChannelType() == ChannelType.Text);
+                IEnumerable<SocketTextChannel> channelList = Context.Guild.Channels.OfType<SocketTextChannel>().Where(ch => ch.GetChannelType() == ChannelType.Text);
 
                 await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
-                foreach (var ch in channelList)
+                foreach (SocketTextChannel ch in channelList)
                 {
-                    Console.WriteLine(ch.Name );
+                    Console.WriteLine(ch.Name);
 
 
                     IMessage? lastMessage = null;
 
                     while (true)
                     {
-                        var messages = (await (lastMessage == null ? ch.GetMessagesAsync(100).FlattenAsync() : ch.GetMessagesAsync(lastMessage, Direction.Before, 100).FlattenAsync())).ToList()  ;
+                        List<IMessage> messages = (await (lastMessage == null ? ch.GetMessagesAsync(100).FlattenAsync() : ch.GetMessagesAsync(lastMessage, Direction.Before, 100).FlattenAsync())).ToList()  ;
 
                         if (messages.Count == 0)
                         {
@@ -48,9 +48,9 @@ namespace OlliBot.Modules
 
                         lastMessage = messages[messages.Count - 1];
 
-                        foreach (var e in emoteList)
+                        foreach (GuildEmote e in emotes)
                         {
-                            var count = messages.Count(m => (m.Content.Contains(e.ToString()) || m.Reactions.Any(reaction => reaction.Key.Equals(e))) && m.Author.Id!=1118358168708329543);
+                            int count = messages.Count(m => (m.Content.Contains(e.ToString()) || m.Reactions.Any(reaction => reaction.Key.Equals(e))) && m.Author.Id!=1118358168708329543);
 
                             if (emoteCounts.ContainsKey(e))
                             {
@@ -68,7 +68,7 @@ namespace OlliBot.Modules
 
                 sb.AppendLine("Emote Usage Ranking:");
 
-                foreach (var kv in emoteCounts.OrderByDescending(kv => kv.Value))
+                foreach (KeyValuePair<GuildEmote, int> kv in emoteCounts.OrderByDescending(kv => kv.Value))
                 {
                     sb.AppendLine($"{kv.Key}  -  {kv.Value}");
                 }

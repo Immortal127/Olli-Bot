@@ -32,7 +32,7 @@ namespace OlliBot.Modules
             await _interaction.RegisterCommandsGloballyAsync();
 
             
-            foreach (var item in _interaction.SlashCommands.ToList())
+            foreach (SlashCommandInfo item in _interaction.SlashCommands.ToList())
             {
                 _logger.LogInformation($"{item}");
             }

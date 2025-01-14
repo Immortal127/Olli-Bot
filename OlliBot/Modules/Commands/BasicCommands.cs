@@ -13,7 +13,7 @@ namespace OlliBot.Modules
         {
             user ??= (SocketGuildUser)Context.User;
 
-            var nickname = user.Nickname ?? user.DisplayName ?? user.Username;
+            string nickname = user.Nickname ?? user.DisplayName ?? user.Username;
             
             var embed = new EmbedBuilder();
             embed.WithTitle($"{nickname}'s avatar");
@@ -29,7 +29,7 @@ namespace OlliBot.Modules
         {
             member ??= (SocketGuildUser)Context.User;
 
-            var nickname = member.Nickname ?? member.DisplayName ?? member.Username;
+            string nickname = member.Nickname ?? member.DisplayName ?? member.Username;
 
             //await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(user.AvatarUrl));
             var embed = new EmbedBuilder();

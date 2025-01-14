@@ -41,7 +41,7 @@ namespace OlliBot.Tests
             mockMessage.Content.Returns(content);
 
             var mockAttachments = new List<IAttachment>();
-            foreach (var url in attachments)
+            foreach (string url in attachments)
             {
                 var mockAttachment = Substitute.For<IAttachment>();
                 mockAttachment.Url.Returns(url);
@@ -107,7 +107,7 @@ namespace OlliBot.Tests
         {            
 
             // Act
-            var result = DatabaseLogic.CreateMessageFromInput(inputMessage, Title, _mockContext, messageType);
+            Message result = DatabaseLogic.CreateMessageFromInput(inputMessage, Title, _mockContext, messageType);
 
             // Assert
 
@@ -132,11 +132,11 @@ namespace OlliBot.Tests
         public void CreateMessageFromInput_StringInputNoURL_ShouldReturnExpectedResult(string entryContent, string? Title, string? messageType)
         {
             // Arrange
-            var expectedAuthor = "TestUser 2";
-            var expectedAuthorId = 220253209824854016UL;
-            var expectedMessageOriginId = 775196080101619750UL;
-            var expectedGuildId = 989440353736214299UL;
-            var expectedDateTime = DateTime.UtcNow;
+            string expectedAuthor = "TestUser 2";
+            ulong expectedAuthorId = 220253209824854016UL;
+            ulong expectedMessageOriginId = 775196080101619750UL;
+            ulong expectedGuildId = 989440353736214299UL;
+            DateTime expectedDateTime = DateTime.UtcNow;
 
 
             // Act
@@ -165,11 +165,11 @@ namespace OlliBot.Tests
         public void CreateMessageFromInput_StringInputWithURL_ShouldReturnExpectedResult(string entryContent, string? Title, string? messageType, string expectedContent)
         {
             // Arrange
-            var expectedAuthor = "TestUser 2";
-            var expectedAuthorId = 220253209824854016UL;
-            var expectedMessageOriginId = 775196080101619750UL;
-            var expectedGuildId = 989440353736214299UL;
-            var expectedDateTime = DateTime.UtcNow;
+            string expectedAuthor = "TestUser 2";
+            ulong expectedAuthorId = 220253209824854016UL;
+            ulong expectedMessageOriginId = 775196080101619750UL;
+            ulong expectedGuildId = 989440353736214299UL;
+            DateTime expectedDateTime = DateTime.UtcNow;
 
 
             // Act

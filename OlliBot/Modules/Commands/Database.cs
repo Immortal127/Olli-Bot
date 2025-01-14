@@ -21,7 +21,7 @@ namespace OlliBot.Modules
 
             if (ulong.TryParse(messageEntry, out ulong result))
             {
-                var DiscordMessageObj = await Context.Interaction.Channel.GetMessageAsync(result);
+                IMessage DiscordMessageObj = await Context.Interaction.Channel.GetMessageAsync(result);
                 entry = DatabaseLogic.CreateMessageFromInput(DiscordMessageObj, Title, Context, messageType);
             }
             //If input for message is not convertable to ulong assume it is a manually entered quote
@@ -54,7 +54,7 @@ namespace OlliBot.Modules
         {
             using (var db = new MessageDB())
             {
-                var guildMessages = db.Messages.AsQueryable().Where(x=> x.GuildId == Context.Guild.Id);
+                IQueryable<Message> guildMessages = db.Messages.AsQueryable().Where(x=> x.GuildId == Context.Guild.Id);
                 
                 Message? queriedMessage;
 
@@ -68,15 +68,12 @@ namespace OlliBot.Modules
 
                 }
 
-
-
                 if (queriedMessage is null)
                 {
                     await Context.Interaction.RespondAsync("No message found", ephemeral: true);
 
                     return;
                 }
-
 
                 if (queriedMessage.DiscordMessageId is null && queriedMessage.MessageType=="Quote")
                 {
@@ -92,7 +89,7 @@ namespace OlliBot.Modules
                     if (queriedMessage.AttachmentUrls.Count > 0)
                     {
                         responseContent+=Environment.NewLine;
-                        foreach (var attachment in queriedMessage.AttachmentUrls)
+                        foreach (string attachment in queriedMessage.AttachmentUrls)
                         {
                             responseContent+=attachment;
                         }
@@ -136,7 +133,7 @@ namespace OlliBot.Modules
         {
             using (var db = new MessageDB())
             {
-                var queriedMessage = db.Messages.AsQueryable().Where(x => x.Id == DbID && x.GuildId == Context.Guild.Id).FirstOrDefault();
+                Message? queriedMessage = db.Messages.AsQueryable().Where(x => x.Id == DbID && x.GuildId == Context.Guild.Id).FirstOrDefault();
 
                 if (queriedMessage == null || (Title == null && MessageType == null))
                 {
@@ -162,14 +159,14 @@ namespace OlliBot.Modules
         {
             using (var db = new MessageDB())
             {
-                var messages = db.Messages.Where(m=> m.GuildId == Context.Guild.Id);
+                IQueryable<Message> messages = db.Messages.Where(m=> m.GuildId == Context.Guild.Id);
                 
                 if (user != null)
                 {
                     messages=messages.Where(m => m.AuthorId == user.Id);
                 }
 
-                var messageList = messages.ToList();
+                List<Message> messageList = messages.ToList();
 
                 if (messageList.Count == 0 )
                 {
@@ -177,11 +174,10 @@ namespace OlliBot.Modules
                     return;
                 }
 
-
-                var idString = string.Join("\n",messages.Select(m => m.Id));
-                var titleString = string.Join("\n",messages.Select(m => m.Title?? "N/A"));
-                var typeString = string.Join("\n", messages.Select(m => m.MessageType));
-                var authorString = string.Join("\n", messages.Select(m => m.Author));
+                string idString = string.Join("\n",messages.Select(m => m.Id));
+                string titleString = string.Join("\n",messages.Select(m => m.Title?? "N/A"));
+                string typeString = string.Join("\n", messages.Select(m => m.MessageType));
+                string authorString = string.Join("\n", messages.Select(m => m.Author));
 
                 var embed = new EmbedBuilder();
 
@@ -208,12 +204,11 @@ namespace OlliBot.Modules
             //Attachment is a file upload attached to a message
             if (message.Attachments.Count > 0)
             {
-                foreach (var attachment in message.Attachments)
+                foreach (IAttachment attachment in message.Attachments)
                 {
                     attList.Add(attachment.Url);
                 }
             }
-
 
             var entry = new Message
             {
@@ -232,7 +227,7 @@ namespace OlliBot.Modules
             {
                 // Add logic here
                 var regex = new Regex(@"https?://[^\s/$.?#].[^\s]*");
-                var matches = regex.Matches(entry.Content).Select(m => m.Value).ToList();
+                List<string> matches = regex.Matches(entry.Content).Select(m => m.Value).ToList();
 
                 entry.AttachmentUrls.AddRange(matches);
 
@@ -261,9 +256,9 @@ namespace OlliBot.Modules
             {
                 var regex = new Regex(@"https?://[^\s/$.?#].[^\s]*");
 
-                var matches = regex.Matches(entry.Content).Select(m => m.Value).ToList();
+                List<string> matches = regex.Matches(entry.Content).Select(m => m.Value).ToList();
 
-                var currentAttachments = entry.AttachmentUrls;
+                List<string> currentAttachments = entry.AttachmentUrls;
                 currentAttachments.AddRange(matches);
                 entry.AttachmentUrls = currentAttachments;
 

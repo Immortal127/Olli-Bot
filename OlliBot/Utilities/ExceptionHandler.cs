@@ -1,4 +1,8 @@
-﻿using DSharpPlus.SlashCommands.Attributes;
+﻿// DEPRECATED SINCE MIGRATING TO Discord.NET
+
+
+
+using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.SlashCommands.EventArgs;
 using DSharpPlus.SlashCommands;
 using DSharpPlus;
@@ -17,7 +21,7 @@ namespace OlliBot.Utilities
                     // Slash command is on cooldown
                     if (check is SlashCooldownAttribute cooldown)
                     {
-                        var cd = Math.Round(cooldown.GetRemainingCooldown(e.Context).TotalSeconds, 1);
+                        decimal cd = Math.Round(cooldown.GetRemainingCooldown(e.Context).TotalSeconds, 1);
                         sender.Client.Logger.LogError($"Command is on cooldown (Cooldown remaining: {cd})");
                         await e.Context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DSharpPlus.Entities.DiscordInteractionResponseBuilder()
                         .WithContent($"This command is on cooldown\nCooldown Remaining: {cd} seconds.")

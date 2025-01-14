@@ -12,7 +12,7 @@ namespace OlliBot
     {
         private static async Task Main(string[] args)
         {
-            var builder = Host.CreateApplicationBuilder(args);
+            HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 
             Log.Logger = new LoggerConfiguration()
@@ -39,7 +39,7 @@ namespace OlliBot
 
             builder.Services.AddSingleton<DiscordSocketClient>((serviceProvider) =>
             {
-                var config = builder.Configuration;
+                ConfigurationManager config = builder.Configuration;
 
                 try
                 {
@@ -70,7 +70,7 @@ namespace OlliBot
 
             builder.Services.AddSingleton<InteractionService>((serviceProvider) =>
             {
-                var discordClient = serviceProvider.GetRequiredService<DiscordSocketClient>();
+                DiscordSocketClient discordClient = serviceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var interaction = new InteractionService(discordClient.Rest);
 
@@ -84,7 +84,7 @@ namespace OlliBot
 
             try
             {
-                var host = builder.Build();
+                IHost host = builder.Build();
                 host.Run();
             }
             catch (Exception ex) 
@@ -99,7 +99,7 @@ namespace OlliBot
         }
         private static async Task LogAsync(LogMessage message)
         {
-            var severity = message.Severity switch
+            LogEventLevel severity = message.Severity switch
             {
                 LogSeverity.Critical => LogEventLevel.Fatal,
                 LogSeverity.Error => LogEventLevel.Error,

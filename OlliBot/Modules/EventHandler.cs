@@ -21,7 +21,7 @@ namespace OlliBot.Modules
         public async Task OnMessage(SocketMessage message)
         {
             SocketGuildChannel channel = (SocketGuildChannel)message.Channel;
-            var guild = channel.Guild;
+            SocketGuild guild = channel.Guild;
 
             if (message.Content.Length > 150 && message.Author.Id != _client.CurrentUser.Id)
             {

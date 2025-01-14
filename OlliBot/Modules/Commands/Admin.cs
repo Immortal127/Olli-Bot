@@ -12,6 +12,8 @@ namespace OlliBot.Modules
         {
             try
             {
+                await Context.Interaction.DeferAsync(ephemeral: true);
+
                 //Temp safety precaution to avoid someone mass deleting messages on accident
                 if (amount > 20)
                 {
@@ -20,25 +22,24 @@ namespace OlliBot.Modules
                 }
 
 
-                var messageList = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
-                var filteredMessages = from m in messageList
+                IEnumerable<IMessage> messages = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
+                IEnumerable<IMessage> filteredMessages = from m in messages
                                        where m.Author.Id == user.Id
                                        select m;
 
-                var delMessages = filteredMessages.Take(amount);
+                IEnumerable<IMessage> delMessages = filteredMessages.Take(amount);
 
                 //Console.WriteLine((DateTimeOffset.UtcNow - delMessages.First().Timestamp).TotalDays);
 
                 //Messages older than 14 days can't be bulk deleted so we split old and recent messages into two lists and delete them using appropriate methods
 
                 //Messages older than 13.5 days
-                var oldMessages = from m in delMessages where (DateTimeOffset.UtcNow - m.Timestamp).TotalDays > 13.5 select m;
+                IEnumerable<IMessage> oldMessages = from m in delMessages where (DateTimeOffset.UtcNow - m.Timestamp).TotalDays > 13.5 select m;
 
                 //Every other message in delMessages not in oldMessages
-                var recentMessages = delMessages.Except(oldMessages);
+                IEnumerable<IMessage> recentMessages = delMessages.Except(oldMessages);
 
-                await Context.Interaction.DeferAsync(ephemeral: true);
-
+                //Cast ISocketMessageChannel to ITextChannel
                 var channel = (ITextChannel)Context.Channel;
 
                 if (recentMessages.Any())
