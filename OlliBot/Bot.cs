@@ -14,11 +14,10 @@ public class Bot : BackgroundService
     private readonly IConfiguration _configuration;
     private readonly BotInitialization _botInitialization;
     private readonly InteractionHandler _interactionHandler;
-    private readonly OlliBot.Modules.EventHandler _eventHandler;
+    private readonly BotEventHandler _eventHandler;
 
-    public Bot(ILogger<Bot> logger, DiscordSocketClient client, InteractionService interaction, IConfiguration configuration , BotInitialization botInitialization, InteractionHandler interactionHandler, OlliBot.Modules.EventHandler eventHandler)
+    public Bot(ILogger<Bot> logger, DiscordSocketClient client, InteractionService interaction, IConfiguration configuration , BotInitialization botInitialization, InteractionHandler interactionHandler, BotEventHandler eventHandler)
     {
-        //_logger = Log.ForContext<Bot>();
         _logger = logger;
         _client = client;
         _interaction = interaction;
