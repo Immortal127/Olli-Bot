@@ -42,8 +42,8 @@ namespace OlliBot.Modules
             //embed.WithColor(DiscordColor.Orange);
             embed.WithColor(new Color(252, 177, 3));
             embed.WithThumbnailUrl(member.GetAvatarUrl(ImageFormat.Auto, 1024));
+            
             await RespondAsync(embed: embed.Build());
-            //Console.Write(user);
         }
     }
 }
