@@ -48,6 +48,8 @@ namespace OlliBot.Modules
             }
         }
 
+
+
         //Command to call an entry from the database based on ID
         [SlashCommand("db", "Call entry by ID from the database")]
         public async Task CallMessage([Summary("Query", "Message ID or Title")] string query)
@@ -117,7 +119,7 @@ namespace OlliBot.Modules
 
                 if (queriedMessage.AuthorId!=Context.User.Id && !user.GuildPermissions.Has(GuildPermission.Administrator))
                 {
-                    await Context.Interaction.RespondAsync(user.GuildPermissions.Has(GuildPermission.Administrator).ToString());
+                    await Context.Interaction.RespondAsync("You must be admin to delete database entries from other users", ephemeral: true);
                     return;
                 }
                 db.Messages.Remove(queriedMessage);
@@ -225,7 +227,6 @@ namespace OlliBot.Modules
 
             if (!string.IsNullOrEmpty(entry.Content) && Helpers.HasURL(entry.Content))
             {
-                // Add logic here
                 var regex = new Regex(@"https?://[^\s/$.?#].[^\s]*");
                 List<string> matches = regex.Matches(entry.Content).Select(m => m.Value).ToList();
 
