@@ -5,13 +5,13 @@ using Discord.Interactions;
 
 namespace OlliBot.Modules
 {
-    public class EventHandler
+    public class BotEventHandler
     {
         private readonly IConfiguration _configuration;
         private readonly DiscordSocketClient _client;
         private readonly ILogger<Bot> _logger;
 
-        public EventHandler(IConfiguration configuration, DiscordSocketClient client, ILogger<Bot> logger)
+        public BotEventHandler(IConfiguration configuration, DiscordSocketClient client, ILogger<Bot> logger)
         {
             _configuration = configuration;
             _client = client;
@@ -35,11 +35,8 @@ namespace OlliBot.Modules
             {
                 await message.Channel.SendMessageAsync("James Here", messageReference: new MessageReference(message.Id));
             }
-
-
-            // Add more logic to this event
         }
-        public Task OnSlashExecute(SlashCommandInfo slashInfo, IInteractionContext ctx, IResult result)
+        public async Task OnSlashExecute(SlashCommandInfo slashInfo, IInteractionContext ctx, IResult result)
         {
             if (result.IsSuccess)
             {
@@ -49,40 +46,10 @@ namespace OlliBot.Modules
             {
                 if (result.Error == InteractionCommandError.UnmetPrecondition)
                 {
+                    await ctx.Interaction.RespondAsync("Only admins can use this command", ephemeral: true);
                     _logger.LogWarning($"{result.ErrorReason}");
                 }
             }
-            return Task.CompletedTask;
         }
     }
 }
-
-/*
-public Task OnSlashInvoke(SlashCommandsExtension Slash, SlashCommandInvokedEventArgs args)
-{
-    StringBuilder logMessage = new StringBuilder();
-    logMessage.Append($"Command invoked: {args.Context.CommandName} ");
-
-    if (args.Context.Interaction.Data.Options != null)
-    {
-        logMessage.Append("(");
-        foreach (var option in args.Context.Interaction.Data.Options.Where(option => option != null))
-        {
-            logMessage.Append($"{option.Name}:{option.Value}, ");
-        }
-        if (logMessage[logMessage.Length - 2] == ',') // Removing the trailing comma and space
-        {
-            logMessage.Length -= 2;
-        }
-        logMessage.Append(") ");
-    }
-    logMessage.Append($"by {args.Context.User.Username}, {args.Context.User.Id}");
-
-    if (!string.IsNullOrEmpty(args.Context.Member.Nickname))
-    {
-        logMessage.Append($" ({args.Context.Member.Nickname})");
-    }
-
-    Slash.Client.Logger.LogInformation($"{logMessage}");
-    return Task.CompletedTask;
-}*/
