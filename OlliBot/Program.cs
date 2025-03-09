@@ -14,11 +14,20 @@ namespace OlliBot
         {
             HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
+            try
+            {
+                builder.Configuration.AddJsonFile("config.json", optional: false, reloadOnChange: true);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load config.json");
+                throw;
+            }
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .WriteTo.Console(outputTemplate: "{Timestamp:dd-MM-yyyy HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}", theme: AnsiConsoleTheme.Literate)
-                .Filter.ByExcluding(logEvent => logEvent.MessageTemplate.Text.Contains("Unknown event:"))
+                //.Filter.ByExcluding(logEvent => logEvent.MessageTemplate.Text.Contains("Unknown event:"))
                 .CreateLogger();
 
             builder.Logging.ClearProviders();
@@ -26,16 +35,6 @@ namespace OlliBot
             
 
             builder.Services.AddHostedService<Bot>();
-
-            try
-            {
-                builder.Configuration.AddJsonFile("config.json", optional: false, reloadOnChange: true);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Failed to load config.json: {ex.Message}");
-                return;
-            }
 
             builder.Services.AddSingleton<DiscordSocketClient>((serviceProvider) =>
             {
@@ -63,7 +62,7 @@ namespace OlliBot
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Failed to initialize Discord client: {ex.Message}");
+                    Log.Error(ex, "Failed to initialize Discord client");
                     throw;
                 }
             });
@@ -80,7 +79,7 @@ namespace OlliBot
 
             builder.Services.AddTransient<BotInitialization>();
             builder.Services.AddSingleton<InteractionHandler>();
-            builder.Services.AddSingleton<OlliBot.Modules.EventHandler>();
+            builder.Services.AddSingleton<BotEventHandler>();
 
             try
             {
