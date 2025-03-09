@@ -30,7 +30,7 @@ namespace OlliBot.Tests
         {
             yield return new object[] { "", new List<string> { "https://www.youtube.com/" }, "Other" };
             yield return new object[] { ":3", new List<string> { "https://cdn.discordapp.com/attachments/529752744559640597/998720258506493982/unknown.png?ex=66aeb138&is=66ad5fb8&hm=1bb299d8fd12edb060f442272cf5325148d0b6fb84190f5675d90c557d4c7a58&" }, "Meme" };
-            yield return new object[] { "kek", new List<string> { }, "Quote" };
+            yield return new object[] { "lol", new List<string> { }, "Quote" };
             yield return new object[] { "", new List<string> { "https://cdn.discordapp.com/attachments/530102241701396481/1265917629735108628/FB_IMG_1721888665423.jpg?ex=66af1eaa&is=66adcd2a&hm=d49a3f0abe0883c65ec1f7bfd78d4a7a3cf9fdf4fc37d172b5c4d34980351007&" }, "Meme" };
         }
         
