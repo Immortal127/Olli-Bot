@@ -2,27 +2,41 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Data;
-using OlliBot.Utilities;
-using System.Text.RegularExpressions;
+using OlliBot.Services;
 
 
 namespace OlliBot.Modules
 {
     public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     {
+        private readonly IMessageService _messageService;
+        private readonly ILogger<DatabaseCommands> _logger;
+        private readonly IMessageFactory _messageFactory;
+
+        public DatabaseCommands(IMessageService messageService, ILogger<DatabaseCommands> logger, IMessageFactory messageFactory)
+        {
+            _messageService = messageService;
+            _logger = logger;
+            _messageFactory = messageFactory;
+        }
+
         //Command to add entries to database
         [SlashCommand("dbadd", "Add a discord message to the database")]
         public async Task AddMessage([Summary("message", "Enter a message ID or quote content")] string messageEntry,
         [Summary("title", "Title (Optional)")] string? Title = null,
         [Summary("origin", "Quote origin (Optional if using Message ID for input)")] SocketGuildUser? User = null,
-        [Choice("Meme", "Meme")] [Choice("Quote", "Quote")] [Choice("Other", "Other")] [Summary("Type", "Type (If no value set then will be implicitly determined)")] string? messageType = null)
+        [Choice("Meme", "Meme")] 
+        [Choice("Quote", "Quote")]
+        [Choice("Other", "Other")]
+        [Summary("Type", "Type (If no value set then will be implicitly determined)")] string? messageType = null)
         {
+
             Message entry;
 
             if (ulong.TryParse(messageEntry, out ulong result))
             {
                 IMessage DiscordMessageObj = await Context.Interaction.Channel.GetMessageAsync(result);
-                entry = DatabaseLogic.CreateMessageFromInput(DiscordMessageObj, Title, Context, messageType);
+                entry = _messageFactory.CreateMessageFromInput(DiscordMessageObj, Title, Context, messageType);
             }
             //If input for message is not convertable to ulong assume it is a manually entered quote
             else
@@ -33,18 +47,18 @@ namespace OlliBot.Modules
                     await Context.Interaction.RespondAsync("Entry unsuccessful, try again with a quote origin.", ephemeral: true);
                     return;
                 }
-                entry = DatabaseLogic.CreateMessageFromInput(messageEntry, Title, Context, messageType, User);
-
+                entry = _messageFactory.CreateMessageFromInput(messageEntry, Title, Context, messageType, User);
             }
 
-
-            using (var db = new MessageDB())
+            try
             {
-
-                await db.Messages.AddAsync(entry);
-                await db.SaveChangesAsync();
-
+                await _messageService.AddMessageAsync(entry);
                 await Context.Interaction.RespondAsync("Entry added to the database", ephemeral: true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to add entry to database");
+                await Context.Interaction.RespondAsync("Failed to add entry.", ephemeral: true);
             }
         }
 
@@ -54,237 +68,125 @@ namespace OlliBot.Modules
         [SlashCommand("db", "Call entry by ID from the database")]
         public async Task CallMessage([Summary("Query", "Message ID or Title")] string query)
         {
-            using (var db = new MessageDB())
+            Message? queriedMessage;
+
+            if (int.TryParse(query, out int intQuery))
             {
-                IQueryable<Message> guildMessages = db.Messages.AsQueryable().Where(x=> x.GuildId == Context.Guild.Id);
-                
-                Message? queriedMessage;
-
-                if (int.TryParse(query, out int intQuery))
-                {
-                    queriedMessage = guildMessages.Where(x => x.Id == intQuery).FirstOrDefault();
-                }
-                else
-                {
-                    queriedMessage = guildMessages.Where(x => x.Title != null && x.Title.ToLower().Contains(query.ToLower())).FirstOrDefault();
-
-                }
-
-                if (queriedMessage is null)
-                {
-                    await Context.Interaction.RespondAsync("No message found", ephemeral: true);
-
-                    return;
-                }
-
-                if (queriedMessage.DiscordMessageId is null && queriedMessage.MessageType=="Quote")
-                {
-                    IGuildUser quoteOrigin = Context.Guild.GetUser(queriedMessage.MessageOriginId);
-                    string responseContent = $"\"{queriedMessage.Content}\" - {quoteOrigin.DisplayName}";
-                    await Context.Interaction.RespondAsync(responseContent);
-                }
-                else
-                {
-
-                    string responseContent = queriedMessage.Content ?? string.Empty;
-                    
-                    if (queriedMessage.AttachmentUrls.Count > 0)
-                    {
-                        responseContent+=Environment.NewLine;
-                        foreach (string attachment in queriedMessage.AttachmentUrls)
-                        {
-                            responseContent+=attachment;
-                        }
-                    }
-
-                    await Context.Interaction.RespondAsync(responseContent);
-                }
+                queriedMessage = await _messageService.GetMessageByIdAsync(intQuery, Context.Guild.Id);
+            }
+            else
+            {
+                queriedMessage = await _messageService.GetMessageByTitleAsync(query, Context.Guild.Id);
             }
 
+            if (queriedMessage is null)
+            {
+                await Context.Interaction.RespondAsync("No message found", ephemeral: true);
+
+                return;
+            }
+
+            if (queriedMessage.DiscordMessageId is null && queriedMessage.MessageType == "Quote")
+            {
+                IGuildUser quoteOrigin = Context.Guild.GetUser(queriedMessage.MessageOriginId);
+                string responseContent = $"\"{queriedMessage.Content}\" - {quoteOrigin.DisplayName}";
+                await Context.Interaction.RespondAsync(responseContent);
+            }
+            else
+            {
+
+                string responseContent = queriedMessage.Content ?? string.Empty;
+
+                if (queriedMessage.AttachmentUrls.Count > 0)
+                {
+                    responseContent += Environment.NewLine;
+                    foreach (string attachment in queriedMessage.AttachmentUrls)
+                    {
+                        responseContent += attachment;
+                    }
+                }
+
+                await Context.Interaction.RespondAsync(responseContent);
+            }
         }
         [SlashCommand("dbdelete", "Delete an entry from the database")]
-        public async Task DeleteEntry([Summary("Id", "Database ID")] double DbID)
+        public async Task DeleteEntry(
+        [Summary("Id", "Database ID")] int DbID)
         {
             SocketGuildUser user = (SocketGuildUser)Context.User;
 
-            using (var db = new MessageDB())
+            Message? queriedMessage = await _messageService.GetMessageByIdAsync(DbID, Context.Guild.Id);
+
+            if (queriedMessage is null)
             {
-                Message? queriedMessage = db.Messages.AsQueryable().Where(x => x.Id == DbID && x.GuildId == Context.Guild.Id).FirstOrDefault();
-
-                if (queriedMessage is null)
-                {
-                    await Context.Interaction.RespondAsync("No Entry found", ephemeral: true);
-                    return;
-                }
-
-                if (queriedMessage.AuthorId!=Context.User.Id && !user.GuildPermissions.Has(GuildPermission.Administrator))
-                {
-                    await Context.Interaction.RespondAsync("You must be admin to delete database entries from other users", ephemeral: true);
-                    return;
-                }
-                db.Messages.Remove(queriedMessage);
-                db.SaveChanges();
-
-                await Context.Interaction.RespondAsync("Deleted entry", ephemeral: true);
+                await Context.Interaction.RespondAsync("No Entry found", ephemeral: true);
+                return;
             }
+
+            if (queriedMessage.AuthorId != Context.User.Id && !user.GuildPermissions.Has(GuildPermission.Administrator))
+            {
+                await Context.Interaction.RespondAsync("You must be admin to delete database entries from other users", ephemeral: true);
+                return;
+            }
+
+            await _messageService.DeleteMessageAsync(queriedMessage);
+            await Context.Interaction.RespondAsync("Deleted entry", ephemeral: true);
+
         }
         [SlashCommand("dbupdate", "Update entry in database")]
-        public async Task UpdateEntry([Summary("Id", "Message ID")] double DbID,
+        public async Task UpdateEntry(
+        [Summary("Id", "Message ID")] int DbID,
         [Summary("Title", "Updated title")] string? Title = null,
-        [Choice("Meme", "Meme")] [Choice("Quote", "Quote")] [Choice("Other", "Other")] [Summary("Type", "Updated type")] string? MessageType = null)
+        [Choice("Meme", "Meme")]
+        [Choice("Quote", "Quote")]
+        [Choice("Other", "Other")]
+        [Summary("Type", "Updated type")] string? MessageType = null)
         {
-            using (var db = new MessageDB())
-            {
-                Message? queriedMessage = db.Messages.AsQueryable().Where(x => x.Id == DbID && x.GuildId == Context.Guild.Id).FirstOrDefault();
+            Message? queriedMessage = await _messageService.GetMessageByIdAsync(DbID, Context.Guild.Id);
 
-                if (queriedMessage == null || (Title == null && MessageType == null))
-                {
-                    string x="wat";
-                    await Context.Interaction.RespondAsync(x, ephemeral: true);
-                    return;
-                }
-                if (Title!=null)
-                {
-                    queriedMessage.Title=Title;
-                }
-                if (MessageType!=null)
-                {
-                    queriedMessage.MessageType=MessageType;
-                }
-                db.Messages.Update(queriedMessage);
-                await db.SaveChangesAsync();
-                await Context.Interaction.RespondAsync("Updated entry", ephemeral: true);
+            if (queriedMessage == null || (Title == null && MessageType == null))
+            {
+                string x = "wat";
+                await Context.Interaction.RespondAsync(x, ephemeral: true);
+                return;
             }
+            if (Title != null)
+            {
+                queriedMessage.Title = Title;
+            }
+            if (MessageType != null)
+            {
+                queriedMessage.MessageType = MessageType;
+            }
+
+            await _messageService.UpdateMessageAsync(queriedMessage);
+            await Context.Interaction.RespondAsync("Updated entry", ephemeral: true);
         }
         [SlashCommand("dblist", "List entries in database")]
         public async Task ListEntries([Summary("User", "entries from user")] SocketUser? user = null)
         {
-            using (var db = new MessageDB())
+            List<Message> messageList = await _messageService.ListMessagesAsync(Context.Guild.Id, user?.Id);
+
+            if (messageList.Count == 0)
             {
-                IQueryable<Message> messages = db.Messages.Where(m=> m.GuildId == Context.Guild.Id);
-                
-                if (user != null)
-                {
-                    messages=messages.Where(m => m.AuthorId == user.Id);
-                }
-
-                List<Message> messageList = messages.ToList();
-
-                if (messageList.Count == 0 )
-                {
-                    await Context.Interaction.RespondAsync("No messages found", ephemeral: true);
-                    return;
-                }
-
-                string idString = string.Join("\n",messages.Select(m => m.Id));
-                string titleString = string.Join("\n",messages.Select(m => m.Title?? "N/A"));
-                string typeString = string.Join("\n", messages.Select(m => m.MessageType));
-                string authorString = string.Join("\n", messages.Select(m => m.Author));
-
-                var embed = new EmbedBuilder();
-
-                //Limited to 3 fields inline due to Discord css
-                embed.AddField("Id", idString, true);
-                embed.AddField("Title", titleString, true);
-                embed.AddField("Type", typeString, true);
-                embed.WithColor(Color.Gold);
-                embed.WithTitle("Olli Bot Database");
-
-                await Context.Interaction.RespondAsync(embed: embed.Build(), ephemeral: true);
+                await Context.Interaction.RespondAsync("No messages found", ephemeral: true);
+                return;
             }
-        }
-    }
+            string idString = string.Join("\n", messageList.Select(m => m.Id));
+            string titleString = string.Join("\n", messageList.Select(m => m.Title ?? "N/A"));
+            string typeString = string.Join("\n", messageList.Select(m => m.MessageType));
+            string authorString = string.Join("\n", messageList.Select(m => m.Author));
 
-    public class DatabaseLogic
-    {
-        public static Message CreateMessageFromInput(IMessage message, string? Title, IInteractionContext ctx, string? messageType)
-        {
-            var attList = new List<string>();
+            var embed = new EmbedBuilder();
 
-            string entryContent = message.Content;
+            //Limited to 3 fields inline due to Discord css
+            embed.AddField("Id", idString, true);
+            embed.AddField("Title", titleString, true);
+            embed.AddField("Type", typeString, true);
+            embed.WithColor(Color.Gold);
+            embed.WithTitle("Olli Bot Database");
 
-            //Attachment is a file upload attached to a message
-            if (message.Attachments.Count > 0)
-            {
-                foreach (IAttachment attachment in message.Attachments)
-                {
-                    attList.Add(attachment.Url);
-                }
-            }
-
-            var entry = new Message
-            {
-                DiscordMessageId = message.Id,
-                GuildId = ctx.Guild.Id,
-                Title = Title,
-                Content = entryContent,
-                AttachmentUrls = attList,
-                Author = ctx.User.Username,
-                AuthorId = ctx.User.Id,
-                MessageOriginId = message.Author.Id,
-                DateTimeAdded = DateTime.UtcNow
-            };
-
-            if (!string.IsNullOrEmpty(entry.Content) && Helpers.HasURL(entry.Content))
-            {
-                var regex = new Regex(@"https?://[^\s/$.?#].[^\s]*");
-                List<string> matches = regex.Matches(entry.Content).Select(m => m.Value).ToList();
-
-                entry.AttachmentUrls.AddRange(matches);
-
-                entry.Content = regex.Replace(entry.Content, string.Empty);
-            }
-
-            entry.MessageType = messageType ?? GetMessageType(entry);
-
-            return entry;
-        }
-        public static Message CreateMessageFromInput(string entryContent, string? Title, IInteractionContext ctx, string? messageType, IUser User)
-        {
-
-            var entry = new Message
-            {
-                GuildId = ctx.Guild.Id,
-                Title = Title,
-                Content = entryContent,
-                Author = ctx.User.Username,
-                AuthorId = ctx.User.Id,
-                MessageOriginId = User.Id,
-                DateTimeAdded = DateTime.UtcNow,
-            };
-
-            if (!string.IsNullOrEmpty(entry.Content) && Helpers.HasURL(entry.Content))
-            {
-                var regex = new Regex(@"https?://[^\s/$.?#].[^\s]*");
-
-                List<string> matches = regex.Matches(entry.Content).Select(m => m.Value).ToList();
-
-                List<string> currentAttachments = entry.AttachmentUrls;
-                currentAttachments.AddRange(matches);
-                entry.AttachmentUrls = currentAttachments;
-
-                entry.Content = regex.Replace(entry.Content, string.Empty).Trim();
-            }
-
-            entry.MessageType = messageType ?? GetMessageType(entry);
-
-            return entry;
-        }
-        public static string GetMessageType(Message message)
-        {
-            var memeExtensions = new List<string> { ".png", ".jpeg", ".jpg", ".gif", ".mp4" };
-            if (message.AttachmentUrls.Count > 0 && (message.AttachmentUrls.Any(url => memeExtensions.Any(ex => url.Contains(ex)))))
-            {
-                return "Meme";
-            }
-            else if (!string.IsNullOrEmpty(message.Content) && message.AttachmentUrls.Count == 0)
-            {
-                return "Quote";
-            }
-            else
-            {
-                return "Other";
-            }
+            await Context.Interaction.RespondAsync(embed: embed.Build(), ephemeral: true);
         }
     }
 }

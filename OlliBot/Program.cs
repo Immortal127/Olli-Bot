@@ -2,6 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Modules;
+using OlliBot.Services;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -80,6 +81,9 @@ namespace OlliBot
             builder.Services.AddTransient<BotInitialization>();
             builder.Services.AddSingleton<InteractionHandler>();
             builder.Services.AddSingleton<BotEventHandler>();
+
+            builder.Services.AddTransient<IMessageService, MessageService>();
+            builder.Services.AddTransient<IMessageFactory, MessageFactory>();
 
             try
             {
