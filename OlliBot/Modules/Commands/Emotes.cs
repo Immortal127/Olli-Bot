@@ -1,21 +1,26 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using OlliBot.Services;
 using System.Text;
 
 namespace OlliBot.Modules
 {
     public class Emotes : InteractionModuleBase<SocketInteractionContext>
     {
+
+        private readonly IEmoteRankingService _emoteService;
+
+        public Emotes(IEmoteRankingService emoteService)
+        {
+             _emoteService = emoteService;
+        }
+
         [SlashCommand("emoterank", "Emote rankings")]
         public async Task RankEmotes()
         {
             try
             {
-                
-                //Dictionary of emotes and an integer indicating number of uses 
-                var emoteCounts = new Dictionary<GuildEmote, int>();
-
                 //only emotes that are available
                 IReadOnlyCollection<GuildEmote> emotes = Context.Guild.Emotes;
 
@@ -30,39 +35,7 @@ namespace OlliBot.Modules
 
                 await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
-                foreach (SocketTextChannel ch in channelList)
-                {
-                    Console.WriteLine(ch.Name);
-
-
-                    IMessage? lastMessage = null;
-
-                    while (true)
-                    {
-                        List<IMessage> messages = (await (lastMessage == null ? ch.GetMessagesAsync(100).FlattenAsync() : ch.GetMessagesAsync(lastMessage, Direction.Before, 100).FlattenAsync())).ToList()  ;
-
-                        if (messages.Count == 0)
-                        {
-                            break;
-                        }
-
-                        lastMessage = messages[messages.Count - 1];
-
-                        foreach (GuildEmote e in emotes)
-                        {
-                            int count = messages.Count(m => (m.Content.Contains(e.ToString()) || m.Reactions.Any(reaction => reaction.Key.Equals(e))) && m.Author.Id!=1118358168708329543);
-
-                            if (emoteCounts.ContainsKey(e))
-                            {
-                                emoteCounts[e]+=count;
-                            }
-                            else
-                            {
-                                emoteCounts[e]=count;
-                            }
-                        }
-                    }
-                }
+                Dictionary<GuildEmote, int> emoteCounts = await _emoteService.CountEmoteUsage(emotes, channelList);
 
                 StringBuilder sb = new StringBuilder();
 

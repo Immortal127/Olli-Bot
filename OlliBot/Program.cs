@@ -85,6 +85,8 @@ namespace OlliBot
             builder.Services.AddTransient<IMessageService, MessageService>();
             builder.Services.AddTransient<IMessageFactory, MessageFactory>();
 
+            builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
+
             try
             {
                 IHost host = builder.Build();
