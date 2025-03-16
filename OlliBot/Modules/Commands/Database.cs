@@ -7,6 +7,7 @@ using OlliBot.Services;
 
 namespace OlliBot.Modules
 {
+    [RequireContext(ContextType.Guild)]
     public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly IMessageService _messageService;
