@@ -71,7 +71,7 @@ public class Bot : BackgroundService
         {
             await _client.StopAsync();
             await _client.LogoutAsync();
-            _logger.LogInformation("Ollibot disconnected...");
+            _logger.LogInformation("OlliBot disconnected...");
         }
         catch (Exception ex) 
         {
@@ -87,7 +87,7 @@ public class Bot : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Bot running...");
+        _logger.LogInformation("OlliBot running...");
 
         // Keep the service running until a cancellation is requested.
         while (!stoppingToken.IsCancellationRequested)
