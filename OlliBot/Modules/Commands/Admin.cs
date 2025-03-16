@@ -4,23 +4,31 @@ using Discord.WebSocket;
 
 namespace OlliBot.Modules
 {
+    [RequireUserPermission(GuildPermission.Administrator)]
+    [RequireContext(ContextType.Guild)]
     public class AdminCommands : InteractionModuleBase<SocketInteractionContext>
     {
+        private readonly ILogger<AdminCommands> _logger;
+
+        public AdminCommands(ILogger<AdminCommands> logger)
+        {
+            _logger = logger;
+        }
         [SlashCommand("purge", "Purge a number of messages from a user in a text channel")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task Purge([Summary("user", "Specified user")] SocketGuildUser user, [Summary("amount", "amount of messages to delete")] int amount)
+        public async Task Purge([Summary("user", "Specified user")] IUser user, [Summary("amount", "amount of messages to delete")] int amount)
         {
             try
             {
                 await Context.Interaction.DeferAsync(ephemeral: true);
 
-                //Temp safety precaution to avoid someone mass deleting messages on accident
                 if (amount > 20)
                 {
-                    await Context.Interaction.RespondAsync("No more than 20 messages pls (this is temp lol)", ephemeral: true);
+                    await Context.Interaction.ModifyOriginalResponseAsync(msg =>
+                    {
+                        msg.Content = "Cannot delete more than 20 messages at once";
+                    });
                     return;
                 }
-
 
                 IEnumerable<IMessage> messages = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
                 IEnumerable<IMessage> filteredMessages = from m in messages
@@ -29,9 +37,8 @@ namespace OlliBot.Modules
 
                 IEnumerable<IMessage> delMessages = filteredMessages.Take(amount);
 
-                //Console.WriteLine((DateTimeOffset.UtcNow - delMessages.First().Timestamp).TotalDays);
 
-                //Messages older than 14 days can't be bulk deleted so we split old and recent messages into two lists and delete them using appropriate methods
+                //Messages older than 14 days can't be bulk deleted so we split old and recent messages into two data collections and delete them using appropriate methods
 
                 //Messages older than 13.5 days
                 IEnumerable<IMessage> oldMessages = from m in delMessages where (DateTimeOffset.UtcNow - m.Timestamp).TotalDays > 13.5 select m;
@@ -39,27 +46,34 @@ namespace OlliBot.Modules
                 //Every other message in delMessages not in oldMessages
                 IEnumerable<IMessage> recentMessages = delMessages.Except(oldMessages);
 
-                //Cast ISocketMessageChannel to ITextChannel
-                var channel = (ITextChannel)Context.Channel;
+                var textChannel = (ITextChannel)Context.Channel;
+
+
+                int delMessageCount=0;
 
                 if (recentMessages.Any())
                 {
-                    await channel.DeleteMessagesAsync(recentMessages);
+                    delMessageCount += recentMessages.Count();
+                    await textChannel.DeleteMessagesAsync(recentMessages);
                 }
 
                 foreach (IMessage m in oldMessages)
                 {
+                    delMessageCount += 1;
                     await Context.Channel.DeleteMessageAsync(m);
                 }
                 await Context.Interaction.ModifyOriginalResponseAsync(msg =>
                 {
-                    msg.Content = $"lmao I just deleted {recentMessages.Count()} messages by {user.Username}";
+                    msg.Content = $"Deleted {(recentMessages.Count() + oldMessages.Count())} messages by {user}";
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                await Context.Interaction.RespondAsync($"Error happened: {ex.Message}");
+                _logger.LogError(ex, "An error occurred while deleting messages.");
+                await Context.Interaction.ModifyOriginalResponseAsync(msg =>
+                {
+                    msg.Content = $"Error occured: {ex.Message}";
+                });
             }
         }
     }
