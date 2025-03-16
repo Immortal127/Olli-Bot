@@ -47,14 +47,7 @@ namespace OlliBot
                     {
                         MessageCacheSize=5000,
                         AlwaysDownloadUsers=true,
-                        GatewayIntents = /*GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers |*/ GatewayIntents.All
-                        /*
-                        Token = config["DiscordBotToken"],
-                        TokenType = TokenType.Bot,
-                        AutoReconnect = true,
-                        Intents = DiscordIntents.All,
-                        LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
-                        */
+                        GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages | GatewayIntents.GuildMembers
                     });
 
                     discordClient.Log += LogAsync;
