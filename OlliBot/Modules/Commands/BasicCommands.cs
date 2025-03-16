@@ -37,9 +37,10 @@ namespace OlliBot.Modules
         }
         
         [SlashCommand("info", "Get server info for a user")]
-        public async Task ServerInfo([Summary("user", "Specified user")] SocketGuildUser? member = null)
+        [RequireContext(ContextType.Guild)]
+        public async Task ServerInfo([Summary("user", "Specified user")] IGuildUser? member = null)
         {
-            member ??= (SocketGuildUser)Context.User;
+            member ??= (IGuildUser)Context.User;
 
             string nickname = member.Nickname ?? member.DisplayName ?? member.Username;
 
