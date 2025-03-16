@@ -1,4 +1,5 @@
-﻿using Discord.Interactions;
+﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using System.Text;
 
@@ -8,10 +9,10 @@ namespace OlliBot.Modules
     {
         private readonly InteractionService _interactionService;
         private readonly ILogger<Bot> _logger;
-        private readonly DiscordSocketClient _client;
+        private readonly IDiscordClient _client;
         private readonly IServiceProvider _serviceProvider;
 
-        public InteractionHandler(InteractionService interactionService, ILogger<Bot> logger, DiscordSocketClient client, IServiceProvider serviceProvider)
+        public InteractionHandler(InteractionService interactionService, ILogger<Bot> logger, IDiscordClient client, IServiceProvider serviceProvider)
         {
             _interactionService = interactionService;
             _logger = logger;
@@ -28,7 +29,7 @@ namespace OlliBot.Modules
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"Error handling interaction: {ex.Message}");
+                _logger.LogCritical(ex, "Error handling interaction.");
             }
         }
         public Task OnSlashInvoked(SocketInteraction interaction)

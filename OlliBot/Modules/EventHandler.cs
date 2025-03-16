@@ -10,10 +10,10 @@ namespace OlliBot.Modules
     public class BotEventHandler
     {
         private readonly IConfiguration _configuration;
-        private readonly DiscordSocketClient _client;
+        private readonly IDiscordClient _client;
         private readonly ILogger<Bot> _logger;
 
-        public BotEventHandler(IConfiguration configuration, DiscordSocketClient client, ILogger<Bot> logger)
+        public BotEventHandler(IConfiguration configuration, IDiscordClient client, ILogger<Bot> logger)
         {
             _configuration = configuration;
             _client = client;
