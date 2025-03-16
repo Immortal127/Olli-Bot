@@ -5,15 +5,15 @@ namespace OlliBot.Services
 {
     public interface IMessageService
     {
-        Task AddMessageAsync(Message message);
-        Task DeleteMessageAsync(Message message);
-        Task UpdateMessageAsync(Message message);
-        Task<Message?> GetMessageByIdAsync(int Id, ulong guildId);
-        Task<Message?> GetMessageByTitleAsync(string Title, ulong guildId);
-        Task<List<Message>> ListMessagesAsync(ulong guildId, ulong? userId = null);
+        public Task AddMessageAsync(Message message);
+        public Task DeleteMessageAsync(Message message);
+        public Task UpdateMessageAsync(Message message);
+        public Task<Message?> GetMessageByIdAsync(int Id, ulong guildId);
+        public Task<Message?> GetMessageByTitleAsync(string Title, ulong guildId);
+        public Task<List<Message>> ListMessagesAsync(ulong guildId, ulong? userId = null);
     }
 
-    internal class MessageService : IMessageService
+    public class MessageService : IMessageService
     {
         public async Task AddMessageAsync(Message message)
         {

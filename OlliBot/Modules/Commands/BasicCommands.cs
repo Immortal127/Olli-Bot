@@ -9,19 +9,31 @@ namespace OlliBot.Modules
     public class BasicCommands : InteractionModuleBase<SocketInteractionContext>
     {
         [SlashCommand("avatar", "Get the avatar of the specified user")]
-        public async Task Avatar([Summary("user", "Specified user")] SocketGuildUser? user = null)
+        public async Task Avatar([Summary("user", "Specified user")] IUser? user = null)
         {
-            user ??= (SocketGuildUser)Context.User;
+            {
+                user ??= Context.User;
 
-            string nickname = user.Nickname ?? user.DisplayName ?? user.Username;
-            
-            var embed = new EmbedBuilder();
-            embed.WithTitle($"{nickname}'s avatar");
-            embed.WithColor(new Color(252, 177, 3));
-            embed.WithUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
-            embed.WithImageUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
+                //string displayName = user.Nickname ?? user.DisplayName ?? user.Username;
+                string displayName;
+                if (user is IGuildUser guildUser)
+                {
+                    displayName = guildUser.Nickname ?? guildUser.DisplayName ?? guildUser.Username;
+                }
+                else
+                {
+                    displayName = user.Username;
+                }
 
-            await RespondAsync(embed: embed.Build());
+
+                var embed = new EmbedBuilder();
+                embed.WithTitle($"{displayName}'s avatar");
+                embed.WithColor(new Color(252, 177, 3));
+                embed.WithUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
+                embed.WithImageUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
+
+                await RespondAsync(embed: embed.Build());
+            }
         }
         
         [SlashCommand("info", "Get server info for a user")]

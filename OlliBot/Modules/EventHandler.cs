@@ -2,6 +2,8 @@ using Discord.WebSocket;
 using Discord;
 using System.Text;
 using Discord.Interactions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System;
 
 namespace OlliBot.Modules
 {
@@ -18,8 +20,13 @@ namespace OlliBot.Modules
             _logger = logger;
         }
 
-        public async Task OnMessage(SocketMessage message)
+        public async Task OnMessage(IMessage message)
         {
+            if (message.Channel.GetChannelType().ToString() == "DM")
+            {
+                return;
+            }
+
             SocketGuildChannel channel = (SocketGuildChannel)message.Channel;
             SocketGuild guild = channel.Guild;
 
@@ -46,8 +53,16 @@ namespace OlliBot.Modules
             {
                 if (result.Error == InteractionCommandError.UnmetPrecondition)
                 {
-                    await ctx.Interaction.RespondAsync("Only admins can use this command", ephemeral: true);
-                    _logger.LogWarning($"{result.ErrorReason}");
+                    if (result.ErrorReason == "Invalid context for command; accepted contexts: Guild.")
+                    {
+                        await ctx.Interaction.RespondAsync("Command can only be used in a server.", ephemeral: true);
+                        _logger.LogWarning($"{result.ErrorReason}");
+                    }
+                    if (result.Error == InteractionCommandError.UnmetPrecondition)
+                    {
+                        await ctx.Interaction.RespondAsync(result.ErrorReason, ephemeral: true);
+                        _logger.LogWarning($"{result.ErrorReason}");
+                    }
                 }
             }
         }

@@ -9,12 +9,14 @@ namespace OlliBot.Modules
         private readonly InteractionService _interactionService;
         private readonly ILogger<Bot> _logger;
         private readonly DiscordSocketClient _client;
+        private readonly IServiceProvider _serviceProvider;
 
-        public InteractionHandler(InteractionService interactionService, ILogger<Bot> logger, DiscordSocketClient client)
+        public InteractionHandler(InteractionService interactionService, ILogger<Bot> logger, DiscordSocketClient client, IServiceProvider serviceProvider)
         {
             _interactionService = interactionService;
             _logger = logger;
             _client = client;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task HandleInteraction(SocketInteraction arg)
@@ -22,7 +24,7 @@ namespace OlliBot.Modules
             try
             {
                 var context = new SocketInteractionContext(_client, arg);
-                await _interactionService.ExecuteCommandAsync(context, null);
+                await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
             }
             catch (Exception ex)
             {

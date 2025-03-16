@@ -77,15 +77,15 @@ namespace OlliBot
                 return interaction;
             });
 
-
             builder.Services.AddTransient<BotInitialization>();
             builder.Services.AddSingleton<InteractionHandler>();
             builder.Services.AddSingleton<BotEventHandler>();
 
+
             builder.Services.AddTransient<IMessageService, MessageService>();
             builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-
             builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
+
 
             try
             {

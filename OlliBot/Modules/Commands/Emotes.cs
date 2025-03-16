@@ -2,18 +2,22 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Services;
+using OlliBot.Utilities;
 using System.Text;
 
 namespace OlliBot.Modules
 {
+    [RequireContext(ContextType.Guild)]
     public class Emotes : InteractionModuleBase<SocketInteractionContext>
     {
 
         private readonly IEmoteRankingService _emoteService;
+        private readonly ILogger<Emotes> _logger;
 
-        public Emotes(IEmoteRankingService emoteService)
+        public Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger)
         {
              _emoteService = emoteService;
+            _logger = logger;
         }
 
         [SlashCommand("emoterank", "Emote rankings")]
@@ -21,7 +25,6 @@ namespace OlliBot.Modules
         {
             try
             {
-                //only emotes that are available
                 IReadOnlyCollection<GuildEmote> emotes = Context.Guild.Emotes;
 
                 if (emotes.Count==0)
@@ -30,27 +33,20 @@ namespace OlliBot.Modules
                     return;
                 }
 
-                //only text channels
-                IEnumerable<SocketTextChannel> channelList = Context.Guild.Channels.OfType<SocketTextChannel>().Where(ch => ch.GetChannelType() == ChannelType.Text);
+                //Any channel that can receive messages
+                IEnumerable<ITextChannel> textChannels = Context.Guild.Channels.OfType<ITextChannel>();
 
                 await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
-                Dictionary<GuildEmote, int> emoteCounts = await _emoteService.CountEmoteUsage(emotes, channelList);
+                Dictionary<GuildEmote, int> emoteCounts = await _emoteService.CountEmoteUsage(emotes, textChannels);
 
-                StringBuilder sb = new StringBuilder();
+                string formattedRankings = Helpers.FormatEmoteRankings(emoteCounts);
 
-                sb.AppendLine("Emote Usage Ranking:");
-
-                foreach (KeyValuePair<GuildEmote, int> kv in emoteCounts.OrderByDescending(kv => kv.Value))
-                {
-                    sb.AppendLine($"{kv.Key}  -  {kv.Value}");
-                }
-
-                await Context.Channel.SendMessageAsync(sb.ToString());
+                await Context.Channel.SendMessageAsync(formattedRankings);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                _logger.LogError(e.Message);
             }
         }
     }

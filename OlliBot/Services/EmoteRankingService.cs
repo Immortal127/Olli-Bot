@@ -5,13 +5,13 @@ namespace OlliBot.Services
 {
     public interface IEmoteRankingService
     {
-        Task<Dictionary<GuildEmote, int>> CountEmoteUsage(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<SocketTextChannel> textChannels);
+        public Task<Dictionary<GuildEmote, int>> CountEmoteUsage(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels);
     }
 
 
     public class EmoteRankingService : IEmoteRankingService
     {
-        public async Task<Dictionary<GuildEmote, int>> CountEmoteUsage(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<SocketTextChannel> textChannels)
+        public async Task<Dictionary<GuildEmote, int>> CountEmoteUsage(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels)
         {
             var emoteCounts = new Dictionary<GuildEmote, int>();
 
