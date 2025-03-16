@@ -54,42 +54,45 @@ public class Bot : BackgroundService
 
             throw;
         }
+        await base.StartAsync(cancellationToken);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("OlliBot disconnecting...");
+
+        _client.Ready -= _botInitialization.InitializationTasks;
+        _client.InteractionCreated -= _interactionHandler.HandleInteraction;
+        _client.InteractionCreated -= _interactionHandler.OnSlashInvoked;
+        _client.MessageReceived -= _eventHandler.OnMessage;
+        _interaction.SlashCommandExecuted -= _eventHandler.OnSlashExecute;
+
         try
         {
-
-            _client.Ready -= _botInitialization.InitializationTasks;
-
-            _client.InteractionCreated -= _interactionHandler.HandleInteraction;
-            _client.InteractionCreated -= _interactionHandler.OnSlashInvoked;
-
-            _client.MessageReceived -= _eventHandler.OnMessage;
-
-            _interaction.SlashCommandExecuted -= _eventHandler.OnSlashExecute;
-
-            _logger.LogInformation("OlliBot disconnecting...");
             await _client.StopAsync();
             await _client.LogoutAsync();
             _logger.LogInformation("Ollibot disconnected...");
-
-            _logger.LogInformation("Disposing client...");
-            _interaction.Dispose();
-            _client.Dispose();
-            _logger.LogInformation("Bot client disposed...");
-
-            _logger.LogInformation("OlliBot shutting down...");
         }
         catch (Exception ex) 
         {
             _logger.LogCritical($"Error occured while shutting down: {ex.Message}");
             throw;
         }
+
+        _interaction.Dispose();
+        _client.Dispose();
+
+        await base.StopAsync(cancellationToken);
     }
 
-    //Only returns Task.CompletedTask to satisfy implementation requirement for BackgroundService
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        => Task.CompletedTask;
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Bot running...");
+
+        // Keep the service running until a cancellation is requested.
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await Task.Delay(1000, stoppingToken);
+        }
+    }
 }
