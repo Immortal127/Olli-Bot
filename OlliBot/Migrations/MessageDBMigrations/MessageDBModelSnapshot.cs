@@ -7,7 +7,7 @@ using OlliBot.Data;
 
 #nullable disable
 
-namespace OlliBot.Migrations
+namespace OlliBot.Migrations.MessageDBMigrations
 {
     [DbContext(typeof(MessageDB))]
     partial class MessageDBModelSnapshot : ModelSnapshot
