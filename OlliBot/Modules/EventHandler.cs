@@ -1,9 +1,7 @@
-using Discord.WebSocket;
 using Discord;
-using System.Text;
 using Discord.Interactions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using System;
+using Discord.WebSocket;
+using OlliBot.Utilities;
 
 namespace OlliBot.Modules
 {
@@ -30,7 +28,7 @@ namespace OlliBot.Modules
             SocketGuildChannel channel = (SocketGuildChannel)message.Channel;
             SocketGuild guild = channel.Guild;
 
-            if (message.Content.Length > 150 && message.Author.Id != _client.CurrentUser.Id)
+            if (message.ContentExeedsLength(150) && !message.IsAuthorOlliBot(_client))
             {
                 await message.Channel.SendMessageAsync("i ain't reading all that", messageReference: new MessageReference(message.Id));
                 await message.Channel.SendMessageAsync("i'm happy for u tho");
