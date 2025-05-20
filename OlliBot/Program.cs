@@ -78,6 +78,7 @@ namespace OlliBot
             builder.Services.AddTransient<IMessageService, MessageService>();
             builder.Services.AddTransient<IMessageFactory, MessageFactory>();
             builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
+            builder.Services.AddTransient<IDiscordClient, DiscordSocketClient>();
 
 
             try
