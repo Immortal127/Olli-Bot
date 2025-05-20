@@ -9,10 +9,10 @@ namespace OlliBot.Modules
     {
         private readonly InteractionService _interactionService;
         private readonly ILogger<Bot> _logger;
-        private readonly IDiscordClient _client;
+        private readonly DiscordSocketClient _client;
         private readonly IServiceProvider _serviceProvider;
 
-        public InteractionHandler(InteractionService interactionService, ILogger<Bot> logger, IDiscordClient client, IServiceProvider serviceProvider)
+        public InteractionHandler(InteractionService interactionService, ILogger<Bot> logger, DiscordSocketClient client, IServiceProvider serviceProvider)
         {
             _interactionService = interactionService;
             _logger = logger;

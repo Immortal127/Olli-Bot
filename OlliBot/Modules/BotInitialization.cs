@@ -1,7 +1,5 @@
+using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Microsoft.VisualBasic;
-using System.Linq;
 using System.Reflection;
 
 namespace OlliBot.Modules
@@ -12,8 +10,8 @@ namespace OlliBot.Modules
         private readonly ILogger<Bot> _logger;
         private readonly InteractionService _interaction;
         private readonly IServiceProvider _serviceProvider;
-        private readonly DiscordSocketClient _client;
-        public BotInitialization(IConfiguration configuration, ILogger<Bot> logger, InteractionService interaction, IServiceProvider serviceProvider, DiscordSocketClient client)
+        private readonly IDiscordClient _client;
+        public BotInitialization(IConfiguration configuration, ILogger<Bot> logger, InteractionService interaction, IServiceProvider serviceProvider, IDiscordClient client)
         {
             _configuration = configuration;
             _logger = logger;
