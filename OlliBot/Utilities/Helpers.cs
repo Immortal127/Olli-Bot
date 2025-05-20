@@ -1,4 +1,5 @@
 ﻿using Discord;
+using OlliBot.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -25,6 +26,14 @@ namespace OlliBot.Utilities
             }
 
             return sb.ToString();
+        }
+        public static bool ContentExeedsLength(this IMessage message, int length)
+        {
+            return message.Content.Length > length;
+        }
+        public static bool IsAuthorOlliBot(this IMessage message, IDiscordClient discordClient)
+        {
+            return message.Author.Id == discordClient.CurrentUser.Id;
         }
     }
 }
