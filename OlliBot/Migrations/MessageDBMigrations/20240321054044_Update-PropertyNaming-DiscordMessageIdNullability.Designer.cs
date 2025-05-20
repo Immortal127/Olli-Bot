@@ -9,7 +9,7 @@ using OlliBot.Data;
 
 #nullable disable
 
-namespace OlliBot.Migrations
+namespace OlliBot.Migrations.MessageDBMigrations
 {
     [DbContext(typeof(MessageDB))]
     [Migration("20240321054044_Update-PropertyNaming-DiscordMessageIdNullability")]

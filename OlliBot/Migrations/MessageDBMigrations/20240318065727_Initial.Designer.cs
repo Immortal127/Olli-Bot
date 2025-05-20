@@ -8,7 +8,7 @@ using OlliBot.Data;
 
 #nullable disable
 
-namespace OlliBot.Migrations
+namespace OlliBot.Migrations.MessageDBMigrations
 {
     [DbContext(typeof(MessageDB))]
     [Migration("20240318065727_Initial")]
