@@ -4,7 +4,7 @@ namespace OlliBot.Data
 {
     public class EmoteRankingDB : DbContext
     {
-        public DbSet<Emote> EmoteCounts { get; set; }
+        public DbSet<EmoteCount> EmoteCounts { get; set; }
         public DbSet<LastChannelMessage> LastChannelMessages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -16,7 +16,7 @@ namespace OlliBot.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Emote>()
+            modelBuilder.Entity<EmoteCount>()
                 .HasKey(e => new { e.GuildId, e.EmoteId });
 
             modelBuilder.Entity<LastChannelMessage>()
@@ -24,7 +24,7 @@ namespace OlliBot.Data
         }
     }
 
-    public class Emote
+    public class EmoteCount
     {
         public ulong GuildId { get; set; }
         public  ulong EmoteId {get; set; }
