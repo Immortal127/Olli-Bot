@@ -1,9 +1,7 @@
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using OlliBot.Services;
 using OlliBot.Utilities;
-using System.Text;
 
 namespace OlliBot.Modules
 {
@@ -21,10 +19,11 @@ namespace OlliBot.Modules
         }
 
         [SlashCommand("emoterank", "Emote rankings")]
-        public async Task RankEmotes()
+        public async Task SendEmoteRankings()
         {
             try
             {
+                //All custom emotes in a server
                 IReadOnlyCollection<GuildEmote> emotes = Context.Guild.Emotes;
 
                 if (emotes.Count==0)
@@ -33,12 +32,18 @@ namespace OlliBot.Modules
                     return;
                 }
 
-                //Any channel that can receive messages
+                //All channels in a guild that can receive messages
                 IEnumerable<ITextChannel> textChannels = Context.Guild.Channels.OfType<ITextChannel>();
 
                 await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
-                Dictionary<GuildEmote, int> emoteCounts = await _emoteService.CountEmoteUsage(emotes, textChannels);
+
+
+
+
+
+
+                Dictionary<GuildEmote, int> emoteCounts = await _emoteService.GetEmoteCounts(emotes, textChannels);
 
                 string formattedRankings = Helpers.FormatEmoteRankings(emoteCounts);
 
