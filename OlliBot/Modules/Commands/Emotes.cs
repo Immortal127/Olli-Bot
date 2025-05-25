@@ -19,12 +19,20 @@ namespace OlliBot.Modules
         }
 
         [SlashCommand("emoterank", "Emote rankings")]
-        public async Task SendEmoteRankings()
+        public async Task SendEmoteRankings(
+        [Choice("True", 1)]
+        [Choice("False", 0)]
+        [Summary("Reset")] int reset = 0)
         {
             try
             {
                 //All custom emotes in a server
                 IReadOnlyCollection<GuildEmote> emotes = Context.Guild.Emotes;
+
+                if (reset==1)
+                {
+                    await _emoteService.ResetDB(Context);
+                }
 
                 if (emotes.Count==0)
                 {
@@ -37,13 +45,10 @@ namespace OlliBot.Modules
 
                 await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
+                Dictionary<GuildEmote, int> emoteCounts = await _emoteService.GetEmoteCounts(emotes, textChannels, Context);
 
 
 
-
-
-
-                Dictionary<GuildEmote, int> emoteCounts = await _emoteService.GetEmoteCounts(emotes, textChannels);
 
                 string formattedRankings = Helpers.FormatEmoteRankings(emoteCounts);
 
