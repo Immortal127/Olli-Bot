@@ -100,6 +100,9 @@ namespace OlliBot.Services
                 {
                     List<IMessage> messages = (await (lastMessage == null ? ch.GetMessagesAsync(0, Direction.After, 100).FlattenAsync() : ch.GetMessagesAsync(lastMessage, Direction.After, 100).FlattenAsync())).ToList();
 
+                    //Discord API returns messages in reverse chronological order even if using Direction.After so this reorders the list so the messages in the list are oldest to newest
+                    messages.Reverse();
+
                     if (messages.Count == 0)
                     {
                         //Update last message in db
