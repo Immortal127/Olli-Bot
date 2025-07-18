@@ -2,6 +2,7 @@
 using NSubstitute;
 using OlliBot.Data;
 using OlliBot.Modules;
+using OlliBot.Services;
 
 namespace OlliBot.Tests
 {
@@ -90,12 +91,13 @@ namespace OlliBot.Tests
         {
             // Arrange
             Message inputMessage = Substitute.For<Message>();
+            IMessageFactory messageFactory = new MessageFactory();
 
             inputMessage.Content = entryContent;
             inputMessage.AttachmentUrls = attachmentList;
 
             // Act
-            string result = DatabaseLogic.GetMessageType(inputMessage);
+            string result = messageFactory.EvaluateMessageType(inputMessage);
 
             //Assert
             Assert.Equal(expectedType, result);
@@ -105,9 +107,11 @@ namespace OlliBot.Tests
         [MemberData(nameof(GetMockMessageData))]
         public void CreateMessageFromInput_FromIMessage_ShouldReturnExpectedResult(IMessage inputMessage, string? Title, string? messageType, Message expectedMessage)
         {            
+            // Arrange
+            IMessageFactory messageFactory = new MessageFactory();
 
             // Act
-            Message result = DatabaseLogic.CreateMessageFromInput(inputMessage, Title, _mockContext, messageType);
+            Message result = messageFactory.CreateMessageFromInput(inputMessage, Title, _mockContext, messageType);
 
             // Assert
 
@@ -137,10 +141,11 @@ namespace OlliBot.Tests
             ulong expectedMessageOriginId = 775196080101619750UL;
             ulong expectedGuildId = 989440353736214299UL;
             DateTime expectedDateTime = DateTime.UtcNow;
+            IMessageFactory messageFactory = new MessageFactory();
 
 
             // Act
-            Message result = DatabaseLogic.CreateMessageFromInput(entryContent, Title, _mockContext, messageType, _mockUser);
+            Message result = messageFactory.CreateMessageFromInput(entryContent, Title, _mockContext, messageType, _mockUser);
 
             // Assert
             Assert.Equal(expectedGuildId, result.GuildId);
@@ -170,10 +175,11 @@ namespace OlliBot.Tests
             ulong expectedMessageOriginId = 775196080101619750UL;
             ulong expectedGuildId = 989440353736214299UL;
             DateTime expectedDateTime = DateTime.UtcNow;
+            IMessageFactory messageFactory = new MessageFactory();
 
 
             // Act
-            Message result = DatabaseLogic.CreateMessageFromInput(entryContent, Title, _mockContext, messageType, _mockUser);
+            Message result = messageFactory.CreateMessageFromInput(entryContent, Title, _mockContext, messageType, _mockUser);
 
             // Assert
             Assert.Equal(expectedGuildId, result.GuildId);
