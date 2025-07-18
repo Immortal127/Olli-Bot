@@ -30,7 +30,7 @@ namespace OlliBot.Modules
                     return;
                 }
 
-                IEnumerable<IMessage> messages = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
+                IEnumerable<IMessage> messages = (await Context.Channel.GetMessagesAsync(100).FlattenAsync()).Where(m => (m.Flags & MessageFlags.Ephemeral) == 0); //exclude Ephemeral messages
                 IEnumerable<IMessage> filteredMessages = from m in messages
                                        where m.Author.Id == user.Id
                                        select m;
