@@ -6,13 +6,13 @@ using OlliBot.Services;
 
 namespace OlliBot.Tests
 {
-    public class DatabaseLogicTests
+    public class MessageFactoryTests
     {
 
         private readonly IUser _mockUser;
         private readonly IInteractionContext _mockContext;
 
-        public DatabaseLogicTests()
+        public MessageFactoryTests()
         {
             _mockUser = Substitute.For<IUser>();
             _mockUser.Id.Returns(775196080101619750UL);
