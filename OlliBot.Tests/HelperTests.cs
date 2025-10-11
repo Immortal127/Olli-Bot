@@ -1,8 +1,4 @@
-using Discord;
-using NSubstitute;
-using OlliBot.Modules;
 using OlliBot.Utilities;
-using Xunit;
 
 namespace OlliBot.Tests
 {

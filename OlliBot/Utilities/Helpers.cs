@@ -1,5 +1,4 @@
 ﻿using Discord;
-using OlliBot.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 

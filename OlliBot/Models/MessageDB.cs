@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 
 namespace OlliBot.Data
 {

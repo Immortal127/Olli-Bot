@@ -1,9 +1,6 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using OlliBot.Data;
-using OlliBot.Modules;
-using System.Linq;
 
 namespace OlliBot.Services
 {

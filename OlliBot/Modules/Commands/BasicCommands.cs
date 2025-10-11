@@ -1,8 +1,5 @@
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Serilog;
-using System.Net.NetworkInformation;
 
 namespace OlliBot.Modules
 {
