@@ -2,41 +2,40 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
-namespace OlliBot.Data
+namespace OlliBot.Data;
+
+public class MessageDB : DbContext
 {
-    public class MessageDB : DbContext
+    public DbSet<Message> Messages { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        public DbSet<Message> Messages { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=ServersData.db");
-            optionsBuilder.EnableSensitiveDataLogging(true);
-        }
+        optionsBuilder.UseSqlite("Data Source=ServersData.db");
+        optionsBuilder.EnableSensitiveDataLogging(true);
     }
+}
 
-    public class Message
+public class Message
+{
+    public int Id { get; set; }
+    public ulong? DiscordMessageId { get; set; }
+    public ulong GuildId { get; set; }
+    public string? Title { get; set; }
+
+    public string? Content { get; set; }
+    public string? Attachments { get; set; }
+    [NotMapped]
+    public List<string> AttachmentUrls
     {
-        public int Id { get; set; }
-        public ulong? DiscordMessageId { get; set; }
-        public ulong GuildId { get; set; }
-        public string? Title {get; set; }
-
-        public string? Content { get; set; }
-        public string? Attachments { get; set; }
-        [NotMapped]
-        public List<string> AttachmentUrls
-        {
-            get => Attachments == null ? new List<string>() : JsonSerializer.Deserialize<List<string>>(Attachments) ?? new List<string>();
-            set => Attachments = JsonSerializer.Serialize(value);
-        }
-        public required string Author { get; set; }
-
-        public ulong AuthorId { get; set; }
-
-        public ulong MessageOriginId { get; set; }
-
-        public string MessageType { get; set; } = "Other";
-        public required DateTime DateTimeAdded {get; set; }
+        get => Attachments == null ? new List<string>() : JsonSerializer.Deserialize<List<string>>(Attachments) ?? new List<string>();
+        set => Attachments = JsonSerializer.Serialize(value);
     }
+    public required string Author { get; set; }
+
+    public ulong AuthorId { get; set; }
+
+    public ulong MessageOriginId { get; set; }
+
+    public string MessageType { get; set; } = "Other";
+    public required DateTime DateTimeAdded { get; set; }
 }

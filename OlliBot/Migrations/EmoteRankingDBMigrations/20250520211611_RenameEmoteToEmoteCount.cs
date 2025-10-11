@@ -2,21 +2,20 @@
 
 #nullable disable
 
-namespace OlliBot.Migrations.EmoteRankingDBMigrations
+namespace OlliBot.Migrations.EmoteRankingDBMigrations;
+
+/// <inheritdoc />
+public partial class RenameEmoteToEmoteCount : Migration
 {
     /// <inheritdoc />
-    public partial class RenameEmoteToEmoteCount : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
 
-        }
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        }
     }
 }

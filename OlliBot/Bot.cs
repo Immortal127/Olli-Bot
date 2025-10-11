@@ -16,7 +16,7 @@ public class Bot : BackgroundService
     private readonly InteractionHandler _interactionHandler;
     private readonly BotEventHandler _eventHandler;
 
-    public Bot(ILogger<Bot> logger, DiscordSocketClient client, InteractionService interaction, IConfiguration configuration , BotInitialization botInitialization, InteractionHandler interactionHandler, BotEventHandler eventHandler)
+    public Bot(ILogger<Bot> logger, DiscordSocketClient client, InteractionService interaction, IConfiguration configuration, BotInitialization botInitialization, InteractionHandler interactionHandler, BotEventHandler eventHandler)
     {
         _logger = logger;
         _client = client;
@@ -73,7 +73,7 @@ public class Bot : BackgroundService
             await _client.LogoutAsync();
             _logger.LogInformation("OlliBot disconnected...");
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             _logger.LogCritical($"Error occured while shutting down: {ex.Message}");
             throw;

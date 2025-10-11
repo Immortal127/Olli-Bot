@@ -1,40 +1,39 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace OlliBot.Data
+namespace OlliBot.Data;
+
+public class EmoteRankingDB : DbContext
 {
-    public class EmoteRankingDB : DbContext
+    public DbSet<EmoteCount> EmoteCounts { get; set; }
+    public DbSet<LastChannelMessage> LastChannelMessages { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        public DbSet<EmoteCount> EmoteCounts { get; set; }
-        public DbSet<LastChannelMessage> LastChannelMessages { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=ServersData.db");
-            optionsBuilder.EnableSensitiveDataLogging(true);
-        }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<EmoteCount>()
-                .HasKey(e => new { e.GuildId, e.EmoteId });
-
-            modelBuilder.Entity<LastChannelMessage>()
-                .HasKey(m => new { m.GuildId, m.ChannelId });
-        }
+        optionsBuilder.UseSqlite("Data Source=ServersData.db");
+        optionsBuilder.EnableSensitiveDataLogging(true);
     }
-
-    public class EmoteCount
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        public ulong GuildId { get; set; }
-        public  ulong EmoteId {get; set; }
-        public int Count { get; set; } = 0;
-        public DateTime DateTimeUpdated { get; set; }
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<EmoteCount>()
+            .HasKey(e => new { e.GuildId, e.EmoteId });
+
+        modelBuilder.Entity<LastChannelMessage>()
+            .HasKey(m => new { m.GuildId, m.ChannelId });
     }
-    public class LastChannelMessage
-    {
-        public ulong GuildId { get; set; }
-        public ulong ChannelId { get; set; }
-        public ulong MessageId { get; set; }
-    }
+}
+
+public class EmoteCount
+{
+    public ulong GuildId { get; set; }
+    public ulong EmoteId { get; set; }
+    public int Count { get; set; } = 0;
+    public DateTime DateTimeUpdated { get; set; }
+}
+public class LastChannelMessage
+{
+    public ulong GuildId { get; set; }
+    public ulong ChannelId { get; set; }
+    public ulong MessageId { get; set; }
 }
