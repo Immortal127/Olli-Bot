@@ -4,34 +4,15 @@ using OlliBot.Data;
 
 namespace OlliBot.Services;
 
-
 public interface IEmoteRankingService
 {
-    public Task<Dictionary<GuildEmote, int>> GetEmoteCounts(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels, IInteractionContext context);
-    public Task ResetDB(IInteractionContext context);
-    /*public Task<Dictionary<GuildEmote, int>> GetLastMessage(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels, IInteractionContext context);
-    
-    public Task AddLastMessageToDB(ITextChannel channel, IMessage message);
-
-    public Task AddEmoteCountToDB(GuildEmote guildEmote, int count);
-
-    public Task DeleteOldLastMessage(ITextChannel channel, IMessage message);
-
-    public Task DeleteOldEmoteCount(GuildEmote guildEmote, int count);
-
-    public Task UpdateLastMessage(ITextChannel channel, IMessage message);
-
-    public Task UpdateEmoteCount(GuildEmote guildEmote, int count);
-    public bool CheckForOldEmotes#*/
+    Task DeleteStaleEmoteCounts(HashSet<ulong> activeEmoteIds, IInteractionContext context);
+    Task<Dictionary<GuildEmote, int>> GetEmoteCounts(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels, IInteractionContext context);
+    Task<Dictionary<GuildEmote, int>> GetNewEmoteCounts(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels, IEnumerable<LastChannelMessage> lastMessages);
+    Task ResetDB(IInteractionContext context);
+    Task UpdateOrAddEmoteCounts(Dictionary<GuildEmote, int> emoteCounts, IInteractionContext context);
+    Task UpdateOrAddLastMessage(ITextChannel channel, IMessage message);
 }
-
-
-/*
- GetEmoteCounts is entry point for the discord command
-get all emotes and textable channels in server
-get current emote counts from database
-get last message checked for every channel in server from database
-*/
 
 public class EmoteRankingService : IEmoteRankingService
 {
