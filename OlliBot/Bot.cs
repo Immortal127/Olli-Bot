@@ -84,7 +84,6 @@ public class Bot : BackgroundService
 
         await base.StopAsync(cancellationToken);
     }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("OlliBot running...");

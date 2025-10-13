@@ -55,4 +55,14 @@ public class BasicCommands : InteractionModuleBase<SocketInteractionContext>
 
         await RespondAsync(embed: embed.Build());
     }
+
+    [SlashCommand("coinflip", "Flip a coin")]
+    public async Task CoinFlip()
+    {
+        int rng = new Random().Next(1, 101);
+
+        string result = rng > 50 ? "Heads!" : "Tails!";
+
+        await RespondAsync(result);
+    }
 }

@@ -31,9 +31,8 @@ public interface IEmoteRankingService
 get all emotes and textable channels in server
 get current emote counts from database
 get last message checked for every channel in server from database
-
-
 */
+
 public class EmoteRankingService : IEmoteRankingService
 {
     //Entry point for discord command
@@ -73,8 +72,6 @@ public class EmoteRankingService : IEmoteRankingService
 
         //update counts in db
         await UpdateOrAddEmoteCounts(combinedCounts, context);
-
-
 
         return combinedCounts;
     }

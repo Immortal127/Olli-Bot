@@ -30,12 +30,10 @@ public class BotInitialization
         await _interaction.RegisterCommandsGloballyAsync();
 
 
-        foreach (SlashCommandInfo item in _interaction.SlashCommands.ToList())
+        foreach (SlashCommandInfo slashCommand in _interaction.SlashCommands.ToList())
         {
-            _logger.LogInformation($"{item}");
+            _logger.LogInformation($"Registered {slashCommand}");
         }
-
-        //_logger.LogInformation($"{_interaction.SlashCommands.All()}");
 
         await Task.CompletedTask;
     }

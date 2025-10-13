@@ -1,6 +1,5 @@
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using OlliBot.Utilities;
 
 namespace OlliBot.Modules;
@@ -20,13 +19,13 @@ public class BotEventHandler
 
     public async Task OnMessage(IMessage message)
     {
-        if (message.Channel.GetChannelType().ToString() == "DM")
+        if (message.Channel.GetChannelType() == ChannelType.DM)
         {
             return;
         }
 
-        var channel = (SocketGuildChannel)message.Channel;
-        SocketGuild guild = channel.Guild;
+        var channel = (ITextChannel)message.Channel;
+        IGuild guild = channel.Guild;
 
         if (message.ContentExeedsLength(150) && !message.IsAuthorOlliBot(_client))
         {
