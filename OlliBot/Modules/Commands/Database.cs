@@ -8,6 +8,7 @@ using OlliBot.Services;
 namespace OlliBot.Modules;
 
 [RequireContext(ContextType.Guild)]
+[Group("db", "Commands to interact with the message database")]
 public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
 {
     private readonly IMessageService _messageService;
@@ -22,7 +23,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     }
 
     //Command to add entries to database
-    [SlashCommand("dbadd", "Add a discord message to the database")]
+    [SlashCommand("add", "Add a discord message to the database")]
     public async Task AddMessage([Summary("message", "Enter a message ID or quote content")] string messageEntry,
     [Summary("title", "Title (Optional)")] string? Title = null,
     [Summary("origin", "Quote origin (Optional if using Message ID for input)")] SocketGuildUser? User = null,
@@ -66,7 +67,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
 
 
     //Command to call an entry from the database based on ID
-    [SlashCommand("db", "Call entry by ID from the database")]
+    [SlashCommand("call", "Call entry by ID from the database")]
     public async Task CallMessage([Summary("Query", "Message ID or Title")] string query)
     {
         Message? queriedMessage;
@@ -110,7 +111,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
             await Context.Interaction.RespondAsync(responseContent);
         }
     }
-    [SlashCommand("dbdelete", "Delete an entry from the database")]
+    [SlashCommand("delete", "Delete an entry from the database")]
     public async Task DeleteEntry(
     [Summary("Id", "Database ID")] int DbID)
     {
@@ -134,7 +135,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
         await Context.Interaction.RespondAsync("Deleted entry", ephemeral: true);
 
     }
-    [SlashCommand("dbupdate", "Update entry in database")]
+    [SlashCommand("update", "Update entry in database")]
     public async Task UpdateEntry(
     [Summary("Id", "Message ID")] int DbID,
     [Summary("Title", "Updated title")] string? Title = null,
@@ -163,8 +164,9 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
         await _messageService.UpdateMessageAsync(queriedMessage);
         await Context.Interaction.RespondAsync("Updated entry", ephemeral: true);
     }
-    [SlashCommand("dblist", "List entries in database")]
-    public async Task ListEntries([Summary("User", "entries from user")] SocketUser? user = null)
+
+    [SlashCommand("list", "List entries in database")]
+    public async Task ListEntries([Summary("User", "list entries from a specific user")] SocketUser? user = null)
     {
         List<Message> messageList = await _messageService.ListMessagesAsync(Context.Guild.Id, user?.Id);
 
