@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.001.0
+VisualStudioVersion = 17.5.1.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OlliBot", "Ollibot\OlliBot.csproj", "{6FA80487-910C-4A9A-AB0A-471E7CD9C71F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Tests", "OlliBot.Tests\OlliBot.Tests.csproj", "{144A6C6B-98AF-4C6E-9DE8-876DD9E4839C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Domain", "OlliBot.Domain\OlliBot.Domain.csproj", "{94E95004-C01E-4391-9939-4B26493B63DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Application", "OlliBot.Application\OlliBot.Application.csproj", "{501ABFFD-D216-4648-9C4C-334B624EB1FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Infrastructure", "OlliBot.Infrastructure\OlliBot.Infrastructure.csproj", "{C85CC566-E56D-4B68-A630-0AFA9B0A0EE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Bot", "OlliBot.Bot\OlliBot.Bot.csproj", "{4CF92901-775D-55CD-A798-C4CDAAEA54DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +19,26 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6FA80487-910C-4A9A-AB0A-471E7CD9C71F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6FA80487-910C-4A9A-AB0A-471E7CD9C71F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6FA80487-910C-4A9A-AB0A-471E7CD9C71F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6FA80487-910C-4A9A-AB0A-471E7CD9C71F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{144A6C6B-98AF-4C6E-9DE8-876DD9E4839C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{144A6C6B-98AF-4C6E-9DE8-876DD9E4839C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{144A6C6B-98AF-4C6E-9DE8-876DD9E4839C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{144A6C6B-98AF-4C6E-9DE8-876DD9E4839C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94E95004-C01E-4391-9939-4B26493B63DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94E95004-C01E-4391-9939-4B26493B63DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94E95004-C01E-4391-9939-4B26493B63DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94E95004-C01E-4391-9939-4B26493B63DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{501ABFFD-D216-4648-9C4C-334B624EB1FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{501ABFFD-D216-4648-9C4C-334B624EB1FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{501ABFFD-D216-4648-9C4C-334B624EB1FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{501ABFFD-D216-4648-9C4C-334B624EB1FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C85CC566-E56D-4B68-A630-0AFA9B0A0EE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C85CC566-E56D-4B68-A630-0AFA9B0A0EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C85CC566-E56D-4B68-A630-0AFA9B0A0EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C85CC566-E56D-4B68-A630-0AFA9B0A0EE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CF92901-775D-55CD-A798-C4CDAAEA54DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CF92901-775D-55CD-A798-C4CDAAEA54DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CF92901-775D-55CD-A798-C4CDAAEA54DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CF92901-775D-55CD-A798-C4CDAAEA54DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
