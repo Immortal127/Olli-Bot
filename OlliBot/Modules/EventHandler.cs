@@ -1,5 +1,6 @@
 using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using OlliBot.Utilities;
 
 namespace OlliBot.Modules;
@@ -27,17 +28,21 @@ public class BotEventHandler
         var channel = (ITextChannel)message.Channel;
         IGuild guild = channel.Guild;
 
+        if (!message.IsAuthorOlliBot(_client) && message.Content.Contains("good bot", StringComparison.OrdinalIgnoreCase) && (await channel.GetMessagesAsync(message.Id, Direction.Before, 10).FlattenAsync()).Any(m => m.IsAuthorOlliBot(_client)))
+        {
+            await channel.SendMessageAsync(":3", messageReference: new MessageReference(message.Id));
+        }
         if (message.ContentExeedsLength(150) && !message.IsAuthorOlliBot(_client))
         {
-            await message.Channel.SendMessageAsync("i ain't reading all that", messageReference: new MessageReference(message.Id));
-            await message.Channel.SendMessageAsync("i'm happy for u tho");
-            await message.Channel.SendMessageAsync("or sorry that happened");
+            await channel.SendMessageAsync("i ain't reading all that", messageReference: new MessageReference(message.Id));
+            await channel.SendMessageAsync("i'm happy for u tho");
+            await channel.SendMessageAsync("or sorry that happened");
             return;
         }
 
         if (message.Author.Id == 164740251934392321 && guild.Id.ToString() == _configuration["MainServer"] && new Random().Next(1, 101) <= 15)
         {
-            await message.Channel.SendMessageAsync("James Here", messageReference: new MessageReference(message.Id));
+            await channel.SendMessageAsync("James Here", messageReference: new MessageReference(message.Id));
         }
     }
     public async Task OnSlashExecute(SlashCommandInfo slashInfo, IInteractionContext ctx, IResult result)
