@@ -13,3 +13,11 @@ public class OlliBotDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         => modelBuilder.ApplyConfigurationsFromAssembly(typeof(OlliBotDbContext).Assembly);
 }
+
+/*
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlite("Data Source=ServersData.db");
+        optionsBuilder.EnableSensitiveDataLogging(true);
+    }
+*/
