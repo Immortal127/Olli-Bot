@@ -12,10 +12,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OlliBot.Application\OlliBot.Application.csproj" />
     <ProjectReference Include="..\OlliBot.Domain\OlliBot.Domain.csproj" />
   </ItemGroup>
 

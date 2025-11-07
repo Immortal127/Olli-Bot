@@ -2,7 +2,6 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Data;
-using OlliBot.Services;
 
 
 namespace OlliBot.Modules;

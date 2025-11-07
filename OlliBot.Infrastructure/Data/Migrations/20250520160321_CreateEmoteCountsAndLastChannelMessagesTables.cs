@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace OlliBot.Migrations.EmoteRankingDBMigrations;
+namespace OlliBot.Infrastructure.Data.Migrations;
 
 /// <inheritdoc />
 public partial class CreateEmoteCountsAndLastChannelMessagesTables : Migration

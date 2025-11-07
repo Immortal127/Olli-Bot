@@ -1,6 +1,5 @@
 using Discord;
 using Discord.Interactions;
-using OlliBot.Services;
 using OlliBot.Utilities;
 
 namespace OlliBot.Modules;

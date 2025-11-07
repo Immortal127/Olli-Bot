@@ -1,6 +1,9 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using OlliBot.Application.Interfaces;
+using OlliBot.Infrastructure;
+using OlliBot.Infrastructure.Services;
 using OlliBot.Modules;
 using OlliBot.Services;
 using Serilog;
@@ -30,6 +33,8 @@ internal class Program
         builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
             .ReadFrom.Configuration(builder.Configuration)
             .ReadFrom.Services(services));
+
+        builder.Services.AddInfrastructure(builder.Configuration);
 
         builder.Services.AddHostedService<Bot>();
 

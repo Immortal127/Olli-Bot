@@ -1,16 +1,8 @@
-﻿using Discord;
-using OlliBot.Data;
-using OlliBot.Utilities;
+﻿using OlliBot.Application.Interfaces;
+using OlliBot.Domain.Entities;
 using System.Text.RegularExpressions;
 
 namespace OlliBot.Services;
-
-public interface IMessageFactory
-{
-    public Message CreateMessageFromInput(IMessage message, string? Title, IInteractionContext ctx, string? messageType);
-    public Message CreateMessageFromInput(string entryContent, string? Title, IInteractionContext ctx, string? messageType, IUser User);
-    public string EvaluateMessageType(Message message);
-}
 
 public class MessageFactory : IMessageFactory
 {

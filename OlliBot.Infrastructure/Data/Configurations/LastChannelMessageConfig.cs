@@ -9,8 +9,8 @@ public sealed class LastChannelMessageConfig : IEntityTypeConfiguration<LastChan
     public void Configure(EntityTypeBuilder<LastChannelMessage> b)
     {
         b.HasKey(x => new { x.GuildId, x.ChannelId });
-        b.Property(x => x.GuildId).HasConversion(Converters.ULongToLong);
-        b.Property(x => x.ChannelId).HasConversion(Converters.ULongToLong);
-        b.Property(x => x.MessageId).HasConversion(Converters.ULongToLong);
+        b.Property(x => x.GuildId);//.HasConversion(Converters.ULongToLong);
+        b.Property(x => x.ChannelId);//.HasConversion(Converters.ULongToLong);
+        b.Property(x => x.MessageId);//.HasConversion(Converters.ULongToLong);
     }
 }
