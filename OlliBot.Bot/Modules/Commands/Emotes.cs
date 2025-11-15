@@ -1,8 +1,9 @@
 using Discord;
 using Discord.Interactions;
-using OlliBot.Utilities;
+using OlliBot.Bot.Interfaces;
+using OlliBot.Bot.Utilities;
 
-namespace OlliBot.Modules;
+namespace OlliBot.Bot.Modules;
 
 [RequireContext(ContextType.Guild)]
 public class Emotes : InteractionModuleBase<SocketInteractionContext>

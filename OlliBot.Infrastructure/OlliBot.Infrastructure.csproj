@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\EmoteRankingService.cs" />
+    <Compile Remove="Services\MessageFactory.cs" />
+    <Compile Remove="Services\MessageService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Services\EmoteRankingService.cs" />
+    <None Include="Services\MessageFactory.cs" />
+    <None Include="Services\MessageService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>

@@ -1,4 +1,5 @@
 ﻿namespace OlliBot.Domain.Entities;
+
 public class EmoteCount
 {
     public ulong GuildId { get; set; }

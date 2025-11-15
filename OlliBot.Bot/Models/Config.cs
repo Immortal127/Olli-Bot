@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 
 
-namespace OlliBot.Data;
+namespace OlliBot.Bot.Data;
 
 public class Config
 {

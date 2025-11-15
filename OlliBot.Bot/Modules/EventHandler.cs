@@ -1,8 +1,8 @@
 using Discord;
 using Discord.Interactions;
-using OlliBot.Utilities;
+using OlliBot.Bot.Utilities;
 
-namespace OlliBot.Modules;
+namespace OlliBot.Bot.Modules;
 
 public class BotEventHandler
 {

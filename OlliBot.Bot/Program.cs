@@ -1,15 +1,14 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using OlliBot.Application.Interfaces;
+using OlliBot.Bot.Interfaces;
+using OlliBot.Bot.Modules;
+using OlliBot.Bot.Services;
 using OlliBot.Infrastructure;
-using OlliBot.Infrastructure.Services;
-using OlliBot.Modules;
-using OlliBot.Services;
 using Serilog;
 using Serilog.Events;
 
-namespace OlliBot;
+namespace OlliBot.Bot;
 
 internal class Program
 {
@@ -22,11 +21,11 @@ internal class Program
 #endif
             .CreateBootstrapLogger();
 
-        Log.Information("Creating OlliBot...");
+        Log.Information("Creating OlliBot.Bot...");
 
         HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
-        Log.Information("Configuring OlliBot...");
+        Log.Information("Configuring OlliBot.Bot...");
 
         // Is there a better way of configuring Serilog to work with CreateApplicationBuilder???
 
@@ -35,6 +34,9 @@ internal class Program
             .ReadFrom.Services(services));
 
         builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddTransient<IMessageFactory, MessageFactory>();
+        builder.Services.AddScoped<IMessageService, MessageService>();
+        builder.Services.AddScoped<IEmoteRankingService, EmoteRankingService>();
 
         builder.Services.AddHostedService<Bot>();
 
@@ -76,9 +78,9 @@ internal class Program
         builder.Services.AddSingleton<InteractionHandler>();
         builder.Services.AddSingleton<BotEventHandler>();
 
-        builder.Services.AddTransient<IMessageService, MessageService>();
-        builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-        builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
+        //builder.Services.AddTransient<IMessageService, MessageService>();
+        //builder.Services.AddTransient<IMessageFactory, MessageFactory>();
+        //builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
         builder.Services.AddSingleton<IDiscordClient>(sp => sp.GetRequiredService<DiscordSocketClient>());
 
         try
@@ -86,7 +88,7 @@ internal class Program
             IHost host = builder.Build();
 
             Log.Information("///////////////////////////////////////");
-            Log.Information($"///// OlliBot {DateTime.Now} /////");
+            Log.Information($"///// OlliBot.Bot {DateTime.Now} /////");
             Log.Information("///////////////////////////////////////");
 
             host.Run();

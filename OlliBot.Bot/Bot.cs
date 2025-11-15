@@ -1,9 +1,9 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using OlliBot.Modules;
+using OlliBot.Bot.Modules;
 
-namespace OlliBot;
+namespace OlliBot.Bot;
 
 public class Bot : BackgroundService
 {
@@ -30,7 +30,7 @@ public class Bot : BackgroundService
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("OlliBot starting...");
+        _logger.LogInformation("OlliBot.Bot starting...");
         _client.Ready += _botInitialization.InitializationTasks;
 
         _client.InteractionCreated += _interactionHandler.HandleInteraction;
@@ -45,6 +45,7 @@ public class Bot : BackgroundService
         try
         {
             await _client.LoginAsync(TokenType.Bot, _configuration["DiscordBotToken"]);
+            //await _client.LoginAsync(TokenType.Bot, _configuration["DiscordBotToken"]);
             await _client.StartAsync();
         }
         catch (Exception ex)
@@ -59,7 +60,7 @@ public class Bot : BackgroundService
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("OlliBot disconnecting...");
+        _logger.LogInformation("OlliBot.Bot disconnecting...");
 
         _client.Ready -= _botInitialization.InitializationTasks;
         _client.InteractionCreated -= _interactionHandler.HandleInteraction;
@@ -71,7 +72,7 @@ public class Bot : BackgroundService
         {
             await _client.StopAsync();
             await _client.LogoutAsync();
-            _logger.LogInformation("OlliBot disconnected...");
+            _logger.LogInformation("OlliBot.Bot disconnected...");
         }
         catch (Exception ex)
         {
@@ -86,12 +87,23 @@ public class Bot : BackgroundService
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("OlliBot running...");
+        _logger.LogInformation("OlliBot.Bot running...");
 
         // Keep the service running until a cancellation is requested.
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            await Task.Delay(1000, stoppingToken);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await Task.Delay(Timeout.Infinite, stoppingToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected during shutdown (Ctrl+C) – ignore
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred during shutdown");
         }
     }
 }

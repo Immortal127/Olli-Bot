@@ -3,7 +3,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
 
-namespace OlliBot.Modules
+namespace OlliBot.Bot.Modules
 {
     internal class ConfigCommands : ApplicationCommandModule
     {

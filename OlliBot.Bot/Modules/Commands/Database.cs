@@ -1,10 +1,11 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using OlliBot.Data;
+using OlliBot.Bot.Interfaces;
+using OlliBot.Domain.Entities;
 
 
-namespace OlliBot.Modules;
+namespace OlliBot.Bot.Modules;
 
 [RequireContext(ContextType.Guild)]
 [Group("db", "Commands to interact with the message database")]

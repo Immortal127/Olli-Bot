@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OlliBot.Application.Interfaces;
+﻿using Discord;
+using Microsoft.EntityFrameworkCore;
+using OlliBot.Bot.Interfaces;
+using OlliBot.Domain.Entities;
 using OlliBot.Infrastructure.Data;
 
 namespace OlliBot.Bot.Services;
@@ -10,9 +12,6 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
     public async Task<Dictionary<GuildEmote, int>> GetEmoteCounts(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels, IInteractionContext context)
     {
         DateTime dateTimeExecuted = DateTime.UtcNow;
-
-
-        using var db = new EmoteRankingDB();
 
         var recordedEmoteCounts = db.EmoteCounts.Where(x => x.GuildId == context.Guild.Id).ToDictionary(x => x.EmoteId, x => x.Count);
         IEnumerable<LastChannelMessage> lastChannelMessages = await db.LastChannelMessages.Where(x => x.GuildId == context.Guild.Id).ToListAsync();
@@ -100,8 +99,6 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
     }
     public async Task UpdateOrAddLastMessage(ITextChannel channel, IMessage message)
     {
-        using var db = new EmoteRankingDB();
-
         LastChannelMessage? existingEntry = await db.LastChannelMessages.FirstOrDefaultAsync(m => m.GuildId == channel.GuildId && m.ChannelId == channel.Id);
 
         if (existingEntry != null)
@@ -125,8 +122,6 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
     }
     public async Task UpdateOrAddEmoteCounts(Dictionary<GuildEmote, int> emoteCounts, IInteractionContext context)
     {
-        using var db = new EmoteRankingDB();
-
         DateTime dateTimeExecuted = DateTime.UtcNow;
 
         foreach ((GuildEmote emote, int count) in emoteCounts)
@@ -156,8 +151,6 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
     }
     public async Task DeleteStaleEmoteCounts(HashSet<ulong> activeEmoteIds, IInteractionContext context)
     {
-        using var db = new EmoteRankingDB();
-
         IQueryable<EmoteCount> staleEmoteEntries = db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id && !activeEmoteIds.Contains(e.EmoteId));
 
         db.EmoteCounts.RemoveRange(staleEmoteEntries);
@@ -165,8 +158,6 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
     }
     public async Task ResetDB(IInteractionContext context)
     {
-        using var db = new EmoteRankingDB();
-
         IQueryable<EmoteCount> guildEmoteEntries = db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id);
         IQueryable<LastChannelMessage> guildLastMessageEntries = db.LastChannelMessages.Where(e => e.GuildId == context.Guild.Id);
 

@@ -15,7 +15,7 @@ public sealed class EmoteCountConfig : IEntityTypeConfiguration<EmoteCount>
 }
 
 /*
- *     protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 

@@ -1,0 +1,17 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using OlliBot.Application.Interfaces;
+
+namespace OlliBot.Application;
+public static class DependencyInjection
+{
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration cfg)
+    {
+        // services
+
+        builder.Services.AddTransient<IMessageService, MessageService>();
+        builder.Services.AddTransient<IMessageFactory, MessageFactory>();
+        builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
+
+        return services;
+    }
+}

@@ -1,7 +1,8 @@
 ﻿using Discord;
 using NSubstitute;
-using OlliBot.Data;
-using OlliBot.Services;
+using OlliBot.Bot.Interfaces;
+using OlliBot.Bot.Services;
+using OlliBot.Domain.Entities;
 
 namespace OlliBot.Tests;
 

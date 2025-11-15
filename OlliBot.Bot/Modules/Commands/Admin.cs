@@ -1,7 +1,7 @@
 using Discord;
 using Discord.Interactions;
 
-namespace OlliBot.Modules;
+namespace OlliBot.Bot.Modules;
 
 [RequireUserPermission(GuildPermission.Administrator)]
 [RequireContext(ContextType.Guild)]

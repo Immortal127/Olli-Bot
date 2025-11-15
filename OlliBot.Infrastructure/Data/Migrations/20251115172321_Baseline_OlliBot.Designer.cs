@@ -4,28 +4,66 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OlliBot.Data;
-
+using OlliBot.Infrastructure.Data;
 
 #nullable disable
 
-namespace OlliBot.Migrations.MessageDBMigrations
+namespace OlliBot.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(MessageDB))]
-    [Migration("20240321054044_Update-PropertyNaming-DiscordMessageIdNullability")]
-    partial class UpdatePropertyNamingDiscordMessageIdNullability
+    [DbContext(typeof(OlliBotDbContext))]
+    [Migration("20251115172321_Baseline_OlliBot")]
+    partial class Baseline_OlliBot
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
 
-            modelBuilder.Entity("self_bot.modules.data.Message", b =>
+            modelBuilder.Entity("OlliBot.Domain.Entities.EmoteCount", b =>
+                {
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("EmoteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateTimeUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("GuildId", "EmoteId");
+
+                    b.ToTable("EmoteCounts");
+                });
+
+            modelBuilder.Entity("OlliBot.Domain.Entities.LastChannelMessage", b =>
+                {
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("ChannelId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("MessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("GuildId", "ChannelId");
+
+                    b.ToTable("LastChannelMessages");
+                });
+
+            modelBuilder.Entity("OlliBot.Domain.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.PrimitiveCollection<string>("AttachmentUrls")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Attachments")
                         .HasColumnType("TEXT");
@@ -60,6 +98,8 @@ namespace OlliBot.Migrations.MessageDBMigrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GuildId", "MessageOriginId");
 
                     b.ToTable("Messages");
                 });
