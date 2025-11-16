@@ -1,6 +1,11 @@
-﻿namespace OlliBot.Domain.Entities;
-internal class HumbleBundle
+﻿using OlliBot.Domain.Enums;
+
+namespace OlliBot.Domain.Entities;
+public class HumbleBundle
 {
-    string Name { get; set; }
-    List<HumbleBundleTier> BundleTiers { get; set; }
+    public string Name { get; set; }
+    public List<HumbleBundleTier> BundleTiers { get; set; }
+    public DateTime ExpiryDate { get; set; }
+    public HumbleBundleType BundleType { get; set; }
+
 }

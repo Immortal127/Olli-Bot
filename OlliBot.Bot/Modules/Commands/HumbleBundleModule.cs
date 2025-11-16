@@ -3,7 +3,7 @@ using Discord.Interactions;
 
 namespace OlliBot.Bot.Modules;
 
-internal class HumbleBundle : InteractionModuleBase<SocketInteractionContext>
+internal class HumbleBundleModule : InteractionModuleBase<SocketInteractionContext>
 {
     [SlashCommand("hb", "Humble Bundles")]
     public async Task GetHumbleBundles()

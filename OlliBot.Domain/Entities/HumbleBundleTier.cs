@@ -1,7 +1,7 @@
 ﻿namespace OlliBot.Domain.Entities;
-internal class HumbleBundleTier
+public class HumbleBundleTier
 {
-    int Tier { get; set; }
-    Decimal Price { get; set; }
-    List<HumbleBundleItem> HumbleBundleItems { get; set; }
+    public int Tier { get; set; }
+    public Decimal Price { get; set; }
+    public List<HumbleBundleItem> HumbleBundleItems { get; set; }
 }

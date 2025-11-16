@@ -1,9 +1,11 @@
 ﻿using Microsoft.Playwright;
+using OlliBot.Bot.Modules;
+using OlliBot.Domain.Entities;
 
 namespace OlliBot.Bot.Services;
 public class HumbleBundleService
 {
-    public async Task GetAllBundleDetailsAsync()
+    public async Task<List<HumbleBundle>> GetAllBundleDetailsAsync()
     {
         IPlaywright pw = await Playwright.CreateAsync();
         IBrowser browser = await pw.Chromium.LaunchAsync();
@@ -15,15 +17,19 @@ public class HumbleBundleService
         ILocator bundles = gamesPage.Locator(".full-tile-view.one-third.bundle");
         int bundleCount = await bundles.CountAsync();
 
+        var humbleBundles = new List<HumbleBundle>();
+
         for (int i = 0; i < bundleCount; i++)
         {
+            var humbleBundle = new HumbleBundle();
             ILocator bundle = bundles.Nth(i);
             string bundleName = await bundle.Locator(".name").InnerHTMLAsync();
+            humbleBundle.Name = bundleName;
 
             string? href = await bundle.GetAttributeAsync("href");
             try
             {
-                await GetBundleDetails(context, href);
+                await GetBundleDetails(context, href, humbleBundle);
             }
             catch (Exception ex)
             {
@@ -31,9 +37,10 @@ public class HumbleBundleService
             }
         }
         await context.CloseAsync();
+        return humbleBundles;
     }
 
-    public async Task GetBundleDetails(IBrowserContext context, string href)
+    public async Task<HumbleBundle> GetBundleDetails(IBrowserContext context, string href, HumbleBundle bundle)
     {
         IPage page = await context.NewPageAsync();
         await page.GotoAsync("https://www.humblebundle.com" + href);
@@ -43,7 +50,8 @@ public class HumbleBundleService
 
         for (int i = 0; i < tierCount; i++)
         {
-
+            var bundleTier = new HumbleBundleTier();
+            bundleTier.Tier = i;
             ILocator tierFilter = tierFilters.Nth(i);
             if (await tierFilter.IsVisibleAsync())
                 await tierFilter.ClickAsync();
@@ -54,16 +62,17 @@ public class HumbleBundleService
 
             if (i != 0)
             {
-
                 await page.WaitForFunctionAsync("() => !document.querySelector('.tier-item-view.flipping')");
             }
 
             string header = await page.Locator(".tier-header.js-tier-header").First.InnerTextAsync();
+
             /*
             var bundleItems = page.Locator(".tier-item-view");
             var tierHeader = page.Locator(".tier-header.js-tier-header");
             */
             //Console.WriteLine(await tierHeader.InnerTextAsync());
+
             if (i != 0)
                 Console.WriteLine();
             Console.WriteLine(new string('/', header.Length));
@@ -86,5 +95,6 @@ public class HumbleBundleService
             }
         }
         await page.CloseAsync();
+        return bundle;
     }
 }
