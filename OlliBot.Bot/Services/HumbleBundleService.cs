@@ -1,6 +1,7 @@
 ﻿using Microsoft.Playwright;
 using OlliBot.Bot.Modules;
 using OlliBot.Domain.Entities;
+using OlliBot.Domain.Enums;
 
 namespace OlliBot.Bot.Services;
 public class HumbleBundleService
@@ -21,10 +22,14 @@ public class HumbleBundleService
 
         for (int i = 0; i < bundleCount; i++)
         {
-            var humbleBundle = new HumbleBundle();
             ILocator bundle = bundles.Nth(i);
             string bundleName = await bundle.Locator(".name").InnerHTMLAsync();
-            humbleBundle.Name = bundleName;
+            // Will need to adjust this when considering other types of bundles i.e books, software
+            var humbleBundle = new HumbleBundle
+            {
+                Name = bundleName,
+                BundleType = HumbleBundleType.Game,
+            };
 
             string? href = await bundle.GetAttributeAsync("href");
             try
@@ -48,11 +53,13 @@ public class HumbleBundleService
         ILocator tierFilters = page.Locator(".js-tier-filter.chip");
         int tierCount = Math.Max(1, await tierFilters.CountAsync());
 
-        for (int i = 0; i < tierCount; i++)
+        for (int tier = 0; tier < tierCount; tier++)
         {
-            var bundleTier = new HumbleBundleTier();
-            bundleTier.Tier = i;
-            ILocator tierFilter = tierFilters.Nth(i);
+            var bundleTier = new HumbleBundleTier
+            {
+                Tier = tier,
+            };
+            ILocator tierFilter = tierFilters.Nth(tier);
             if (await tierFilter.IsVisibleAsync())
                 await tierFilter.ClickAsync();
 
@@ -60,12 +67,12 @@ public class HumbleBundleService
             //var tierHeader = page.Locator(".tier-header.js-tier-header");
             //await Task.Delay(160);
 
-            if (i != 0)
+            if (tier != 0)
             {
                 await page.WaitForFunctionAsync("() => !document.querySelector('.tier-item-view.flipping')");
             }
 
-            string header = await page.Locator(".tier-header.js-tier-header").First.InnerTextAsync();
+            string priceHeader = await page.Locator(".tier-header.js-tier-header").First.InnerTextAsync();
 
             /*
             var bundleItems = page.Locator(".tier-item-view");
@@ -73,26 +80,38 @@ public class HumbleBundleService
             */
             //Console.WriteLine(await tierHeader.InnerTextAsync());
 
-            if (i != 0)
-                Console.WriteLine();
-            Console.WriteLine(new string('/', header.Length));
-            Console.WriteLine(header);
-            Console.WriteLine(new string('/', header.Length));
-            Console.WriteLine();
+            //if (i != 0)
+            //    Console.WriteLine();
+            //Console.WriteLine(new string('/', header.Length));
+            //Console.WriteLine(header);
+            //Console.WriteLine(new string('/', header.Length));
+            //Console.WriteLine();
 
             int itemCount = await bundleItems.CountAsync();
 
-            for (int j = 0; j < itemCount; j++)
+            for (int item = 0; item < itemCount; item++)
             {
-                string title = await bundleItems.Nth(j).Locator(".item-title").InnerTextAsync();
-                ILocator extraInfo = bundleItems.Nth(j).Locator(".extra-info.fine-print");
-                if (await extraInfo.CountAsync() > 0)
+                var title = await bundleItems.Nth(item).Locator(".item-title").InnerTextAsync();
+                var extraInfo = await bundleItems.Nth(item).Locator(".extra-info.fine-print").InnerTextAsync();
+
+                // Might need to look into what happens if there is no extra info when calling the InnerTextAsync method
+                var bundleItem = new HumbleBundleItem
                 {
-                    Console.WriteLine($"{title} ({await extraInfo.InnerTextAsync()})");
-                }
-                else
-                    Console.WriteLine($"{title}");
+                    ItemName = title,
+                    //ExtraInfo = await extraInfo.InnerTextAsync(),
+                    ExtraInfo = extraInfo
+                };
+
+                //if (await extraInfo.CountAsync() > 0)
+                //{
+                //    Console.WriteLine($"{title} ({await extraInfo.InnerTextAsync()})");
+                //}
+                //else
+                //    Console.WriteLine($"{title}");
+
+                bundleTier.HumbleBundleItems.Add(bundleItem);
             }
+            bundle.BundleTiers.Add(bundleTier);
         }
         await page.CloseAsync();
         return bundle;
