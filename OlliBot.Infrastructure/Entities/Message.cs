@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
-namespace OlliBot.Domain.Entities;
+namespace OlliBot.Infrastructure.Entities;
 
 public class Message
 {

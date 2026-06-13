@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OlliBot.Application.Interfaces;
 
-namespace OlliBot.Services;
+namespace OlliBot.Infrastructure.Services;
 
 public class MessageService : IMessageService
 {

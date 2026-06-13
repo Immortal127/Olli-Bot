@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OlliBot.Domain.Entities;
 
 namespace OlliBot.Infrastructure.Data.Configurations;
 public sealed class MessageConfig : IEntityTypeConfiguration<Message>

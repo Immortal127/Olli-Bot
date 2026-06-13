@@ -1,10 +1,7 @@
 ﻿using Discord;
-using OlliBot.Bot.Interfaces;
-using OlliBot.Bot.Utilities;
-using OlliBot.Domain.Entities;
 using System.Text.RegularExpressions;
 
-namespace OlliBot.Bot.Services;
+namespace OlliBot.Host.Services;
 
 public class MessageFactory : IMessageFactory
 {
@@ -83,7 +80,7 @@ public class MessageFactory : IMessageFactory
     public string EvaluateMessageType(Message message)
     {
         var memeExtensions = new List<string> { ".png", ".jpeg", ".jpg", ".gif", ".mp4" };
-        if (message.AttachmentUrls.Count > 0 && (message.AttachmentUrls.Any(url => memeExtensions.Any(ex => url.Contains(ex)))))
+        if (message.AttachmentUrls.Count > 0 && message.AttachmentUrls.Any(url => memeExtensions.Any(ex => url.Contains(ex))))
         {
             return "Meme";
         }

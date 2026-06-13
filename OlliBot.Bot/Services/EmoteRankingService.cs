@@ -1,10 +1,8 @@
 ﻿using Discord;
 using Microsoft.EntityFrameworkCore;
-using OlliBot.Bot.Interfaces;
-using OlliBot.Domain.Entities;
 using OlliBot.Infrastructure.Data;
 
-namespace OlliBot.Bot.Services;
+namespace OlliBot.Host.Services;
 
 public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
 {

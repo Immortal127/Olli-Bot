@@ -1,11 +1,9 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using OlliBot.Bot.Interfaces;
-using OlliBot.Domain.Entities;
 
 
-namespace OlliBot.Bot.Modules;
+namespace OlliBot.Host.Modules.Commands;
 
 [RequireContext(ContextType.Guild)]
 [Group("db", "Commands to interact with the message database")]
@@ -146,7 +144,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     {
         Message? queriedMessage = await _messageService.GetMessageByIdAsync(DbID, Context.Guild.Id);
 
-        if (queriedMessage == null || (Title == null && MessageType == null))
+        if (queriedMessage == null || Title == null && MessageType == null)
         {
             string x = "wat";
             await Context.Interaction.RespondAsync(x, ephemeral: true);

@@ -1,7 +1,7 @@
 using Discord;
 using Discord.Interactions;
 
-namespace OlliBot.Bot.Modules;
+namespace OlliBot.Host.Modules.Commands;
 
 [RequireUserPermission(GuildPermission.Administrator)]
 [RequireContext(ContextType.Guild)]
@@ -64,7 +64,7 @@ public class AdminCommands : InteractionModuleBase<SocketInteractionContext>
             }
             await Context.Interaction.ModifyOriginalResponseAsync(msg =>
             {
-                msg.Content = $"Deleted {(recentMessages.Count() + oldMessages.Count())} messages by {user}";
+                msg.Content = $"Deleted {recentMessages.Count() + oldMessages.Count()} messages by {user}";
             });
         }
         catch (Exception ex)

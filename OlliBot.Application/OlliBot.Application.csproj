@@ -8,16 +8,10 @@
 
   <ItemGroup>
     <Compile Remove="DependencyInjection.cs" />
-    <Compile Remove="Interfaces\IEmoteRankingService.cs" />
-    <Compile Remove="Interfaces\IMessageFactory.cs" />
-    <Compile Remove="Interfaces\IMessageService.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="DependencyInjection.cs" />
-    <None Include="Interfaces\IEmoteRankingService.cs" />
-    <None Include="Interfaces\IMessageFactory.cs" />
-    <None Include="Interfaces\IMessageService.cs" />
   </ItemGroup>
 
   <ItemGroup>

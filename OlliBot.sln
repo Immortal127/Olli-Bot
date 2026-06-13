@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Application", "Olli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Infrastructure", "OlliBot.Infrastructure\OlliBot.Infrastructure.csproj", "{C85CC566-E56D-4B68-A630-0AFA9B0A0EE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Bot", "OlliBot.Bot\OlliBot.Bot.csproj", "{4CF92901-775D-55CD-A798-C4CDAAEA54DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlliBot.Host", "OlliBot.Bot\OlliBot.Host.csproj", "{4CF92901-775D-55CD-A798-C4CDAAEA54DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

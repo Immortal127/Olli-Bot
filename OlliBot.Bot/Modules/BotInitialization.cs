@@ -2,7 +2,7 @@ using Discord;
 using Discord.Interactions;
 using System.Reflection;
 
-namespace OlliBot.Bot.Modules;
+namespace OlliBot.Host.Modules;
 
 public class BotInitialization
 {

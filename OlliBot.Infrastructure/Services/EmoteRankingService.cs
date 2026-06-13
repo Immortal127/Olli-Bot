@@ -2,7 +2,7 @@
 using OlliBot.Application.Interfaces;
 using OlliBot.Infrastructure.Data;
 
-namespace OlliBot.Bot.Services;
+namespace OlliBot.Infrastructure.Services;
 
 public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
 {

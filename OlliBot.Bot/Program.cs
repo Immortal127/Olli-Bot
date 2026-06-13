@@ -1,14 +1,11 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using OlliBot.Bot.Interfaces;
-using OlliBot.Bot.Modules;
-using OlliBot.Bot.Services;
 using OlliBot.Infrastructure;
 using Serilog;
 using Serilog.Events;
 
-namespace OlliBot.Bot;
+namespace OlliBot.Host;
 
 internal class Program
 {

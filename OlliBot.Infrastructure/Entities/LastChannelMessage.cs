@@ -1,4 +1,4 @@
-﻿namespace OlliBot.Domain.Entities;
+﻿namespace OlliBot.Infrastructure.Entities;
 public class LastChannelMessage
 {
     public ulong GuildId { get; set; }

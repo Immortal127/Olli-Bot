@@ -1,9 +1,8 @@
 ﻿using Microsoft.Playwright;
-using OlliBot.Bot.Modules;
-using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
+using OlliBot.Infrastructure.Entities;
 
-namespace OlliBot.Bot.Services;
+namespace OlliBot.Host.Services;
 public class HumbleBundleService
 {
     public async Task<List<HumbleBundle>> GetAllBundleDetailsAsync()
@@ -91,8 +90,8 @@ public class HumbleBundleService
 
             for (int item = 0; item < itemCount; item++)
             {
-                var title = await bundleItems.Nth(item).Locator(".item-title").InnerTextAsync();
-                var extraInfo = await bundleItems.Nth(item).Locator(".extra-info.fine-print").InnerTextAsync();
+                string title = await bundleItems.Nth(item).Locator(".item-title").InnerTextAsync();
+                string extraInfo = await bundleItems.Nth(item).Locator(".extra-info.fine-print").InnerTextAsync();
 
                 // Might need to look into what happens if there is no extra info when calling the InnerTextAsync method
                 var bundleItem = new HumbleBundleItem

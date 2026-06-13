@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OlliBot.Domain.Entities;
 
 namespace OlliBot.Infrastructure.Data;
 public class OlliBotDbContext : DbContext

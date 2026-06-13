@@ -7,12 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\IEmoteRankingService.cs" />
+    <Compile Remove="Interfaces\IMessageFactory.cs" />
+    <Compile Remove="Interfaces\IMessageService.cs" />
     <Compile Remove="Services\EmoteRankingService.cs" />
     <Compile Remove="Services\MessageFactory.cs" />
     <Compile Remove="Services\MessageService.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Interfaces\IEmoteRankingService.cs" />
+    <None Include="Interfaces\IMessageFactory.cs" />
+    <None Include="Interfaces\IMessageService.cs" />
     <None Include="Services\EmoteRankingService.cs" />
     <None Include="Services\MessageFactory.cs" />
     <None Include="Services\MessageService.cs" />

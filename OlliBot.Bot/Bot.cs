@@ -1,9 +1,8 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using OlliBot.Bot.Modules;
 
-namespace OlliBot.Bot;
+namespace OlliBot.Host;
 
 public class Bot : BackgroundService
 {

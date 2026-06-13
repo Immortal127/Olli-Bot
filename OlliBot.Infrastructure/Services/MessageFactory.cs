@@ -2,7 +2,7 @@
 using OlliBot.Domain.Entities;
 using System.Text.RegularExpressions;
 
-namespace OlliBot.Services;
+namespace OlliBot.Infrastructure.Services;
 
 public class MessageFactory : IMessageFactory
 {

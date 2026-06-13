@@ -1,6 +1,5 @@
-﻿using OlliBot.Domain.Entities;
-
-namespace OlliBot.Bot.Interfaces;
+﻿
+namespace OlliBot.Infrastructure.Interfaces;
 
 public interface IMessageService
 {

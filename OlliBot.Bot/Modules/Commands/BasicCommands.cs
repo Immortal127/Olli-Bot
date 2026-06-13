@@ -1,7 +1,7 @@
 using Discord;
 using Discord.Interactions;
 
-namespace OlliBot.Bot.Modules;
+namespace OlliBot.Host.Modules.Commands;
 
 public class BasicCommands : InteractionModuleBase<SocketInteractionContext>
 {

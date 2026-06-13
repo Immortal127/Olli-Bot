@@ -1,5 +1,3 @@
-using OlliBot.Bot.Utilities;
-
 namespace OlliBot.Tests;
 
 public class HelperTests
