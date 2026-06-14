@@ -1,21 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OlliBot.Application.Interfaces;
+﻿using Discord;
+using Microsoft.EntityFrameworkCore;
+using OlliBot.Host.Interfaces;
 using OlliBot.Infrastructure.Data;
+using OlliBot.Infrastructure.Entities;
 
-namespace OlliBot.Infrastructure.Services;
+namespace OlliBot.Host.Services;
 
 public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
 {
+    private readonly OlliBotDbContext _db = db;
+
     //Entry point for discord command
     public async Task<Dictionary<GuildEmote, int>> GetEmoteCounts(IReadOnlyCollection<GuildEmote> guildEmotes, IEnumerable<ITextChannel> textChannels, IInteractionContext context)
     {
         DateTime dateTimeExecuted = DateTime.UtcNow;
 
-
-        using var db = new EmoteRankingDB();
-
-        var recordedEmoteCounts = db.EmoteCounts.Where(x => x.GuildId == context.Guild.Id).ToDictionary(x => x.EmoteId, x => x.Count);
-        IEnumerable<LastChannelMessage> lastChannelMessages = await db.LastChannelMessages.Where(x => x.GuildId == context.Guild.Id).ToListAsync();
+        var recordedEmoteCounts = _db.EmoteCounts.Where(x => x.GuildId == context.Guild.Id).ToDictionary(x => x.EmoteId, x => x.Count);
+        IEnumerable<LastChannelMessage> lastChannelMessages = await _db.LastChannelMessages.Where(x => x.GuildId == context.Guild.Id).ToListAsync();
 
         Dictionary<GuildEmote, int> newEmoteCounts = await GetNewEmoteCounts(guildEmotes, textChannels, lastChannelMessages);
 
@@ -24,7 +25,7 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
         //delete emotes counts for emoetes that no longer exist in the database
         var activeEmoteIds = guildEmotes.Select(e => e.Id).ToHashSet();
 
-        bool hasStaleEmotes = await db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id).AnyAsync(e => !activeEmoteIds.Contains(e.EmoteId));
+        bool hasStaleEmotes = await _db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id).AnyAsync(e => !activeEmoteIds.Contains(e.EmoteId));
 
         if (hasStaleEmotes)
         {
@@ -100,14 +101,12 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
     }
     public async Task UpdateOrAddLastMessage(ITextChannel channel, IMessage message)
     {
-        using var db = new EmoteRankingDB();
-
-        LastChannelMessage? existingEntry = await db.LastChannelMessages.FirstOrDefaultAsync(m => m.GuildId == channel.GuildId && m.ChannelId == channel.Id);
+        LastChannelMessage? existingEntry = await _db.LastChannelMessages.FirstOrDefaultAsync(m => m.GuildId == channel.GuildId && m.ChannelId == channel.Id);
 
         if (existingEntry != null)
         {
             existingEntry.MessageId = message.Id;
-            db.LastChannelMessages.Update(existingEntry);
+            _db.LastChannelMessages.Update(existingEntry);
         }
         else
         {
@@ -117,27 +116,25 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
                 ChannelId = channel.Id,
                 MessageId = message.Id
             };
-            await db.LastChannelMessages.AddAsync(newLastMessage);
+            await _db.LastChannelMessages.AddAsync(newLastMessage);
 
         }
 
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
     }
     public async Task UpdateOrAddEmoteCounts(Dictionary<GuildEmote, int> emoteCounts, IInteractionContext context)
     {
-        using var db = new EmoteRankingDB();
-
         DateTime dateTimeExecuted = DateTime.UtcNow;
 
         foreach ((GuildEmote emote, int count) in emoteCounts)
         {
-            EmoteCount? existingEntry = await db.EmoteCounts.FirstOrDefaultAsync(e => e.EmoteId == emote.Id);
+            EmoteCount? existingEntry = await _db.EmoteCounts.FirstOrDefaultAsync(e => e.EmoteId == emote.Id);
 
             if (existingEntry != null)
             {
                 existingEntry.Count = count;
                 existingEntry.DateTimeUpdated = dateTimeExecuted;
-                db.EmoteCounts.Update(existingEntry);
+                _db.EmoteCounts.Update(existingEntry);
             }
             else
             {
@@ -148,30 +145,26 @@ public class EmoteRankingService(OlliBotDbContext db) : IEmoteRankingService
                     EmoteId = emote.Id,
                     GuildId = context.Guild.Id,
                 };
-                await db.EmoteCounts.AddAsync(newEmoteCount);
+                await _db.EmoteCounts.AddAsync(newEmoteCount);
             }
         }
 
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
     }
     public async Task DeleteStaleEmoteCounts(HashSet<ulong> activeEmoteIds, IInteractionContext context)
     {
-        using var db = new EmoteRankingDB();
+        IQueryable<EmoteCount> staleEmoteEntries = _db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id && !activeEmoteIds.Contains(e.EmoteId));
 
-        IQueryable<EmoteCount> staleEmoteEntries = db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id && !activeEmoteIds.Contains(e.EmoteId));
-
-        db.EmoteCounts.RemoveRange(staleEmoteEntries);
-        await db.SaveChangesAsync();
+        _db.EmoteCounts.RemoveRange(staleEmoteEntries);
+        await _db.SaveChangesAsync();
     }
     public async Task ResetDB(IInteractionContext context)
     {
-        using var db = new EmoteRankingDB();
+        IQueryable<EmoteCount> guildEmoteEntries = _db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id);
+        IQueryable<LastChannelMessage> guildLastMessageEntries = _db.LastChannelMessages.Where(e => e.GuildId == context.Guild.Id);
 
-        IQueryable<EmoteCount> guildEmoteEntries = db.EmoteCounts.Where(e => e.GuildId == context.Guild.Id);
-        IQueryable<LastChannelMessage> guildLastMessageEntries = db.LastChannelMessages.Where(e => e.GuildId == context.Guild.Id);
-
-        db.EmoteCounts.RemoveRange(guildEmoteEntries);
-        db.LastChannelMessages.RemoveRange(guildLastMessageEntries);
-        await db.SaveChangesAsync();
+        _db.EmoteCounts.RemoveRange(guildEmoteEntries);
+        _db.LastChannelMessages.RemoveRange(guildLastMessageEntries);
+        await _db.SaveChangesAsync();
     }
 }

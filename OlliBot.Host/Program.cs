@@ -1,7 +1,14 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
+using OlliBot.Host.Interfaces;
+using OlliBot.Host.Modules;
+using OlliBot.Host.Services;
 using OlliBot.Infrastructure;
+using OlliBot.Infrastructure.Data;
+using OlliBot.Infrastructure.Interfaces;
+using OlliBot.Infrastructure.Services;
 using Serilog;
 using Serilog.Events;
 
@@ -20,7 +27,7 @@ internal class Program
 
         Log.Information("Creating OlliBot.Bot...");
 
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+        HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
 
         Log.Information("Configuring OlliBot.Bot...");
 
@@ -74,6 +81,13 @@ internal class Program
         builder.Services.AddTransient<BotInitialization>();
         builder.Services.AddSingleton<InteractionHandler>();
         builder.Services.AddSingleton<BotEventHandler>();
+
+        builder.Services.AddDbContext<OlliBotDbContext>(options =>
+        {
+            options.UseSqlite();
+        });
+
+        //builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
         //builder.Services.AddTransient<IMessageService, MessageService>();
         //builder.Services.AddTransient<IMessageFactory, MessageFactory>();

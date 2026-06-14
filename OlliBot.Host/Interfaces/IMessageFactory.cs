@@ -1,6 +1,7 @@
-﻿using OlliBot.Domain.Entities;
+﻿using Discord;
+using OlliBot.Infrastructure.Entities;
 
-namespace OlliBot.Infrastructure.Interfaces;
+namespace OlliBot.Host.Interfaces;
 
 public interface IMessageFactory
 {

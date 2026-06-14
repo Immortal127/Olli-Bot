@@ -1,5 +1,7 @@
-﻿
-namespace OlliBot.Infrastructure.Interfaces;
+﻿using Discord;
+using OlliBot.Infrastructure.Entities;
+
+namespace OlliBot.Host.Interfaces;
 
 public interface IEmoteRankingService
 {

@@ -1,20 +1,15 @@
 using Discord;
 using Discord.Interactions;
+using OlliBot.Host.Interfaces;
+using OlliBot.Host.Utilities;
 
 namespace OlliBot.Host.Modules.Commands;
 
 [RequireContext(ContextType.Guild)]
-public class Emotes : InteractionModuleBase<SocketInteractionContext>
+public class Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger) : InteractionModuleBase<SocketInteractionContext>
 {
-
-    private readonly EmoteRankingService _emoteService;
-    private readonly ILogger<Emotes> _logger;
-
-    public Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger)
-    {
-        _emoteService = emoteService;
-        _logger = logger;
-    }
+    private readonly IEmoteRankingService _emoteService = emoteService;
+    private readonly ILogger<Emotes> _logger = logger;
 
     [SlashCommand("emoterank", "Emote rankings")]
     public async Task SendEmoteRankings(
