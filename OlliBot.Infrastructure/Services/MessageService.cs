@@ -24,18 +24,23 @@ public class MessageService(OlliBotDbContext db) : IMessageService
     }
     public async Task<Message?> GetMessageByIdAsync(int id, ulong guildId)
     {
-        Message? message = await db.Messages.FirstOrDefaultAsync(m => m.Id == id && m.GuildId == guildId);
+        Message? message = await db.Messages
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == id && m.GuildId == guildId);
         return message;
     }
     public async Task<Message?> GetMessageByTitleAsync(string Title, ulong guildId)
     {
-        Message? message = await db.Messages.FirstOrDefaultAsync(m => m.Title != null && m.GuildId == guildId && m.Title.ToLower().Contains(Title));
+        Message? message = await db.Messages
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Title != null && m.GuildId == guildId && m.Title.ToLower().Contains(Title));
         return message;
-
     }
     public async Task<List<Message>> ListMessagesAsync(ulong guildId, ulong? userId = null)
     {
-        IQueryable<Message> messageQuery = db.Messages.Where(m => m.GuildId == guildId);
+        IQueryable<Message> messageQuery = db.Messages
+            .AsNoTracking()
+            .Where(m => m.GuildId == guildId);
 
         if (userId != null)
         {
