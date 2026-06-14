@@ -27,7 +27,7 @@ internal class Program
 
         Log.Information("Creating OlliBot.Bot...");
 
-        HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
         Log.Information("Configuring OlliBot.Bot...");
 
@@ -38,6 +38,7 @@ internal class Program
             .ReadFrom.Services(services));
 
         builder.Services.AddInfrastructure(builder.Configuration);
+
         builder.Services.AddTransient<IMessageFactory, MessageFactory>();
         builder.Services.AddScoped<IMessageService, MessageService>();
         builder.Services.AddScoped<IEmoteRankingService, EmoteRankingService>();
@@ -81,11 +82,6 @@ internal class Program
         builder.Services.AddTransient<BotInitialization>();
         builder.Services.AddSingleton<InteractionHandler>();
         builder.Services.AddSingleton<BotEventHandler>();
-
-        builder.Services.AddDbContext<OlliBotDbContext>(options =>
-        {
-            options.UseSqlite();
-        });
 
         //builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 

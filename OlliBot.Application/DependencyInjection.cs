@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using OlliBot.Application.Interfaces;
 
+// Build action set to none until I figure out if this is a good idea
+
 namespace OlliBot.Application;
 public static class DependencyInjection
 {
