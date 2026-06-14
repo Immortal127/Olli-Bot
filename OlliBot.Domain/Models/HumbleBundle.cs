@@ -1,6 +1,6 @@
 ﻿using OlliBot.Domain.Enums;
 
-namespace OlliBot.Infrastructure.Entities;
+namespace OlliBot.Domain.Models;
 public class HumbleBundle
 {
     public required string Name { get; set; }

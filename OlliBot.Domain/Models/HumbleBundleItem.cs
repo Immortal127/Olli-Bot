@@ -1,4 +1,4 @@
-﻿namespace OlliBot.Infrastructure.Entities;
+﻿namespace OlliBot.Domain.Models;
 public class HumbleBundleItem
 {
     public string ItemName { get; set; }

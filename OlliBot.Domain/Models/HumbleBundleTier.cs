@@ -1,4 +1,4 @@
-﻿namespace OlliBot.Infrastructure.Entities;
+﻿namespace OlliBot.Domain.Models;
 public class HumbleBundleTier
 {
     public int Tier { get; set; }

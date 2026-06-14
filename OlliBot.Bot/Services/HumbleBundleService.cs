@@ -1,6 +1,6 @@
 ﻿using Microsoft.Playwright;
 using OlliBot.Domain.Enums;
-using OlliBot.Infrastructure.Entities;
+using OlliBot.Domain.Models;
 
 namespace OlliBot.Bot.Services;
 public class HumbleBundleService

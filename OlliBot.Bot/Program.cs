@@ -1,12 +1,10 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Modules;
 using OlliBot.Bot.Services;
 using OlliBot.Infrastructure;
-using OlliBot.Infrastructure.Data;
 using OlliBot.Infrastructure.Interfaces;
 using OlliBot.Infrastructure.Services;
 using Serilog;
