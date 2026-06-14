@@ -2,7 +2,7 @@
 
 public enum MessageEntityType
 {
-    Other = 1,
-    Quote = 2,
-    Meme = 3,
+    Other = 0,
+    Quote = 1,
+    Meme = 2,
 }
