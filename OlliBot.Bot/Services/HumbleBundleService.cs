@@ -35,7 +35,7 @@ public class HumbleBundleService
             {
                 await GetBundleDetails(context, href, humbleBundle);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
