@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace OlliBot.Host.Utilities;
+namespace OlliBot.Bot.Utilities;
 
 public static class Helpers
 {

@@ -1,4 +1,4 @@
-using OlliBot.Host.Utilities;
+using OlliBot.Bot.Utilities;
 
 namespace OlliBot.Tests;
 

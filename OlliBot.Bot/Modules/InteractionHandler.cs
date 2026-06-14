@@ -2,7 +2,7 @@
 using Discord.WebSocket;
 using System.Text;
 
-namespace OlliBot.Host.Modules;
+namespace OlliBot.Bot.Modules;
 
 public class InteractionHandler
 {

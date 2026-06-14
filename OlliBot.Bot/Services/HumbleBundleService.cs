@@ -2,7 +2,7 @@
 using OlliBot.Domain.Enums;
 using OlliBot.Infrastructure.Entities;
 
-namespace OlliBot.Host.Services;
+namespace OlliBot.Bot.Services;
 public class HumbleBundleService
 {
     public async Task<List<HumbleBundle>> GetAllBundleDetailsAsync()

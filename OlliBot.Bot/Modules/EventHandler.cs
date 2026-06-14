@@ -1,21 +1,14 @@
 using Discord;
 using Discord.Interactions;
-using OlliBot.Host.Utilities;
+using OlliBot.Bot.Utilities;
 
-namespace OlliBot.Host.Modules;
+namespace OlliBot.Bot.Modules;
 
-public class BotEventHandler
+public class BotEventHandler(IConfiguration configuration, IDiscordClient client, ILogger<BotEventHandler> logger)
 {
-    private readonly IConfiguration _configuration;
-    private readonly IDiscordClient _client;
-    private readonly ILogger<Bot> _logger;
-
-    public BotEventHandler(IConfiguration configuration, IDiscordClient client, ILogger<Bot> logger)
-    {
-        _configuration = configuration;
-        _client = client;
-        _logger = logger;
-    }
+    private readonly IConfiguration _configuration = configuration;
+    private readonly IDiscordClient _client = client;
+    private readonly ILogger<BotEventHandler> _logger = logger;
 
     public async Task OnMessage(IMessage message)
     {

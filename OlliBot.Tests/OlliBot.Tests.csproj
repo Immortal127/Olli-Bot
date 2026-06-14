@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OlliBot.Host\OlliBot.Host.csproj" />
+    <ProjectReference Include="..\OlliBot.Bot\OlliBot.Bot.csproj" />
   </ItemGroup>
 
   <ItemGroup>

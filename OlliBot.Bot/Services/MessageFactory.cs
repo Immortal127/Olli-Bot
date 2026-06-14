@@ -1,10 +1,10 @@
 ﻿using Discord;
-using OlliBot.Host.Interfaces;
-using OlliBot.Host.Utilities;
+using OlliBot.Bot.Interfaces;
+using OlliBot.Bot.Utilities;
 using OlliBot.Infrastructure.Entities;
 using System.Text.RegularExpressions;
 
-namespace OlliBot.Host.Services;
+namespace OlliBot.Bot.Services;
 
 public class MessageFactory : IMessageFactory
 {

@@ -1,9 +1,9 @@
 using Discord;
 using Discord.Interactions;
-using OlliBot.Host.Interfaces;
-using OlliBot.Host.Utilities;
+using OlliBot.Bot.Interfaces;
+using OlliBot.Bot.Utilities;
 
-namespace OlliBot.Host.Modules.Commands;
+namespace OlliBot.Bot.Modules.Commands;
 
 [RequireContext(ContextType.Guild)]
 public class Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger) : InteractionModuleBase<SocketInteractionContext>
