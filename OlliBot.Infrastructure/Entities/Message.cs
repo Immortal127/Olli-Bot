@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using OlliBot.Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
 namespace OlliBot.Infrastructure.Entities;
@@ -35,7 +36,7 @@ public class Message
     [NotMapped]
     public List<string> AttachmentUrls
     {
-        get => Attachments == null ? new List<string>() : JsonSerializer.Deserialize<List<string>>(Attachments) ?? new List<string>();
+        get => string.IsNullOrEmpty(Attachments) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(Attachments) ?? [];
         set => Attachments = JsonSerializer.Serialize(value);
     }
     /// <summary>
@@ -51,7 +52,7 @@ public class Message
     /// </summary>
     public ulong MessageOriginId { get; set; }
 
-    public string MessageType { get; set; } = "Other";
+    public MessageEntityType MessageType { get; set; } = MessageEntityType.Other;
     /// <summary>
     /// When was the Message added to the database.
     /// </summary>

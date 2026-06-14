@@ -2,6 +2,7 @@
 using NSubstitute;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Services;
+using OlliBot.Domain.Enums;
 using OlliBot.Infrastructure.Entities;
 
 namespace OlliBot.Tests;
@@ -29,10 +30,10 @@ public class MessageFactoryTests
     //         //
     public static IEnumerable<object[]> GetTestTypeData()
     {
-        yield return new object[] { "", new List<string> { "https://www.youtube.com/" }, "Other" };
-        yield return new object[] { ":3", new List<string> { "https://cdn.discordapp.com/attachments/529752744559640597/998720258506493982/unknown.png?ex=66aeb138&is=66ad5fb8&hm=1bb299d8fd12edb060f442272cf5325148d0b6fb84190f5675d90c557d4c7a58&" }, "Meme" };
-        yield return new object[] { "lol", new List<string> { }, "Quote" };
-        yield return new object[] { "", new List<string> { "https://cdn.discordapp.com/attachments/530102241701396481/1265917629735108628/FB_IMG_1721888665423.jpg?ex=66af1eaa&is=66adcd2a&hm=d49a3f0abe0883c65ec1f7bfd78d4a7a3cf9fdf4fc37d172b5c4d34980351007&" }, "Meme" };
+        yield return new object[] { "", new List<string> { "https://www.youtube.com/" }, MessageEntityType.Other };
+        yield return new object[] { ":3", new List<string> { "https://cdn.discordapp.com/attachments/529752744559640597/998720258506493982/unknown.png?ex=66aeb138&is=66ad5fb8&hm=1bb299d8fd12edb060f442272cf5325148d0b6fb84190f5675d90c557d4c7a58&" }, MessageEntityType.Meme };
+        yield return new object[] { "lol", new List<string> { }, MessageEntityType.Quote };
+        yield return new object[] { "", new List<string> { "https://cdn.discordapp.com/attachments/530102241701396481/1265917629735108628/FB_IMG_1721888665423.jpg?ex=66af1eaa&is=66adcd2a&hm=d49a3f0abe0883c65ec1f7bfd78d4a7a3cf9fdf4fc37d172b5c4d34980351007&" }, MessageEntityType.Meme };
     }
 
     private static IMessage CreateMockMessage(ulong id, string? content, List<string> attachments)
@@ -76,7 +77,7 @@ public class MessageFactoryTests
                 AuthorId = 220253209824854016UL,
                 MessageOriginId = 1111,
                 DateTimeAdded = DateTime.UtcNow,
-                MessageType = "Quote"
+                MessageType = MessageEntityType.Quote
             }
         };
     }
@@ -87,7 +88,7 @@ public class MessageFactoryTests
 
     [Theory]
     [MemberData(nameof(GetTestTypeData))]
-    public void GetMessageType_ShouldReturnExpectedResult(string entryContent, List<string> attachmentList, string expectedType)
+    public void GetMessageType_ShouldReturnExpectedResult(string entryContent, List<string> attachmentList, MessageEntityType expectedType)
     {
         // Arrange
         Message inputMessage = Substitute.For<Message>();
@@ -97,7 +98,7 @@ public class MessageFactoryTests
         inputMessage.AttachmentUrls = attachmentList;
 
         // Act
-        string result = messageFactory.EvaluateMessageType(inputMessage);
+        MessageEntityType result = messageFactory.EvaluateMessageType(inputMessage);
 
         //Assert
         Assert.Equal(expectedType, result);
@@ -105,7 +106,7 @@ public class MessageFactoryTests
 
     [Theory]
     [MemberData(nameof(GetMockMessageData))]
-    public void CreateMessageFromInput_FromIMessage_ShouldReturnExpectedResult(IMessage inputMessage, string? Title, string? messageType, Message expectedMessage)
+    public void CreateMessageFromInput_FromIMessage_ShouldReturnExpectedResult(IMessage inputMessage, string? Title, MessageEntityType? messageType, Message expectedMessage)
     {
         // Arrange
         IMessageFactory messageFactory = new MessageFactory();
@@ -131,9 +132,9 @@ public class MessageFactoryTests
     [Theory]
     [InlineData("test message", null, null)]
     [InlineData("test message", "Test title", null)]
-    [InlineData("test message", null, "Meme")]
-    [InlineData("test message", "Test title", "Other")]
-    public void CreateMessageFromInput_StringInputNoURL_ShouldReturnExpectedResult(string entryContent, string? Title, string? messageType)
+    [InlineData("test message", null, MessageEntityType.Meme)]
+    [InlineData("test message", "Test title", MessageEntityType.Other)]
+    public void CreateMessageFromInput_StringInputNoURL_ShouldReturnExpectedResult(string entryContent, string? Title, MessageEntityType? messageType)
     {
         // Arrange
         string expectedAuthor = "TestUser 2";
@@ -157,7 +158,7 @@ public class MessageFactoryTests
         if (messageType is null)
         {
             Assert.NotEqual(messageType, result.MessageType);
-            Assert.Equal("Quote", result.MessageType);
+            Assert.Equal(MessageEntityType.Quote, result.MessageType);
         }
         else
         {
@@ -166,8 +167,8 @@ public class MessageFactoryTests
     }
     [Theory]
     [InlineData(@"test message with url https://youtu.be/dQw4w9WgXcQ?si=uqwvdVsBBR51RLQP", null, null, "test message with url")]
-    [InlineData(@"https://map.projectzomboid.com/", "Test title", "Other", "")]
-    public void CreateMessageFromInput_StringInputWithURL_ShouldReturnExpectedResult(string entryContent, string? Title, string? messageType, string expectedContent)
+    [InlineData(@"https://map.projectzomboid.com/", "Test title", MessageEntityType.Other, "")]
+    public void CreateMessageFromInput_StringInputWithURL_ShouldReturnExpectedResult(string entryContent, string? Title, MessageEntityType? messageType, string expectedContent)
     {
         // Arrange
         string expectedAuthor = "TestUser 2";
@@ -193,7 +194,7 @@ public class MessageFactoryTests
         if (messageType is null)
         {
             Assert.NotEqual(messageType, result.MessageType);
-            Assert.Equal("Other", result.MessageType);
+            Assert.Equal(MessageEntityType.Other, result.MessageType);
         }
         else
         {

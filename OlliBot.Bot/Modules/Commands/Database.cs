@@ -2,6 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Bot.Interfaces;
+using OlliBot.Domain.Enums;
 using OlliBot.Infrastructure.Entities;
 using OlliBot.Infrastructure.Interfaces;
 
@@ -30,10 +31,17 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     [Choice("Meme", "Meme")]
     [Choice("Quote", "Quote")]
     [Choice("Other", "Other")]
-    [Summary("Type", "Type (If no value set then will be implicitly determined)")] string? messageType = null)
+    [Summary("Type", "Type (If no value set then will be implicitly determined)")] string? messageTypeString = null)
     {
-
         Message entry;
+
+        MessageEntityType messageType = messageTypeString switch
+        {
+            "Meme" => MessageEntityType.Meme,
+            "Quote" => MessageEntityType.Quote,
+            "Other" => MessageEntityType.Other,
+            _ => MessageEntityType.Other
+        };
 
         if (ulong.TryParse(messageEntry, out ulong result))
         {
@@ -88,7 +96,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
             return;
         }
 
-        if (queriedMessage.DiscordMessageId is null && queriedMessage.MessageType == "Quote")
+        if (queriedMessage.DiscordMessageId is null && queriedMessage.MessageType == MessageEntityType.Quote)
         {
             IGuildUser quoteOrigin = Context.Guild.GetUser(queriedMessage.MessageOriginId);
             string responseContent = $"\"{queriedMessage.Content}\" - {quoteOrigin.DisplayName}";
@@ -142,11 +150,11 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     [Choice("Meme", "Meme")]
     [Choice("Quote", "Quote")]
     [Choice("Other", "Other")]
-    [Summary("Type", "Updated type")] string? MessageType = null)
+    [Summary("Type", "Updated type")] string? messageTypeString = null)
     {
         Message? queriedMessage = await _messageService.GetMessageByIdAsync(DbID, Context.Guild.Id);
 
-        if (queriedMessage == null || Title == null && MessageType == null)
+        if (queriedMessage == null || Title == null && messageTypeString == null)
         {
             string x = "wat";
             await Context.Interaction.RespondAsync(x, ephemeral: true);
@@ -156,9 +164,17 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
         {
             queriedMessage.Title = Title;
         }
-        if (MessageType != null)
+        if (messageTypeString != null)
         {
-            queriedMessage.MessageType = MessageType;
+            MessageEntityType messageType = messageTypeString switch
+            {
+                "Meme" => MessageEntityType.Meme,
+                "Quote" => MessageEntityType.Quote,
+                "Other" => MessageEntityType.Other,
+                _ => MessageEntityType.Other
+            };
+
+            queriedMessage.MessageType = messageType;
         }
 
         await _messageService.UpdateMessageAsync(queriedMessage);

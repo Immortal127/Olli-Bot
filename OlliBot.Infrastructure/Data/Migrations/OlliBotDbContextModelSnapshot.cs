@@ -7,7 +7,7 @@ using OlliBot.Infrastructure.Data;
 
 #nullable disable
 
-namespace OlliBot.Infrastructure.Data.Migrations
+namespace OlliBot.Infrastructure.Migrations
 {
     [DbContext(typeof(OlliBotDbContext))]
     partial class OlliBotDbContextModelSnapshot : ModelSnapshot
@@ -17,7 +17,7 @@ namespace OlliBot.Infrastructure.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
 
-            modelBuilder.Entity("OlliBot.Domain.Entities.EmoteCount", b =>
+            modelBuilder.Entity("OlliBot.Infrastructure.Entities.EmoteCount", b =>
                 {
                     b.Property<ulong>("GuildId")
                         .HasColumnType("INTEGER");
@@ -36,7 +36,7 @@ namespace OlliBot.Infrastructure.Data.Migrations
                     b.ToTable("EmoteCounts");
                 });
 
-            modelBuilder.Entity("OlliBot.Domain.Entities.LastChannelMessage", b =>
+            modelBuilder.Entity("OlliBot.Infrastructure.Entities.LastChannelMessage", b =>
                 {
                     b.Property<ulong>("GuildId")
                         .HasColumnType("INTEGER");
@@ -52,15 +52,11 @@ namespace OlliBot.Infrastructure.Data.Migrations
                     b.ToTable("LastChannelMessages");
                 });
 
-            modelBuilder.Entity("OlliBot.Domain.Entities.Message", b =>
+            modelBuilder.Entity("OlliBot.Infrastructure.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.PrimitiveCollection<string>("AttachmentUrls")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Attachments")
                         .HasColumnType("TEXT");
@@ -87,9 +83,8 @@ namespace OlliBot.Infrastructure.Data.Migrations
                     b.Property<ulong>("MessageOriginId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("MessageType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("MessageType")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Utilities;
+using OlliBot.Domain.Enums;
 using OlliBot.Infrastructure.Entities;
 using System.Text.RegularExpressions;
 
@@ -8,7 +9,7 @@ namespace OlliBot.Bot.Services;
 
 public class MessageFactory : IMessageFactory
 {
-    public Message CreateMessageFromInput(IMessage message, string? Title, IInteractionContext ctx, string? messageType)
+    public Message CreateMessageFromInput(IMessage message, string? Title, IInteractionContext ctx, MessageEntityType? messageType)
     {
         var attList = new List<string>();
 
@@ -50,7 +51,7 @@ public class MessageFactory : IMessageFactory
 
         return entry;
     }
-    public Message CreateMessageFromInput(string messageContent, string? Title, IInteractionContext ctx, string? messageType, IUser User)
+    public Message CreateMessageFromInput(string messageContent, string? Title, IInteractionContext ctx, MessageEntityType? messageType, IUser User)
     {
         var entry = new Message
         {
@@ -80,20 +81,20 @@ public class MessageFactory : IMessageFactory
 
         return entry;
     }
-    public string EvaluateMessageType(Message message)
+    public MessageEntityType EvaluateMessageType(Message message)
     {
         var memeExtensions = new List<string> { ".png", ".jpeg", ".jpg", ".gif", ".mp4" };
-        if (message.AttachmentUrls.Count > 0 && message.AttachmentUrls.Any(url => memeExtensions.Any(ex => url.Contains(ex))))
+        if (message.AttachmentUrls.Count > 0 && message.AttachmentUrls.Any(url => memeExtensions.Any(ex => url.Contains(ex, StringComparison.OrdinalIgnoreCase))))
         {
-            return "Meme";
+            return MessageEntityType.Meme;
         }
         else if (!string.IsNullOrEmpty(message.Content) && message.AttachmentUrls.Count == 0)
         {
-            return "Quote";
+            return MessageEntityType.Quote;
         }
         else
         {
-            return "Other";
+            return MessageEntityType.Other;
         }
     }
 }

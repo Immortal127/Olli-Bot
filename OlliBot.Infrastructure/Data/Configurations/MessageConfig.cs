@@ -13,8 +13,8 @@ public sealed class MessageConfig : IEntityTypeConfiguration<Message>
         b.Property(x => x.DiscordMessageId);//.HasConversion(Converters.NullableULongToLong);
 
         // store attachments as JSON text
-        b.Property(x => x.AttachmentUrls);//.HasConversion(Converters.StringListToJson);
-
+        b.Property(x => x.Attachments);//.HasConversion(Converters.StringListToJson);
+        b.Property(x => x.MessageType);//.HasConversion<string>();
         b.Property(x => x.Author).IsRequired();
         b.Property(x => x.DateTimeAdded).IsRequired();
         b.HasIndex(x => new { x.GuildId, x.MessageOriginId });

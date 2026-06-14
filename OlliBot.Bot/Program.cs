@@ -98,9 +98,13 @@ internal class Program
 
             host.Run();
         }
+        catch (HostAbortedException)
+        {
+            // Expected during EF Core tooling operations
+        }
         catch (Exception ex)
         {
-            Log.Error($"Host failed to run: {ex.Message}");
+            Log.Error(ex, "Host failed to run");
         }
         finally
         {
