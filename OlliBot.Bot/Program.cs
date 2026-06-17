@@ -96,7 +96,7 @@ internal class Program
             Log.Information($"///// OlliBot.Bot {DateTime.Now} /////");
             Log.Information("///////////////////////////////////////");
 
-            host.Run();
+            await host.RunAsync();
         }
         catch (HostAbortedException)
         {
