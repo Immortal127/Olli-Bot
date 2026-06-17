@@ -3,7 +3,7 @@ using OlliBot.Infrastructure.Entities;
 
 namespace OlliBot.Infrastructure.Interfaces;
 
-public interface IMessageService
+public interface IMessageRepository
 {
     Task AddMessageAsync(Message message);
     Task DeleteMessageAsync(Message message);

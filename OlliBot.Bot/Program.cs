@@ -38,7 +38,7 @@ internal class Program
         builder.Services.AddInfrastructure(builder.Configuration);
 
         builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-        builder.Services.AddScoped<IMessageService, MessageService>();
+        builder.Services.AddScoped<IMessageRepository, MessageRepository>();
         builder.Services.AddScoped<IEmoteRankingService, EmoteRankingService>();
 
         builder.Services.AddHostedService<Bot>();

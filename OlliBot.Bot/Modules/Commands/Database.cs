@@ -12,11 +12,11 @@ namespace OlliBot.Bot.Modules.Commands;
 [Group("db", "Commands to interact with the message database")]
 public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
 {
-    private readonly IMessageService _messageService;
+    private readonly IMessageRepository _messageService;
     private readonly ILogger<DatabaseCommands> _logger;
     private readonly IMessageFactory _messageFactory;
 
-    public DatabaseCommands(IMessageService messageService, ILogger<DatabaseCommands> logger, IMessageFactory messageFactory)
+    public DatabaseCommands(IMessageRepository messageService, ILogger<DatabaseCommands> logger, IMessageFactory messageFactory)
     {
         _messageService = messageService;
         _logger = logger;

@@ -5,7 +5,7 @@ using OlliBot.Infrastructure.Interfaces;
 
 namespace OlliBot.Infrastructure.Services;
 
-public class MessageService(OlliBotDbContext db) : IMessageService
+public class MessageRepository(OlliBotDbContext db) : IMessageRepository
 {
     public async Task AddMessageAsync(Message message)
     {
