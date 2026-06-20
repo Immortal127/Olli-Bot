@@ -31,6 +31,7 @@ public class InteractionHandler
             _logger.LogCritical(ex, "Error handling interaction.");
         }
     }
+
     public Task OnSlashInvoked(SocketInteraction interaction)
     {
         var command = interaction as SocketSlashCommand;
@@ -58,7 +59,7 @@ public class InteractionHandler
             logMessage.Append(") ");
         }
         logMessage.Append($"by {command.User.Username}, {command.User.Id}");
-        _logger.LogInformation($"{logMessage}");
+        _logger.LogInformation("{Message}", logMessage.ToString());
         return Task.CompletedTask;
     }
 }

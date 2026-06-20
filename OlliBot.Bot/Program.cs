@@ -40,6 +40,11 @@ internal class Program
         builder.Services.AddTransient<IMessageFactory, MessageFactory>();
         builder.Services.AddScoped<IMessageRepository, MessageRepository>();
         builder.Services.AddScoped<IEmoteRankingService, EmoteRankingService>();
+        //builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
+        //builder.Services.AddTransient<IMessageService, MessageService>();
+        //builder.Services.AddTransient<IMessageFactory, MessageFactory>();
+        //builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
 
         builder.Services.AddHostedService<Bot>();
 
@@ -63,7 +68,7 @@ internal class Program
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to initialize Discord client");
+                Log.Error(ex, "Failed to initialize Discord Socket Client");
                 throw;
             }
         });
@@ -81,20 +86,18 @@ internal class Program
         builder.Services.AddSingleton<InteractionHandler>();
         builder.Services.AddSingleton<BotEventHandler>();
 
-        //builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-
-        //builder.Services.AddTransient<IMessageService, MessageService>();
-        //builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-        //builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
         builder.Services.AddSingleton<IDiscordClient>(sp => sp.GetRequiredService<DiscordSocketClient>());
 
         try
         {
             IHost host = builder.Build();
 
-            Log.Information("///////////////////////////////////////");
-            Log.Information($"///// OlliBot.Bot {DateTime.Now} /////");
-            Log.Information("///////////////////////////////////////");
+            var middle = $"///// OlliBot.Bot {DateTime.Now:dd/MM/yyyy HH:mm:ss} /////";
+            var border = new string('/', middle.Length);
+
+            Log.Information(border);
+            Log.Information(middle);
+            Log.Information(border);
 
             await host.RunAsync();
         }

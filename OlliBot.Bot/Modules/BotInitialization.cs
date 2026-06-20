@@ -4,35 +4,26 @@ using System.Reflection;
 
 namespace OlliBot.Bot.Modules;
 
-public class BotInitialization
+public class BotInitialization(
+    IConfiguration configuration,
+    ILogger<Bot> logger,
+    InteractionService interaction,
+    IServiceProvider serviceProvider,
+    IDiscordClient client)
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<Bot> _logger;
-    private readonly InteractionService _interaction;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IDiscordClient _client;
-    public BotInitialization(IConfiguration configuration, ILogger<Bot> logger, InteractionService interaction, IServiceProvider serviceProvider, IDiscordClient client)
-    {
-        _configuration = configuration;
-        _logger = logger;
-        _interaction = interaction;
-        _serviceProvider = serviceProvider;
-        _client = client;
-    }
-
     public async Task InitializationTasks()
     {
-        _logger.LogInformation("Initialization tasks running...");
-        _logger.LogInformation($"Bot ID: {_configuration["BotID"] ?? _client.CurrentUser.Id.ToString()}");
+        logger.LogInformation("Initialization tasks running...");
+        logger.LogInformation($"Bot ID: {configuration["BotID"] ?? client.CurrentUser.Id.ToString()}");
 
-        _logger.LogInformation("Registering commands...");
-        await _interaction.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
-        await _interaction.RegisterCommandsGloballyAsync();
+        logger.LogInformation("Registering commands...");
+        await interaction.AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
+        await interaction.RegisterCommandsGloballyAsync();
 
 
-        foreach (SlashCommandInfo slashCommand in _interaction.SlashCommands.ToList())
+        foreach (SlashCommandInfo slashCommand in interaction.SlashCommands.ToList())
         {
-            _logger.LogInformation($"Registered {slashCommand}");
+            logger.LogInformation($"Registered {slashCommand}");
         }
 
         await Task.CompletedTask;
