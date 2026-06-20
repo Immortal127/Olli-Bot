@@ -41,7 +41,7 @@ public class BotEventHandler(IConfiguration configuration, IDiscordClient client
     {
         if (result.IsSuccess)
         {
-            _logger.LogInformation("Command executed successfully");
+            _logger.LogInformation("Command '{Command}' completed without InteractionService errors", slashInfo.Name);
         }
         else if (!result.IsSuccess)
         {

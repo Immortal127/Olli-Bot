@@ -115,8 +115,14 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
                     responseContent += attachment;
                 }
             }
-
-            await Context.Interaction.RespondAsync(responseContent);
+            try
+            {
+                await Context.Interaction.RespondAsync(responseContent);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while responding to interaction");
+            }
         }
     }
     [SlashCommand("delete", "Delete an entry from the database")]
