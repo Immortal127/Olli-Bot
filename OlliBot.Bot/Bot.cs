@@ -5,53 +5,39 @@ using OlliBot.Bot.Modules;
 
 namespace OlliBot.Bot;
 
-public class Bot : BackgroundService
+public class Bot(
+    ILogger<Bot> logger,
+    DiscordSocketClient client,
+    InteractionService interaction,
+    IConfiguration configuration,
+    BotInitialization botInitialization,
+    InteractionHandler interactionHandler,
+    BotEventHandler eventHandler) : BackgroundService
 {
-
-    private readonly ILogger<Bot> _logger;
-    private readonly DiscordSocketClient _client;
-    private readonly InteractionService _interaction;
-    private readonly IConfiguration _configuration;
-    private readonly BotInitialization _botInitialization;
-    private readonly InteractionHandler _interactionHandler;
-    private readonly BotEventHandler _eventHandler;
-
-    public Bot(ILogger<Bot> logger, DiscordSocketClient client, InteractionService interaction, IConfiguration configuration, BotInitialization botInitialization, InteractionHandler interactionHandler, BotEventHandler eventHandler)
-    {
-        _logger = logger;
-        _client = client;
-        _interaction = interaction;
-        _configuration = configuration;
-        _botInitialization = botInitialization;
-        _interactionHandler = interactionHandler;
-        _eventHandler = eventHandler;
-
-    }
-
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("OlliBot.Bot starting...");
-        _client.Ready += _botInitialization.InitializationTasks;
+        logger.LogInformation("OlliBot.Bot starting...");
+        client.Ready += botInitialization.InitializationTasks;
 
-        _client.InteractionCreated += _interactionHandler.HandleInteraction;
-        _client.InteractionCreated += _interactionHandler.OnSlashInvoked;
+        client.InteractionCreated += interactionHandler.HandleInteraction;
+        client.InteractionCreated += interactionHandler.OnSlashInvoked;
 
-        _client.MessageReceived += _eventHandler.OnMessage;
+        client.MessageReceived += eventHandler.OnMessage;
 
-        _interaction.SlashCommandExecuted += _eventHandler.OnSlashExecute;
+        interaction.SlashCommandExecuted += eventHandler.OnSlashExecute;
 
-        _logger.LogInformation(_configuration["OwnerID"] ?? "Owner ID not configured");
+        logger.LogInformation(configuration["OwnerID"] ?? "Owner ID not configured");
 
         try
         {
-            await _client.LoginAsync(TokenType.Bot, _configuration["DiscordBotToken"]);
+            await client.LoginAsync(TokenType.Bot, configuration["DiscordBotToken"]);
             //await _client.LoginAsync(TokenType.Bot, _configuration["DiscordBotToken"]);
-            await _client.StartAsync();
+            await client.StartAsync();
         }
         catch (Exception ex)
         {
 
-            _logger.LogCritical($"Client failed to connect: {ex.Message}");
+            logger.LogCritical($"Client failed to connect: {ex.Message}");
 
             throw;
         }
@@ -60,34 +46,34 @@ public class Bot : BackgroundService
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("OlliBot.Bot disconnecting...");
+        logger.LogInformation("OlliBot.Bot disconnecting...");
 
-        _client.Ready -= _botInitialization.InitializationTasks;
-        _client.InteractionCreated -= _interactionHandler.HandleInteraction;
-        _client.InteractionCreated -= _interactionHandler.OnSlashInvoked;
-        _client.MessageReceived -= _eventHandler.OnMessage;
-        _interaction.SlashCommandExecuted -= _eventHandler.OnSlashExecute;
+        client.Ready -= botInitialization.InitializationTasks;
+        client.InteractionCreated -= interactionHandler.HandleInteraction;
+        client.InteractionCreated -= interactionHandler.OnSlashInvoked;
+        client.MessageReceived -= eventHandler.OnMessage;
+        interaction.SlashCommandExecuted -= eventHandler.OnSlashExecute;
 
         try
         {
-            await _client.StopAsync();
-            await _client.LogoutAsync();
-            _logger.LogInformation("OlliBot.Bot disconnected...");
+            await client.StopAsync();
+            await client.LogoutAsync();
+            logger.LogInformation("OlliBot.Bot disconnected...");
         }
         catch (Exception ex)
         {
-            _logger.LogCritical($"Error occured while shutting down: {ex.Message}");
+            logger.LogCritical($"Error occured while shutting down: {ex.Message}");
             throw;
         }
 
-        _interaction.Dispose();
-        _client.Dispose();
+        interaction.Dispose();
+        client.Dispose();
 
         await base.StopAsync(cancellationToken);
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("OlliBot.Bot running...");
+        logger.LogInformation("OlliBot.Bot running...");
 
         // Keep the service running until a cancellation is requested.
         try
@@ -103,7 +89,7 @@ public class Bot : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred during shutdown");
+            logger.LogError(ex, "An error occurred during shutdown");
         }
     }
 }
