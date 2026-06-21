@@ -6,7 +6,7 @@ namespace OlliBot.Bot.Modules;
 
 public class BotInitialization(
     IConfiguration configuration,
-    ILogger<Bot> logger,
+    ILogger<BotHostedService> logger,
     InteractionService interaction,
     IServiceProvider serviceProvider,
     IDiscordClient client)

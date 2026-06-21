@@ -5,8 +5,6 @@ using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Modules;
 using OlliBot.Bot.Services;
 using OlliBot.Infrastructure;
-using OlliBot.Infrastructure.Interfaces;
-using OlliBot.Infrastructure.Services;
 using Serilog;
 using Serilog.Events;
 
@@ -30,23 +28,20 @@ internal class Program
         Log.Information("Configuring OlliBot.Bot...");
 
         // Is there a better way of configuring Serilog to work with CreateApplicationBuilder???
-
+        #region DI Setup
         builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
             .ReadFrom.Configuration(builder.Configuration)
             .ReadFrom.Services(services));
 
-        builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddInfrastructureServices(builder.Configuration);
 
         builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-        builder.Services.AddScoped<IMessageRepository, MessageRepository>();
         builder.Services.AddScoped<IEmoteRankingService, EmoteRankingService>();
-        //builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+        builder.Services.AddTransient<BotInitialization>();
+        builder.Services.AddSingleton<InteractionHandler>();
+        builder.Services.AddSingleton<BotEventHandler>();
 
-        //builder.Services.AddTransient<IMessageService, MessageService>();
-        //builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-        //builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
-
-        builder.Services.AddHostedService<Bot>();
+        builder.Services.AddHostedService<BotHostedService>();
 
         builder.Services.AddSingleton((serviceProvider) =>
         {
@@ -82,11 +77,8 @@ internal class Program
             return interaction;
         });
 
-        builder.Services.AddTransient<BotInitialization>();
-        builder.Services.AddSingleton<InteractionHandler>();
-        builder.Services.AddSingleton<BotEventHandler>();
-
         builder.Services.AddSingleton<IDiscordClient>(sp => sp.GetRequiredService<DiscordSocketClient>());
+        #endregion
 
         try
         {

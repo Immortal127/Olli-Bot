@@ -5,8 +5,8 @@ using OlliBot.Bot.Modules;
 
 namespace OlliBot.Bot;
 
-public class Bot(
-    ILogger<Bot> logger,
+public class BotHostedService(
+    ILogger<BotHostedService> logger,
     DiscordSocketClient client,
     InteractionService interaction,
     IConfiguration configuration,
@@ -17,8 +17,8 @@ public class Bot(
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("OlliBot.Bot starting...");
-        client.Ready += botInitialization.InitializationTasks;
 
+        client.Ready += botInitialization.InitializationTasks;
 
         // TODO: Consider subscribing to other events
         client.InteractionCreated += interactionHandler.HandleInteraction;
