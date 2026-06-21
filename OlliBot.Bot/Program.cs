@@ -27,57 +27,14 @@ internal class Program
 
         Log.Information("Configuring OlliBot.Bot...");
 
-        // Is there a better way of configuring Serilog to work with CreateApplicationBuilder???
         #region DI Setup
         builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
             .ReadFrom.Configuration(builder.Configuration)
             .ReadFrom.Services(services));
 
         builder.Services.AddInfrastructureServices(builder.Configuration);
-
-        builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-        builder.Services.AddScoped<IEmoteRankingService, EmoteRankingService>();
-        builder.Services.AddTransient<BotInitialization>();
-        builder.Services.AddSingleton<InteractionHandler>();
-        builder.Services.AddSingleton<BotEventHandler>();
-
-        builder.Services.AddHostedService<BotHostedService>();
-
-        builder.Services.AddSingleton((serviceProvider) =>
-        {
-            ConfigurationManager config = builder.Configuration;
-
-            try
-            {
-                var discordClient = new DiscordSocketClient(new DiscordSocketConfig
-                {
-                    MessageCacheSize = 5000,
-                    AlwaysDownloadUsers = true,
-                    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages | GatewayIntents.GuildMembers
-                    //GatewayIntents = GatewayIntents.All
-                });
-
-                discordClient.Log += LogAsync;
-
-                return discordClient;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to initialize Discord Socket Client");
-                throw;
-            }
-        });
-
-        builder.Services.AddSingleton((serviceProvider) =>
-        {
-            DiscordSocketClient discordClient = serviceProvider.GetRequiredService<DiscordSocketClient>();
-
-            var interaction = new InteractionService(discordClient.Rest);
-
-            return interaction;
-        });
-
-        builder.Services.AddSingleton<IDiscordClient>(sp => sp.GetRequiredService<DiscordSocketClient>());
+        builder.Services.AddBotServices();
+        builder.Services.AddDiscordServices(builder.Configuration);
         #endregion
 
         try
@@ -107,7 +64,8 @@ internal class Program
             await Log.CloseAndFlushAsync();
         }
     }
-    private static async Task LogAsync(LogMessage message)
+
+    internal static async Task LogAsync(LogMessage message)
     {
         LogEventLevel severity = message.Severity switch
         {
