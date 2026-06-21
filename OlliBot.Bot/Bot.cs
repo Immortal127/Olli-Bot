@@ -19,6 +19,8 @@ public class Bot(
         logger.LogInformation("OlliBot.Bot starting...");
         client.Ready += botInitialization.InitializationTasks;
 
+
+        // TODO: Consider subscribing to other events
         client.InteractionCreated += interactionHandler.HandleInteraction;
         client.InteractionCreated += interactionHandler.OnSlashInvoked;
 
