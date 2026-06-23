@@ -50,12 +50,12 @@ public class BotEventHandler(IConfiguration configuration, IDiscordClient client
                 if (result.ErrorReason == "Invalid context for command; accepted contexts: Guild.")
                 {
                     await ctx.Interaction.RespondAsync("Command can only be used in a server.", ephemeral: true);
-                    _logger.LogWarning($"{result.ErrorReason}");
+                    _logger.LogWarning("{ErrorReason}", result.ErrorReason);
                 }
                 if (result.Error == InteractionCommandError.UnmetPrecondition)
                 {
                     await ctx.Interaction.RespondAsync(result.ErrorReason, ephemeral: true);
-                    _logger.LogWarning($"{result.ErrorReason}");
+                    _logger.LogWarning("{ErrorReason}", result.ErrorReason);
                 }
             }
         }
