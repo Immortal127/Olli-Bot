@@ -55,7 +55,7 @@ public class BotHostedService(
     {
         try
         {
-            var token = configuration["DiscordBotToken"] ?? throw new InvalidOperationException("DiscordBotToken is not configured");
+            string token = configuration["DiscordBotToken"] ?? throw new InvalidOperationException("DiscordBotToken is not configured");
 
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
@@ -67,7 +67,8 @@ public class BotHostedService(
         catch (OperationCanceledException)
         {
             // Expected during shutdown Ctrl+C
-        }        catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             logger.LogCritical(ex, "Bot failed");
             throw;

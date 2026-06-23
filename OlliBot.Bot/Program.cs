@@ -1,9 +1,4 @@
 using Discord;
-using Discord.Interactions;
-using Discord.WebSocket;
-using OlliBot.Bot.Interfaces;
-using OlliBot.Bot.Modules;
-using OlliBot.Bot.Services;
 using OlliBot.Infrastructure;
 using Serilog;
 using Serilog.Events;
@@ -41,8 +36,8 @@ internal class Program
         {
             IHost host = builder.Build();
 
-            var middle = $"///// OlliBot.Bot {DateTime.Now:dd/MM/yyyy HH:mm:ss} /////";
-            var border = new string('/', middle.Length);
+            string middle = $"///// OlliBot.Bot {DateTime.Now:dd/MM/yyyy HH:mm:ss} /////";
+            string border = new('/', middle.Length);
 
             Log.Information(border);
             Log.Information(middle);
