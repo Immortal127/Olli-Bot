@@ -23,6 +23,8 @@ internal static class DependencyInjection
 
     internal static IServiceCollection AddDiscordServices(this IServiceCollection services, ConfigurationManager configuration)
     {
+        services.AddSingleton<DiscordLogService>();
+
         services.AddSingleton((serviceProvider) =>
         {
             try
@@ -37,7 +39,8 @@ internal static class DependencyInjection
                     //GatewayIntents = GatewayIntents.All
                 });
 
-                discordClient.Log += Program.LogAsync;
+                var discordLogService = serviceProvider.GetRequiredService<DiscordLogService>();
+                discordClient.Log += discordLogService.Log;
 
                 return discordClient;
             }
