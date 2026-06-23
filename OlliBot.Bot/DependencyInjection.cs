@@ -25,12 +25,10 @@ internal static class DependencyInjection
     {
         services.AddSingleton<DiscordLogService>();
 
-        services.AddSingleton((serviceProvider) =>
+        services.AddSingleton<DiscordSocketClient>((serviceProvider) =>
         {
             try
             {
-                ConfigurationManager config = configuration;
-
                 var discordClient = new DiscordSocketClient(new DiscordSocketConfig
                 {
                     MessageCacheSize = 5000,

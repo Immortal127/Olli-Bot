@@ -36,7 +36,9 @@ internal class Program
         {
             IHost host = builder.Build();
 
-            string middle = $"///// OlliBot.Bot {DateTime.Now:dd/MM/yyyy HH:mm:ss} /////";
+            string projectName = typeof(Program).Assembly.GetName().Name!;
+
+            string middle = $"///// {projectName} {DateTime.Now:dd/MM/yyyy HH:mm:ss} /////";
             string border = new('/', middle.Length);
 
             Log.Information(border);

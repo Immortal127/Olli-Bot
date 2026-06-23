@@ -14,9 +14,11 @@ public class BotHostedService(
     InteractionHandler interactionHandler,
     BotEventHandler eventHandler) : BackgroundService
 {
+    private static readonly string ProjectName = typeof(BotHostedService).Assembly.GetName().Name!;
+
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("OlliBot.Bot starting...");
+        logger.LogInformation("{Project} starting...", ProjectName);
 
         client.Ready += botInitialization.InitializationTasks;
 
@@ -27,20 +29,20 @@ public class BotHostedService(
         client.MessageReceived += eventHandler.OnMessage;
         interaction.SlashCommandExecuted += eventHandler.OnSlashExecute;
 
-        logger.LogInformation(configuration["OwnerID"] ?? "Owner ID not configured");
+        logger.LogInformation("Owner ID: {OwnerID}", configuration["OwnerID"] ?? "Owner ID not configured");
 
         await base.StartAsync(cancellationToken);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("OlliBot.Bot disconnecting...");
+        logger.LogInformation("{Project} disconnecting...", ProjectName);
 
         try
         {
             await client.StopAsync();
             await client.LogoutAsync();
-            logger.LogInformation("OlliBot.Bot disconnected...");
+            logger.LogInformation("{Project} disconnected...", ProjectName);
         }
         catch (Exception ex)
         {
@@ -60,7 +62,7 @@ public class BotHostedService(
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
 
-            logger.LogInformation("OlliBot.Bot running...");
+            logger.LogInformation("{Project} running...", ProjectName);
 
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
