@@ -8,29 +8,26 @@ public class BasicCommands : InteractionModuleBase<SocketInteractionContext>
     [SlashCommand("avatar", "Get the avatar of the specified user")]
     public async Task Avatar([Summary("user", "Specified user")] IUser? user = null)
     {
+        user ??= Context.User;
+
+        //string displayName = user.Nickname ?? user.DisplayName ?? user.Username;
+        string displayName;
+        if (user is IGuildUser guildUser)
         {
-            user ??= Context.User;
-
-            //string displayName = user.Nickname ?? user.DisplayName ?? user.Username;
-            string displayName;
-            if (user is IGuildUser guildUser)
-            {
-                displayName = guildUser.Nickname ?? guildUser.DisplayName ?? guildUser.Username;
-            }
-            else
-            {
-                displayName = user.Username;
-            }
-
-
-            var embed = new EmbedBuilder();
-            embed.WithTitle($"{displayName}'s avatar");
-            embed.WithColor(new Color(252, 177, 3));
-            embed.WithUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
-            embed.WithImageUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
-
-            await RespondAsync(embed: embed.Build());
+            displayName = guildUser.Nickname ?? guildUser.DisplayName ?? guildUser.Username;
         }
+        else
+        {
+            displayName = user.Username;
+        }
+
+        var embed = new EmbedBuilder();
+        embed.WithTitle($"{displayName}'s avatar");
+        embed.WithColor(new Color(252, 177, 3));
+        embed.WithUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
+        embed.WithImageUrl(user.GetAvatarUrl(ImageFormat.Png, 1024));
+
+        await RespondAsync(embed: embed.Build());
     }
 
     [SlashCommand("info", "Get server info for a user")]
