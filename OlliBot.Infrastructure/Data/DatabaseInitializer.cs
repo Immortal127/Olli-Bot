@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OlliBot.Infrastructure.Data;
 
-namespace OlliBot.Infrastructure;
+namespace OlliBot.Infrastructure.Data;
 
 public sealed class DatabaseInitializer(
     OlliBotDbContext db,

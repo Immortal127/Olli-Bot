@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using OlliBot.Application.Commands.AddMessage;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Modules;
 using OlliBot.Bot.Services;
