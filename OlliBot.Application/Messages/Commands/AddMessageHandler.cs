@@ -6,7 +6,7 @@ namespace OlliBot.Application.Messages.Commands;
 
 public class AddMessageHandler(ILogger<AddMessageHandler> logger, IMessageRepository messageRepository)
 {
-    public async Task<AddMessageResult> HandleAsync(AddMessageCommand command)
+    public async Task<AddMessageResult> HandleAsync(AddMessageCommand command, CancellationToken cancellationToken = default)
     {
         var message = new Message
         {
@@ -24,7 +24,7 @@ public class AddMessageHandler(ILogger<AddMessageHandler> logger, IMessageReposi
 
         try
         {
-            await messageRepository.AddAsync(message);
+            await messageRepository.AddAsync(message, cancellationToken);
             return new AddMessageResult(true, "Entry added to the database");
         }
         catch (Exception ex)

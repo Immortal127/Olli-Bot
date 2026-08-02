@@ -16,8 +16,4 @@
     <ProjectReference Include="..\OlliBot.Domain\OlliBot.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Messages\Queries\" />
-  </ItemGroup>
-
 </Project>

@@ -70,14 +70,15 @@ public sealed class AddMessageCommandMapper
     }
 
 
-    private static MessageEntityType ResolveMessageType(string? messageTypeString, IReadOnlyCollection<string> attachmentUrls, string content) 
-        => messageTypeString switch
+    private static MessageEntityType ResolveMessageType(string? messageTypeString, IReadOnlyCollection<string> attachmentUrls, string content)
     {
-        "Meme" => MessageEntityType.Meme,
-        "Quote" => MessageEntityType.Quote,
-        "Other" => MessageEntityType.Other,
-        _ => DetermineMessageType(attachmentUrls, content)
-    };
+        if (Enum.TryParse<MessageEntityType>(messageTypeString, out MessageEntityType messageType))
+        {
+            return messageType;
+        }
+
+        return DetermineMessageType(attachmentUrls, content);
+    }
 
     private static string ExtractUrls(string content, List<string> attachmentUrls)
     {

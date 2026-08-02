@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Application.Interfaces;
 using OlliBot.Application.Messages.Commands;
-using OlliBot.Bot.Interfaces;
+using OlliBot.Application.Messages.Queries;
 using OlliBot.Bot.Mappers;
 using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
@@ -13,10 +13,13 @@ namespace OlliBot.Bot.Modules.Commands;
 [RequireContext(ContextType.Guild)]
 [Group("db", "Commands to interact with the message database")]
 public class DatabaseCommands(
-    IMessageRepository messageService,
     ILogger<DatabaseCommands> logger,
     AddMessageHandler addMessageHandler,
-    AddMessageCommandMapper addMessageMapper) : InteractionModuleBase<SocketInteractionContext>
+    AddMessageCommandMapper addMessageMapper,
+    CallMessageHandler callMessageHandler,
+    DeleteMessageHandler deleteMessageHandler,
+    ListMessageHandler listMessageHandler,
+    UpdateMessageHandler updateMessageHandler) : InteractionModuleBase<SocketInteractionContext>
 {
 
     //Command to add entries to database
@@ -29,12 +32,12 @@ public class DatabaseCommands(
     [Choice("Other", "Other")]
     [Summary("Type", "Type (If no value set then will be implicitly determined)")] string? messageTypeString = null)
     {
-        AddMessageCommand command;
+        AddMessageCommand addCommand;
 
         if (ulong.TryParse(messageEntry, out ulong result))
         {
             IMessage discordMessage = await Context.Interaction.Channel.GetMessageAsync(result);
-            command = addMessageMapper.Map(discordMessage, title, Context, messageTypeString);
+            addCommand = addMessageMapper.Map(discordMessage, title, Context, messageTypeString);
         }
         //If input for message is not convertable to ulong assume it is a manually entered quote
         else
@@ -42,61 +45,50 @@ public class DatabaseCommands(
             //If manually entered quote has no origin then respond with unsuccessful message
             if (originUser is null)
             {
-                await Context.Interaction.RespondAsync("Entry unsuccessful.", ephemeral: true);
+                await RespondAsync("Entry unsuccessful.", ephemeral: true);
                 return;
             }
-            command = addMessageMapper.Map(messageEntry, title, Context, messageTypeString, originUser);
+            addCommand = addMessageMapper.Map(messageEntry, title, Context, messageTypeString, originUser);
         }
 
-        AddMessageResult commandResult = await addMessageHandler.HandleAsync(command);
+        AddMessageResult addResult = await addMessageHandler.HandleAsync(addCommand);
 
-        await RespondAsync(commandResult.Message, ephemeral: true);
+        await RespondAsync(addResult.Message, ephemeral: true);
     }
 
     //Command to call an entry from the database based on ID
     [SlashCommand("call", "Call entry by ID from the database")]
     public async Task CallMessage([Summary("Query", "Message ID or Title")] string query)
     {
-        Message? queriedMessage;
+        CallMessageResult callResult = await callMessageHandler.HandleAsync(new CallMessageQuery(query, Context.Guild.Id));
 
-        if (int.TryParse(query, out int intQuery))
+        if (!callResult.Success || callResult.Message is null)
         {
-            queriedMessage = await messageService.GetByIdAsync(intQuery, Context.Guild.Id);
-        }
-        else
-        {
-            queriedMessage = await messageService.GetByTitleAsync(query, Context.Guild.Id);
-        }
-
-        if (queriedMessage is null)
-        {
-            await Context.Interaction.RespondAsync("No message found", ephemeral: true);
-
+            await RespondAsync(callResult.OutcomeMessage, ephemeral: true);
             return;
         }
 
-        if (queriedMessage.DiscordMessageId is null && queriedMessage.MessageType == MessageEntityType.Quote)
+        Message message = callResult.Message;
+
+        if (message.DiscordMessageId is null && message.MessageType == MessageEntityType.Quote)
         {
-            IGuildUser quoteOrigin = Context.Guild.GetUser(queriedMessage.MessageOriginId);
-            string responseContent = $"\"{queriedMessage.Content}\" - {quoteOrigin.DisplayName}";
-            await Context.Interaction.RespondAsync(responseContent);
+            IGuildUser quoteOrigin = Context.Guild.GetUser(message.MessageOriginId);
+            string responseContent = $"\"{message.Content}\" - {quoteOrigin.DisplayName}";
+            await RespondAsync(responseContent);
         }
         else
         {
 
-            string responseContent = queriedMessage.Content ?? string.Empty;
+            string responseContent = message.Content ?? string.Empty;
 
-            if (queriedMessage.AttachmentUrls.Count > 0)
+            if (message.AttachmentUrls.Count > 0)
             {
                 responseContent += Environment.NewLine;
-                foreach (string attachment in queriedMessage.AttachmentUrls)
-                {
-                    responseContent += attachment + Environment.NewLine;
-                }
+                responseContent += string.Join(Environment.NewLine, message.AttachmentUrls);
             }
             try
             {
-                await Context.Interaction.RespondAsync(responseContent);
+                await RespondAsync(responseContent);
             }
             catch (Exception ex)
             {
@@ -104,82 +96,56 @@ public class DatabaseCommands(
             }
         }
     }
+
     [SlashCommand("delete", "Delete an entry from the database")]
     public async Task DeleteEntry(
-    [Summary("Id", "Database ID")] int DbID)
+        [Summary("Id", "Database ID")] int dbId)
     {
-        var user = (SocketGuildUser)Context.User;
+        DeleteMessageResult deleteResult = await deleteMessageHandler.HandleAsync(
+            new DeleteMessageCommand(
+                dbId,
+                Context.Guild.Id,
+                Context.User.Id,
+                ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator)));
 
-        Message? queriedMessage = await messageService.GetByIdAsync(DbID, Context.Guild.Id);
-
-        if (queriedMessage is null)
-        {
-            await Context.Interaction.RespondAsync("No Entry found", ephemeral: true);
-            return;
-        }
-
-        if (queriedMessage.AuthorId != Context.User.Id && !user.GuildPermissions.Has(GuildPermission.Administrator))
-        {
-            await Context.Interaction.RespondAsync("You must be admin to delete database entries from other users", ephemeral: true);
-            return;
-        }
-
-        await messageService.DeleteAsync(queriedMessage);
-        await Context.Interaction.RespondAsync("Deleted entry", ephemeral: true);
-
+        await RespondAsync(deleteResult.OutcomeMessage, ephemeral: true);
     }
+
     [SlashCommand("update", "Update entry in database")]
     public async Task UpdateEntry(
-    [Summary("Id", "Message ID")] int DbID,
-    [Summary("Title", "Updated title")] string? Title = null,
-    [Choice("Meme", "Meme")]
-    [Choice("Quote", "Quote")]
-    [Choice("Other", "Other")]
-    [Summary("Type", "Updated type")] string? messageTypeString = null)
+        [Summary("Id", "Message ID")] int dbId,
+        [Summary("Title", "Updated title")] string? title = null,
+        [Choice("Meme", "Meme")]
+        [Choice("Quote", "Quote")]
+        [Choice("Other", "Other")]
+        [Summary("Type", "Updated type")] string? messageTypeString = null)
     {
-        Message? queriedMessage = await messageService.GetByIdAsync(DbID, Context.Guild.Id);
+        UpdateMessageResult updateResult = await updateMessageHandler.HandleAsync(
+            new UpdateMessageCommand(
+                dbId,
+                Context.Guild.Id,
+                Context.User.Id,
+                ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator),
+                messageTypeString,
+                title));
 
-        if (queriedMessage == null || Title == null && messageTypeString == null)
-        {
-            string x = "wat";
-            await Context.Interaction.RespondAsync(x, ephemeral: true);
-            return;
-        }
-        if (Title != null)
-        {
-            queriedMessage.Title = Title;
-        }
-        if (messageTypeString != null)
-        {
-            MessageEntityType messageType = messageTypeString switch
-            {
-                "Meme" => MessageEntityType.Meme,
-                "Quote" => MessageEntityType.Quote,
-                "Other" => MessageEntityType.Other,
-                _ => MessageEntityType.Other
-            };
-
-            queriedMessage.MessageType = messageType;
-        }
-
-        await messageService.UpdateAsync(queriedMessage);
-        await Context.Interaction.RespondAsync("Updated entry", ephemeral: true);
+        await RespondAsync(updateResult.OutcomeMessage, ephemeral: true);
     }
 
     [SlashCommand("list", "List entries in database")]
     public async Task ListEntries([Summary("User", "list entries from a specific user")] SocketUser? user = null)
     {
-        List<Message> messageList = await messageService.ListAsync(Context.Guild.Id, user?.Id);
+        ListMessageResult listResult = await listMessageHandler.HandleAsync(new ListMessageQuery(Context.Guild.Id, user?.Id));
 
-        if (messageList.Count == 0)
+        if (listResult.Messages.Count == 0)
         {
-            await Context.Interaction.RespondAsync("No messages found", ephemeral: true);
+            await RespondAsync("No messages found", ephemeral: true);
             return;
         }
-        string idString = string.Join("\n", messageList.Select(m => m.Id));
-        string titleString = string.Join("\n", messageList.Select(m => m.Title ?? "N/A"));
-        string typeString = string.Join("\n", messageList.Select(m => m.MessageType));
-        string authorString = string.Join("\n", messageList.Select(m => m.Author));
+        string idString = string.Join("\n", listResult.Messages.Select(m => m.Id));
+        string titleString = string.Join("\n", listResult.Messages.Select(m => m.Title ?? "N/A"));
+        string typeString = string.Join("\n", listResult.Messages.Select(m => m.MessageType.ToString()));
+        string authorString = string.Join("\n", listResult.Messages.Select(m => m.Author));
 
         var embed = new EmbedBuilder();
 
@@ -190,6 +156,6 @@ public class DatabaseCommands(
         embed.WithColor(Color.Gold);
         embed.WithTitle("Olli Bot Database");
 
-        await Context.Interaction.RespondAsync(embed: embed.Build(), ephemeral: true);
+        await RespondAsync(embed: embed.Build(), ephemeral: true);
     }
 }
