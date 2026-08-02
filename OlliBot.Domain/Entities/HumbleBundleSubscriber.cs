@@ -1,6 +1,6 @@
 ﻿using OlliBot.Domain.Enums;
 
-namespace OlliBot.Infrastructure.Entities;
+namespace OlliBot.Domain.Entities;
 public class HumbleBundleSubscriber
 {
     public int Id { get; set; }

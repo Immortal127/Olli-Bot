@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using OlliBot.Application.Commands.AddMessage;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Modules;
 using OlliBot.Bot.Services;
@@ -13,10 +14,11 @@ internal static class DependencyInjection
     {
         services.AddTransient<IMessageFactory, MessageFactory>();
         services.AddScoped<IEmoteRankingService, EmoteRankingService>();
+        services.AddTransient<AddMessageCommandMapper>();
+
         services.AddTransient<BotInitialization>();
         services.AddSingleton<InteractionHandler>();
         services.AddSingleton<BotEventHandler>();
-
         services.AddHostedService<BotHostedService>();
         return services;
     }
@@ -37,7 +39,7 @@ internal static class DependencyInjection
                     //GatewayIntents = GatewayIntents.All
                 });
 
-                var discordLogService = serviceProvider.GetRequiredService<DiscordLogService>();
+                DiscordLogService discordLogService = serviceProvider.GetRequiredService<DiscordLogService>();
                 discordClient.Log += discordLogService.Log;
 
                 return discordClient;

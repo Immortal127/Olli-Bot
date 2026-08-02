@@ -1,6 +1,6 @@
 ﻿using Discord;
+using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
-using OlliBot.Infrastructure.Entities;
 
 namespace OlliBot.Bot.Interfaces;
 

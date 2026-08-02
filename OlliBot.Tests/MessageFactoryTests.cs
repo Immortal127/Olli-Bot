@@ -2,8 +2,8 @@
 using NSubstitute;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Services;
+using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
-using OlliBot.Infrastructure.Entities;
 
 namespace OlliBot.Tests;
 

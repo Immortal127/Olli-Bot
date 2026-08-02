@@ -1,8 +1,8 @@
 ﻿using Discord;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Utilities;
+using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
-using OlliBot.Infrastructure.Entities;
 using System.Text.RegularExpressions;
 
 namespace OlliBot.Bot.Services;

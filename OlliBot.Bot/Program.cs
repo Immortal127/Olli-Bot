@@ -1,7 +1,7 @@
-using Discord;
+using OlliBot.Application;
 using OlliBot.Infrastructure;
+using OlliBot.Infrastructure.Data;
 using Serilog;
-using Serilog.Events;
 
 namespace OlliBot.Bot;
 
@@ -23,13 +23,16 @@ internal class Program
         Log.Information("Configuring OlliBot.Bot...");
 
         #region DI Setup
+
         builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
             .ReadFrom.Configuration(builder.Configuration)
             .ReadFrom.Services(services));
 
+        builder.Services.AddApplicationServices(builder.Configuration);
         builder.Services.AddInfrastructureServices(builder.Configuration);
         builder.Services.AddBotServices();
         builder.Services.AddDiscordServices(builder.Configuration);
+
         #endregion
 
         try
@@ -44,6 +47,14 @@ internal class Program
             Log.Information(border);
             Log.Information(middle);
             Log.Information(border);
+
+            using (IServiceScope scope = host.Services.CreateScope())
+            {
+                DatabaseInitializer initializer =
+                    scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+
+                await initializer.InitializeAsync();
+            }
 
             await host.RunAsync();
         }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OlliBot.Infrastructure.Entities;
+using OlliBot.Domain.Entities;
 
 namespace OlliBot.Infrastructure.Data.Configurations;
 public sealed class EmoteCountConfig : IEntityTypeConfiguration<EmoteCount>

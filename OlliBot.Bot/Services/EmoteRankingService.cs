@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Microsoft.EntityFrameworkCore;
 using OlliBot.Bot.Interfaces;
+using OlliBot.Domain.Entities;
 using OlliBot.Infrastructure.Data;
-using OlliBot.Infrastructure.Entities;
 
 namespace OlliBot.Bot.Services;
 

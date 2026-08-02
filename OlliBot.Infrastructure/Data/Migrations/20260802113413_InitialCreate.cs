@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace OlliBot.Infrastructure.Migrations
+namespace OlliBot.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class OlliBotDatabaseInitialisation : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,7 +48,7 @@ namespace OlliBot.Infrastructure.Migrations
                     GuildId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     Title = table.Column<string>(type: "TEXT", nullable: true),
                     Content = table.Column<string>(type: "TEXT", nullable: true),
-                    Attachments = table.Column<string>(type: "TEXT", nullable: true),
+                    AttachmentUrls = table.Column<string>(type: "TEXT", nullable: false),
                     Author = table.Column<string>(type: "TEXT", nullable: false),
                     AuthorId = table.Column<ulong>(type: "INTEGER", nullable: false),
                     MessageOriginId = table.Column<ulong>(type: "INTEGER", nullable: false),

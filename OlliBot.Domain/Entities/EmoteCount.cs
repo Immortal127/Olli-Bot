@@ -1,4 +1,4 @@
-﻿namespace OlliBot.Infrastructure.Entities;
+﻿namespace OlliBot.Domain.Entities;
 
 public class EmoteCount
 {

@@ -8,19 +8,19 @@ using OlliBot.Infrastructure.Data;
 
 #nullable disable
 
-namespace OlliBot.Infrastructure.Migrations
+namespace OlliBot.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(OlliBotDbContext))]
-    [Migration("20260614213843_OlliBotDatabaseInitialisation")]
-    partial class OlliBotDatabaseInitialisation
+    [Migration("20260802113413_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.18");
 
-            modelBuilder.Entity("OlliBot.Infrastructure.Entities.EmoteCount", b =>
+            modelBuilder.Entity("OlliBot.Domain.Entities.EmoteCount", b =>
                 {
                     b.Property<ulong>("GuildId")
                         .HasColumnType("INTEGER");
@@ -39,7 +39,7 @@ namespace OlliBot.Infrastructure.Migrations
                     b.ToTable("EmoteCounts");
                 });
 
-            modelBuilder.Entity("OlliBot.Infrastructure.Entities.LastChannelMessage", b =>
+            modelBuilder.Entity("OlliBot.Domain.Entities.LastChannelMessage", b =>
                 {
                     b.Property<ulong>("GuildId")
                         .HasColumnType("INTEGER");
@@ -55,13 +55,14 @@ namespace OlliBot.Infrastructure.Migrations
                     b.ToTable("LastChannelMessages");
                 });
 
-            modelBuilder.Entity("OlliBot.Infrastructure.Entities.Message", b =>
+            modelBuilder.Entity("OlliBot.Domain.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Attachments")
+                    b.Property<string>("AttachmentUrls")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Author")

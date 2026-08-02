@@ -1,18 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using OlliBot.Application.Interfaces;
-
-// Build action set to none until I figure out if this is a good idea
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using OlliBot.Application.Commands.AddMessage;
 
 namespace OlliBot.Application;
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration cfg)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration cfg)
     {
         // services
 
-        builder.Services.AddTransient<IMessageService, MessageService>();
-        builder.Services.AddTransient<IMessageFactory, MessageFactory>();
-        builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
+        services.AddTransient<AddMessageHandler>();
+
+
+        //builder.Services.AddTransient<IMessageService, MessageService>();
+        //builder.Services.AddTransient<IMessageFactory, MessageFactory>();
+        //builder.Services.AddTransient<IEmoteRankingService, EmoteRankingService>();
 
         return services;
     }

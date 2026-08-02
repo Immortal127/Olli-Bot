@@ -1,8 +1,6 @@
 ﻿using OlliBot.Domain.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json;
 
-namespace OlliBot.Infrastructure.Entities;
+namespace OlliBot.Domain.Entities;
 
 public class Message
 {
@@ -27,18 +25,9 @@ public class Message
     /// </summary>
     public string? Content { get; set; }
     /// <summary>
-    /// The attachments (urls, images, etc) of the Message serialized as a string
-    /// </summary>
-    public string? Attachments { get; set; }
-    /// <summary>
     /// The attachments of the Message deserialized as a json object. This property is not mapped to a column in the database.
     /// </summary>
-    [NotMapped]
-    public List<string> AttachmentUrls
-    {
-        get => string.IsNullOrEmpty(Attachments) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(Attachments) ?? [];
-        set => Attachments = JsonSerializer.Serialize(value);
-    }
+    public List<string> AttachmentUrls { get; set; } = [];
     /// <summary>
     /// User that added the Message into the database
     /// </summary>
