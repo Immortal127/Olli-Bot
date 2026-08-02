@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace OlliBot.Bot.Mappers;
 
-public class AddMessageCommandMapper
+public sealed class AddMessageCommandMapper
 {
     private static readonly string[] MemeExtensions =
         [
@@ -30,22 +30,8 @@ public class AddMessageCommandMapper
 
         string content = message.Content;
 
-
-        MatchCollection matches = UrlRegex.Matches(content);
-
-        if (matches.Count > 0)
-        {
-            attachmentUrls.AddRange(matches.Select(m => m.Value));
-            content = UrlRegex.Replace(content, string.Empty).Trim();
-        }
-
-        MessageEntityType messageType = messageTypeString switch
-        {
-            "Meme" => MessageEntityType.Meme,
-            "Quote" => MessageEntityType.Quote,
-            "Other" => MessageEntityType.Other,
-            _ => DetermineMessageType(attachmentUrls, content)
-        };
+        content = ExtractUrls(content, attachmentUrls);
+        MessageEntityType messageType = ResolveMessageType(messageTypeString, attachmentUrls, content);
 
         return new AddMessageCommand(
             DiscordMessageId: message.Id,
@@ -60,31 +46,16 @@ public class AddMessageCommandMapper
     }
 
     public AddMessageCommand Map(
-    string messageContent,
-    string? title,
-    IInteractionContext context,
-    string? messageTypeString,
-    IUser originUser)
+        string content,
+        string? title,
+        IInteractionContext context,
+        string? messageTypeString,
+        IUser originUser)
     {
-        var attachmentUrls = new List<string>();
+        List<string> attachmentUrls = [];
 
-        string content = messageContent;
-
-        MatchCollection matches = UrlRegex.Matches(content);
-
-        if (matches.Count > 0)
-        {
-            attachmentUrls.AddRange(matches.Select(m => m.Value));
-            content = UrlRegex.Replace(content, string.Empty).Trim();
-        }
-
-        MessageEntityType messageType = messageTypeString switch
-        {
-            "Meme" => MessageEntityType.Meme,
-            "Quote" => MessageEntityType.Quote,
-            "Other" => MessageEntityType.Other,
-            _ => DetermineMessageType(attachmentUrls, content)
-        };
+        content = ExtractUrls(content, attachmentUrls);
+        MessageEntityType messageType = ResolveMessageType(messageTypeString, attachmentUrls, content);
 
         return new AddMessageCommand(
             DiscordMessageId: null, // or 0, depending on your command
@@ -96,6 +67,29 @@ public class AddMessageCommandMapper
             AuthorId: context.User.Id,
             OriginUserId: originUser.Id,
             MessageType: messageType);
+    }
+
+
+    private static MessageEntityType ResolveMessageType(string? messageTypeString, IReadOnlyCollection<string> attachmentUrls, string content) 
+        => messageTypeString switch
+    {
+        "Meme" => MessageEntityType.Meme,
+        "Quote" => MessageEntityType.Quote,
+        "Other" => MessageEntityType.Other,
+        _ => DetermineMessageType(attachmentUrls, content)
+    };
+
+    private static string ExtractUrls(string content, List<string> attachmentUrls)
+    {
+        MatchCollection matches = UrlRegex.Matches(content);
+
+        if (matches.Count > 0)
+        {
+            attachmentUrls.AddRange(matches.Select(m => m.Value));
+            content = UrlRegex.Replace(content, string.Empty).Trim();
+        }
+
+        return content;
     }
 
     private static bool IsMemeAttachment(string url)

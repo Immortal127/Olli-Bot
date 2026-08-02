@@ -12,14 +12,18 @@ namespace OlliBot.Bot.Modules.Commands;
 
 [RequireContext(ContextType.Guild)]
 [Group("db", "Commands to interact with the message database")]
-public class DatabaseCommands(IMessageRepository messageService, ILogger<DatabaseCommands> logger, IMessageFactory messageFactory, AddMessageHandler addMessageHandler, AddMessageCommandMapper addMessageMapper) : InteractionModuleBase<SocketInteractionContext>
+public class DatabaseCommands(
+    IMessageRepository messageService,
+    ILogger<DatabaseCommands> logger,
+    AddMessageHandler addMessageHandler,
+    AddMessageCommandMapper addMessageMapper) : InteractionModuleBase<SocketInteractionContext>
 {
 
     //Command to add entries to database
     [SlashCommand("add", "Add a discord message to the database")]
     public async Task AddMessage([Summary("message", "Enter a message ID or quote content")] string messageEntry,
-    [Summary("title", "Title (Optional)")] string? Title = null,
-    [Summary("origin", "Quote origin (Optional if using Message ID for input)")] SocketGuildUser? User = null,
+    [Summary("title", "Title (Optional)")] string? title = null,
+    [Summary("origin", "Quote origin (Optional if using Message ID for input)")] SocketGuildUser? originUser = null,
     [Choice("Meme", "Meme")]
     [Choice("Quote", "Quote")]
     [Choice("Other", "Other")]
@@ -29,19 +33,19 @@ public class DatabaseCommands(IMessageRepository messageService, ILogger<Databas
 
         if (ulong.TryParse(messageEntry, out ulong result))
         {
-            IMessage DiscordMessageObj = await Context.Interaction.Channel.GetMessageAsync(result);
-            command = addMessageMapper.Map(DiscordMessageObj, Title, Context, messageTypeString);
+            IMessage discordMessage = await Context.Interaction.Channel.GetMessageAsync(result);
+            command = addMessageMapper.Map(discordMessage, title, Context, messageTypeString);
         }
         //If input for message is not convertable to ulong assume it is a manually entered quote
         else
         {
             //If manually entered quote has no origin then respond with unsuccessful message
-            if (User is null)
+            if (originUser is null)
             {
-                await Context.Interaction.RespondAsync("Entry unsuccessful, try again with a quote origin.", ephemeral: true);
+                await Context.Interaction.RespondAsync("Entry unsuccessful.", ephemeral: true);
                 return;
             }
-            command = addMessageMapper.Map(messageEntry, Title, Context, messageTypeString, User);
+            command = addMessageMapper.Map(messageEntry, title, Context, messageTypeString, originUser);
         }
 
         AddMessageResult commandResult = await addMessageHandler.HandleAsync(command);
