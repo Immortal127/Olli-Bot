@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Bot.Interfaces;
+using OlliBot.Bot.Mappers;
 using OlliBot.Bot.Modules;
 using OlliBot.Bot.Services;
 using Serilog;

@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using OlliBot.Application.Commands.AddMessage;
 using OlliBot.Application.Interfaces;
 using OlliBot.Bot.Interfaces;
+using OlliBot.Bot.Mappers;
 using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
 

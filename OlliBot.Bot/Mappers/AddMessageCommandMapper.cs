@@ -3,7 +3,7 @@ using OlliBot.Application.Commands.AddMessage;
 using OlliBot.Domain.Enums;
 using System.Text.RegularExpressions;
 
-namespace OlliBot.Bot;
+namespace OlliBot.Bot.Mappers;
 
 public class AddMessageCommandMapper
 {
