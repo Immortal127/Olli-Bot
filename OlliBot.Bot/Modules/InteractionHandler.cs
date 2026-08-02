@@ -4,31 +4,22 @@ using System.Text;
 
 namespace OlliBot.Bot.Modules;
 
-public class InteractionHandler
+public class InteractionHandler(
+    InteractionService interactionService, 
+    ILogger<BotHostedService> logger, 
+    DiscordSocketClient client, 
+    IServiceProvider serviceProvider)
 {
-    private readonly InteractionService _interactionService;
-    private readonly ILogger<BotHostedService> _logger;
-    private readonly DiscordSocketClient _client;
-    private readonly IServiceProvider _serviceProvider;
-
-    public InteractionHandler(InteractionService interactionService, ILogger<BotHostedService> logger, DiscordSocketClient client, IServiceProvider serviceProvider)
-    {
-        _interactionService = interactionService;
-        _logger = logger;
-        _client = client;
-        _serviceProvider = serviceProvider;
-    }
-
     public async Task HandleInteraction(SocketInteraction arg)
     {
         try
         {
-            var context = new SocketInteractionContext(_client, arg);
-            await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
+            var context = new SocketInteractionContext(client, arg);
+            await interactionService.ExecuteCommandAsync(context, serviceProvider);
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex, "Error handling interaction.");
+            logger.LogCritical(ex, "Error handling interaction.");
         }
     }
 
@@ -59,7 +50,7 @@ public class InteractionHandler
             logMessage.Append(") ");
         }
         logMessage.Append($"by {command.User.Username}, {command.User.Id}");
-        _logger.LogInformation("{Message}", logMessage.ToString());
+        logger.LogInformation("{Message}", logMessage.ToString());
         return Task.CompletedTask;
     }
 }

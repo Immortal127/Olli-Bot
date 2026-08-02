@@ -1,5 +1,6 @@
 using OlliBot.Application;
 using OlliBot.Infrastructure;
+using OlliBot.Infrastructure.Data;
 using Serilog;
 
 namespace OlliBot.Bot;

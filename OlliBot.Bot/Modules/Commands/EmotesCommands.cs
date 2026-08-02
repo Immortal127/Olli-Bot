@@ -6,11 +6,8 @@ using OlliBot.Bot.Utilities;
 namespace OlliBot.Bot.Modules.Commands;
 
 [RequireContext(ContextType.Guild)]
-public class Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger) : InteractionModuleBase<SocketInteractionContext>
+public class EmotesCommands(IEmoteRankingService emoteService, ILogger<EmotesCommands> logger) : InteractionModuleBase<SocketInteractionContext>
 {
-    private readonly IEmoteRankingService _emoteService = emoteService;
-    private readonly ILogger<Emotes> _logger = logger;
-
     [SlashCommand("emoterank", "Emote rankings")]
     public async Task SendEmoteRankings(
     [Choice("True", 1)]
@@ -24,7 +21,7 @@ public class Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger) :
 
             if (reset == 1)
             {
-                await _emoteService.ResetDB(Context);
+                await emoteService.ResetDB(Context);
             }
 
             if (emotes.Count == 0)
@@ -38,7 +35,7 @@ public class Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger) :
 
             await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
-            Dictionary<GuildEmote, int> emoteCounts = await _emoteService.GetEmoteCounts(emotes, textChannels, Context);
+            Dictionary<GuildEmote, int> emoteCounts = await emoteService.GetEmoteCounts(emotes, textChannels, Context);
 
 
 
@@ -49,7 +46,7 @@ public class Emotes(IEmoteRankingService emoteService, ILogger<Emotes> logger) :
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            logger.LogError(e.Message);
         }
     }
 }

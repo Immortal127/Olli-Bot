@@ -8,14 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Modules\Commands\Config.cs" />
+    <Compile Remove="Modules\Commands\ConfigCommands.cs" />
     <Compile Remove="SlashRegistry.cs" />
     <Compile Remove="Utilities\ConfigManager.cs" />
     <Compile Remove="Utilities\ExceptionHandler.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Modules\Commands\Config.cs" />
+    <None Include="Modules\Commands\ConfigCommands.cs" />
   </ItemGroup>
 
   <ItemGroup>

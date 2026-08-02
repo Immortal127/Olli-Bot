@@ -11,22 +11,8 @@ namespace OlliBot.Bot.Modules.Commands;
 
 [RequireContext(ContextType.Guild)]
 [Group("db", "Commands to interact with the message database")]
-public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
+public class DatabaseCommands(IMessageRepository messageService, ILogger<DatabaseCommands> logger, IMessageFactory messageFactory, AddMessageHandler addMessageHandler, AddMessageCommandMapper addMessageMapper) : InteractionModuleBase<SocketInteractionContext>
 {
-    private readonly IMessageRepository _messageService;
-    private readonly ILogger<DatabaseCommands> _logger;
-    private readonly IMessageFactory _messageFactory;
-    private readonly AddMessageHandler _addMessageHandler;
-    private readonly AddMessageCommandMapper _addMessageMapper;
-
-    public DatabaseCommands(IMessageRepository messageService, ILogger<DatabaseCommands> logger, IMessageFactory messageFactory, AddMessageHandler addMessageHandler, AddMessageCommandMapper addMessageMapper)
-    {
-        _messageService = messageService;
-        _logger = logger;
-        _messageFactory = messageFactory;
-        _addMessageHandler = addMessageHandler;
-        _addMessageMapper = addMessageMapper;
-    }
 
     //Command to add entries to database
     [SlashCommand("add", "Add a discord message to the database")]
@@ -43,7 +29,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
         if (ulong.TryParse(messageEntry, out ulong result))
         {
             IMessage DiscordMessageObj = await Context.Interaction.Channel.GetMessageAsync(result);
-            command = _addMessageMapper.Map(DiscordMessageObj, Title, Context, messageTypeString);
+            command = addMessageMapper.Map(DiscordMessageObj, Title, Context, messageTypeString);
         }
         //If input for message is not convertable to ulong assume it is a manually entered quote
         else
@@ -54,10 +40,10 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
                 await Context.Interaction.RespondAsync("Entry unsuccessful, try again with a quote origin.", ephemeral: true);
                 return;
             }
-            command = _addMessageMapper.Map(messageEntry, Title, Context, messageTypeString, User);
+            command = addMessageMapper.Map(messageEntry, Title, Context, messageTypeString, User);
         }
 
-        AddMessageResult commandResult = await _addMessageHandler.HandleAsync(command);
+        AddMessageResult commandResult = await addMessageHandler.HandleAsync(command);
 
         await RespondAsync(commandResult.Message, ephemeral: true);
     }
@@ -70,11 +56,11 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
 
         if (int.TryParse(query, out int intQuery))
         {
-            queriedMessage = await _messageService.GetByIdAsync(intQuery, Context.Guild.Id);
+            queriedMessage = await messageService.GetByIdAsync(intQuery, Context.Guild.Id);
         }
         else
         {
-            queriedMessage = await _messageService.GetByTitleAsync(query, Context.Guild.Id);
+            queriedMessage = await messageService.GetByTitleAsync(query, Context.Guild.Id);
         }
 
         if (queriedMessage is null)
@@ -109,7 +95,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occured while responding to interaction");
+                logger.LogError(ex, "Error occured while responding to interaction");
             }
         }
     }
@@ -119,7 +105,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     {
         var user = (SocketGuildUser)Context.User;
 
-        Message? queriedMessage = await _messageService.GetByIdAsync(DbID, Context.Guild.Id);
+        Message? queriedMessage = await messageService.GetByIdAsync(DbID, Context.Guild.Id);
 
         if (queriedMessage is null)
         {
@@ -133,7 +119,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
             return;
         }
 
-        await _messageService.DeleteAsync(queriedMessage);
+        await messageService.DeleteAsync(queriedMessage);
         await Context.Interaction.RespondAsync("Deleted entry", ephemeral: true);
 
     }
@@ -146,7 +132,7 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
     [Choice("Other", "Other")]
     [Summary("Type", "Updated type")] string? messageTypeString = null)
     {
-        Message? queriedMessage = await _messageService.GetByIdAsync(DbID, Context.Guild.Id);
+        Message? queriedMessage = await messageService.GetByIdAsync(DbID, Context.Guild.Id);
 
         if (queriedMessage == null || Title == null && messageTypeString == null)
         {
@@ -171,14 +157,14 @@ public class DatabaseCommands : InteractionModuleBase<SocketInteractionContext>
             queriedMessage.MessageType = messageType;
         }
 
-        await _messageService.UpdateAsync(queriedMessage);
+        await messageService.UpdateAsync(queriedMessage);
         await Context.Interaction.RespondAsync("Updated entry", ephemeral: true);
     }
 
     [SlashCommand("list", "List entries in database")]
     public async Task ListEntries([Summary("User", "list entries from a specific user")] SocketUser? user = null)
     {
-        List<Message> messageList = await _messageService.ListAsync(Context.Guild.Id, user?.Id);
+        List<Message> messageList = await messageService.ListAsync(Context.Guild.Id, user?.Id);
 
         if (messageList.Count == 0)
         {

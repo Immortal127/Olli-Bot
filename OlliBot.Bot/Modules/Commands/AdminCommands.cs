@@ -5,14 +5,8 @@ namespace OlliBot.Bot.Modules.Commands;
 
 [RequireUserPermission(GuildPermission.Administrator)]
 [RequireContext(ContextType.Guild)]
-public class AdminCommands : InteractionModuleBase<SocketInteractionContext>
+public class AdminCommands(ILogger<AdminCommands> logger) : InteractionModuleBase<SocketInteractionContext>
 {
-    private readonly ILogger<AdminCommands> _logger;
-
-    public AdminCommands(ILogger<AdminCommands> logger)
-    {
-        _logger = logger;
-    }
     [SlashCommand("purge", "Purge a number of messages from a user in a text channel")]
     public async Task Purge([Summary("user", "Specified user")] IUser user, [Summary("amount", "amount of messages to delete")] int amount)
     {
@@ -69,7 +63,7 @@ public class AdminCommands : InteractionModuleBase<SocketInteractionContext>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while deleting messages.");
+            logger.LogError(ex, "An error occurred while deleting messages.");
             await Context.Interaction.ModifyOriginalResponseAsync(msg =>
             {
                 msg.Content = $"Error occured: {ex.Message}";
