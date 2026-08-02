@@ -1,6 +1,6 @@
 ﻿using OlliBot.Domain.Enums;
 
-namespace OlliBot.Application.Commands.AddMessage;
+namespace OlliBot.Application.Messages.Commands;
 
 public sealed record AddMessageCommand(
     ulong? DiscordMessageId,

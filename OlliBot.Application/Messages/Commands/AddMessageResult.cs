@@ -1,4 +1,4 @@
-﻿namespace OlliBot.Application.Commands.AddMessage;
+﻿namespace OlliBot.Application.Messages.Commands;
 public sealed record AddMessageResult(
     bool Success,
     string Message);

@@ -5,9 +5,9 @@ using System.Text;
 namespace OlliBot.Bot.Modules;
 
 public class InteractionHandler(
-    InteractionService interactionService, 
-    ILogger<BotHostedService> logger, 
-    DiscordSocketClient client, 
+    InteractionService interactionService,
+    ILogger<BotHostedService> logger,
+    DiscordSocketClient client,
     IServiceProvider serviceProvider)
 {
     public async Task HandleInteraction(SocketInteraction arg)

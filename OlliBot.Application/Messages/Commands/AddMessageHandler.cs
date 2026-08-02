@@ -2,7 +2,7 @@
 using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Entities;
 
-namespace OlliBot.Application.Commands.AddMessage;
+namespace OlliBot.Application.Messages.Commands;
 
 public class AddMessageHandler(ILogger<AddMessageHandler> logger, IMessageRepository messageRepository)
 {

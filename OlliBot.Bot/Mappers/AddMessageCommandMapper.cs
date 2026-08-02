@@ -1,5 +1,5 @@
 ﻿using Discord;
-using OlliBot.Application.Commands.AddMessage;
+using OlliBot.Application.Messages.Commands;
 using OlliBot.Domain.Enums;
 using System.Text.RegularExpressions;
 
