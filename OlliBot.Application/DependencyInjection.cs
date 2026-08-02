@@ -5,7 +5,7 @@ using OlliBot.Application.Commands.AddMessage;
 namespace OlliBot.Application;
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration cfg)
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration cfg)
     {
         // services
 

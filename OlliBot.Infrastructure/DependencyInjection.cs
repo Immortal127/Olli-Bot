@@ -9,7 +9,7 @@ namespace OlliBot.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration cfg)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration cfg)
     {
         services.AddDbContext<OlliBotDbContext>(o =>
             o.UseSqlite(cfg.GetConnectionString("DefaultConnection") ?? "Data Source=ServersData.db"));
