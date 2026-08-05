@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using OlliBot.Application.EmoteRanking.Scanning;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Mappers;
 using OlliBot.Bot.Modules;
@@ -13,13 +14,15 @@ internal static class DependencyInjection
     internal static IServiceCollection AddBotServices(this IServiceCollection services)
     {
         services.AddTransient<IMessageFactory, MessageFactory>();
-        services.AddScoped<IEmoteRankingService, EmoteRankingService>();
         services.AddTransient<AddMessageCommandMapper>();
 
         services.AddTransient<BotInitialization>();
         services.AddSingleton<InteractionHandler>();
         services.AddSingleton<BotEventHandler>();
         services.AddHostedService<BotHostedService>();
+
+
+        services.AddTransient<IEmoteCountScanner, EmoteCountScanner>();
         return services;
     }
 

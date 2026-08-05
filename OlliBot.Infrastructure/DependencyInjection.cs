@@ -15,6 +15,8 @@ public static class DependencyInjection
             o.UseSqlite(cfg.GetConnectionString("DefaultConnection") ?? "Data Source=ServersData.db"));
 
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IEmoteCountRepository, EmoteCountRepository>();
+
 
         services.AddTransient<DatabaseInitializer>();
 

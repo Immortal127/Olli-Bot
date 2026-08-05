@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OlliBot.Application.EmoteRanking.Commands;
 using OlliBot.Application.Messages.Commands;
 using OlliBot.Application.Messages.Queries;
 
@@ -14,6 +15,9 @@ public static class DependencyInjection
         services.AddTransient<DeleteMessageHandler>();
         services.AddTransient<ListMessageHandler>();
         services.AddTransient<UpdateMessageHandler>();
+
+        services.AddTransient<UpdateEmoteRankingHandler>();
+
         return services;
     }
 }

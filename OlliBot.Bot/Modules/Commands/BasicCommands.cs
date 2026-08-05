@@ -10,16 +10,13 @@ public class BasicCommands : InteractionModuleBase<SocketInteractionContext>
     {
         user ??= Context.User;
 
-        //string displayName = user.Nickname ?? user.DisplayName ?? user.Username;
-        string displayName;
-        if (user is IGuildUser guildUser)
+        string displayName = user switch
         {
-            displayName = guildUser.Nickname ?? guildUser.DisplayName ?? guildUser.Username;
-        }
-        else
-        {
-            displayName = user.Username;
-        }
+            IGuildUser guildUser => guildUser.Nickname
+                                 ?? guildUser.DisplayName
+                                 ?? guildUser.Username,
+            _ => user.Username
+        };
 
         var embed = new EmbedBuilder();
         embed.WithTitle($"{displayName}'s avatar");
@@ -38,11 +35,9 @@ public class BasicCommands : InteractionModuleBase<SocketInteractionContext>
 
         string nickname = member.Nickname ?? member.DisplayName ?? member.Username;
 
-        //await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(user.AvatarUrl));
         var embed = new EmbedBuilder();
 
-
-        embed.WithTitle($"{member.Nickname} ({member.Username}) server info");
+        embed.WithTitle($"{nickname} ({member.Username}) server info");
         embed.AddField("Account Created:", member.CreatedAt.ToString("yyyy/MM/dd  hh:mm"), true);
         embed.AddField("Join date:", member.JoinedAt?.ToString("yyyy/MM/dd hh:mm") ?? "NULL", true);
         //embed.AddField("Current Activity:", $"{user.Presence.Activity.ActivityType. ?? "Nothing"}", true);

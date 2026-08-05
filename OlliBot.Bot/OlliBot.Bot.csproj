@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\IEmoteRankingService.cs" />
     <Compile Remove="Modules\Commands\ConfigCommands.cs" />
     <Compile Remove="SlashRegistry.cs" />
     <Compile Remove="Utilities\ConfigManager.cs" />
@@ -15,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Interfaces\IEmoteRankingService.cs" />
     <None Include="Modules\Commands\ConfigCommands.cs" />
   </ItemGroup>
 

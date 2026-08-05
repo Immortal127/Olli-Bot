@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EmoteRanking\Queries\**" />
+    <EmbeddedResource Remove="EmoteRanking\Queries\**" />
+    <None Remove="EmoteRanking\Queries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.18" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.18" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.18" />

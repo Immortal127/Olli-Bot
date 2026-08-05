@@ -13,19 +13,36 @@ public static class Helpers
         var regex = new Regex(@"https?://[^\s/$.?#].[^\s]*");
         return regex.IsMatch(input);
     }
-    public static string FormatEmoteRankings(Dictionary<GuildEmote, int> emoteCounts)
+    public static string FormatEmoteRankings(
+        IReadOnlyDictionary<ulong, int> emoteCounts,
+        IReadOnlyCollection<GuildEmote> guildEmotes)
     {
+        Dictionary<ulong, GuildEmote> emotesById =
+            guildEmotes.ToDictionary(
+                emote => emote.Id);
+
         var sb = new StringBuilder();
 
         sb.AppendLine("Emote Usage Ranking:");
 
-        foreach (KeyValuePair<GuildEmote, int> kv in emoteCounts.OrderByDescending(kv => kv.Value))
+        foreach ((ulong emoteId, int count) in
+                 emoteCounts.OrderByDescending(entry => entry.Value))
         {
-            sb.AppendLine($"{kv.Key}  -  {kv.Value}");
+            if (!emotesById.TryGetValue(
+                    emoteId,
+                    out GuildEmote? emote))
+            {
+                // The emote may have been deleted after the scan.
+                continue;
+            }
+
+            // GuildEmote.ToString() produces the Discord emote mention.
+            sb.AppendLine($"{emote} - {count}");
         }
 
         return sb.ToString();
     }
+
     public static bool ContentExeedsLength(this IMessage message, int length)
     {
         return message.Content.Length > length;

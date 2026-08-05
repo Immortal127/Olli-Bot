@@ -1,9 +1,22 @@
-﻿namespace OlliBot.Application.Interfaces;
+﻿using OlliBot.Application.EmoteRanking.Models;
+using OlliBot.Domain.Entities;
+
+namespace OlliBot.Application.Interfaces;
 public interface IEmoteCountRepository
 {
-    Task<Dictionary<ulong, int>> GetCountsAsync(ulong guildId);
+    Task<EmoteCount> GetEmoteCount(ulong emoteId, CancellationToken ct);
 
-    Task SaveCountsAsync(ulong guildId, Dictionary<ulong, int> counts);
+    Task ClearGuildStateAsync(ulong guildId, CancellationToken ct);
 
-    Task DeleteStaleAsync(ulong guildId, HashSet<ulong> activeEmoteIds);
+    Task<int> DeleteStaleCountsAsync(ulong guildId, IReadOnlyCollection<ulong> activeEmoteIds, CancellationToken ct);
+
+    Task<LastChannelMessage?> GetLastMessageForChannel(ulong guildId, ulong channelId, CancellationToken ct);
+
+    Task<IEnumerable<LastChannelMessage>> GetLastMessagesForGuild(ulong guildId, CancellationToken ct);
+
+    Task<Dictionary<ulong, int>> GetCountsAsync(ulong guildId, CancellationToken ct);
+
+    Task<EmoteRankingState> GetGuildStateAsync(ulong guildId, CancellationToken ct);
+
+    Task SaveAsync(EmoteRankingState updatedState, DateTime utcNow, CancellationToken ct);
 }

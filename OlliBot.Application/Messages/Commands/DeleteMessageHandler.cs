@@ -18,7 +18,7 @@ public class DeleteMessageHandler(IMessageRepository messageRepository)
             return new DeleteMessageResult(false, "You must be admin to delete database entries from other users.");
         }
 
-        await messageRepository.DeleteAsync(message);
+        await messageRepository.DeleteAsync(message, cancellationToken);
 
         return new DeleteMessageResult(true, "Message deleted successfully.");
     }
