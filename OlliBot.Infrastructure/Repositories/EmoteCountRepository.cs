@@ -38,7 +38,7 @@ internal class EmoteCountRepository(OlliBotDbContext db) : IEmoteCountRepository
 
     public async Task<Dictionary<ulong, int>> GetCountsAsync(ulong guildId, CancellationToken ct)
     {
-        return await db.EmoteCounts.Where(x => x.GuildId == guildId).ToDictionaryAsync(x => x.EmoteId, x => x.Count);
+        return await db.EmoteCounts.AsNoTracking().Where(x => x.GuildId == guildId).ToDictionaryAsync(x => x.EmoteId, x => x.Count, cancellationToken: ct);
     }
 
     public async Task<int> DeleteStaleCountsAsync(
@@ -56,32 +56,26 @@ internal class EmoteCountRepository(OlliBotDbContext db) : IEmoteCountRepository
     public async Task<EmoteCount> GetEmoteCount(ulong emoteId, CancellationToken ct)
     {
         EmoteCount? existingEntry = await db.EmoteCounts.SingleOrDefaultAsync(e => e.EmoteId == emoteId, ct);
-        if (existingEntry == null)
-        {
-            throw new InvalidOperationException($"EmoteCount with ID {emoteId} not found.");
-        }
-        return existingEntry    ;
+        return existingEntry ?? throw new InvalidOperationException($"EmoteCount with ID {emoteId} not found.");
     }
 
     public async Task<EmoteRankingState> GetGuildStateAsync(
         ulong guildId,
         CancellationToken ct)
     {
-        Dictionary<ulong, int> counts =
-            await db.EmoteCounts
-                .Where(count => count.GuildId == guildId)
-                .ToDictionaryAsync(
-                    count => count.EmoteId,
-                    count => count.Count,
-                    ct);
+        Dictionary<ulong, int> counts = await db.EmoteCounts
+            .Where(count => count.GuildId == guildId)
+            .ToDictionaryAsync(
+                count => count.EmoteId,
+                count => count.Count,
+                ct);
 
-        Dictionary<ulong, ulong> checkpoints =
-            await db.LastChannelMessages
-                .Where(message => message.GuildId == guildId)
-                .ToDictionaryAsync(
-                    message => message.ChannelId,
-                    message => message.MessageId,
-                    ct);
+        Dictionary<ulong, ulong> checkpoints = await db.LastChannelMessages
+            .Where(message => message.GuildId == guildId)
+            .ToDictionaryAsync(
+                message => message.ChannelId,
+                message => message.MessageId,
+                ct);
 
         return new EmoteRankingState(
             GuildId: guildId,
