@@ -17,7 +17,7 @@ public static class Helpers
         IReadOnlyDictionary<ulong, int> emoteCounts,
         IReadOnlyCollection<GuildEmote> guildEmotes)
     {
-        Dictionary<ulong, GuildEmote> emotesById =
+        var emotesById =
             guildEmotes.ToDictionary(
                 emote => emote.Id);
 

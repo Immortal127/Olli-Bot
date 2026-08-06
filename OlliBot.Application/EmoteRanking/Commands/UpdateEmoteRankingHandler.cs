@@ -63,7 +63,7 @@ public class UpdateEmoteRankingHandler(IEmoteCountRepository repository, IEmoteC
         }
         catch (Exception ex)
         {
-            return new UpdateEmoteRankingResult(false, null , "Emote ranking failed");
+            return new UpdateEmoteRankingResult(false, null, "Emote ranking failed");
         }
     }
 }

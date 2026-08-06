@@ -8,9 +8,6 @@ public sealed class EmoteCountConfig : IEntityTypeConfiguration<EmoteCount>
     public void Configure(EntityTypeBuilder<EmoteCount> b)
     {
         b.HasKey(x => new { x.GuildId, x.EmoteId });
-        // WTF does .Property do?
-        b.Property(x => x.GuildId);//.HasConversion(Converters.ULongToLong);
-        b.Property(x => x.EmoteId);//.HasConversion(Converters.ULongToLong);
     }
 }
 

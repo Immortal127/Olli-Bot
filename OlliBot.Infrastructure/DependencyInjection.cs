@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OlliBot.Application.HumbleBundle;
 using OlliBot.Application.Interfaces;
 using OlliBot.Infrastructure.Data;
+using OlliBot.Infrastructure.HumbleBundle;
 using OlliBot.Infrastructure.Repositories;
 
 namespace OlliBot.Infrastructure;
@@ -19,6 +21,8 @@ public static class DependencyInjection
 
 
         services.AddTransient<DatabaseInitializer>();
+
+        services.AddTransient<IHumbleBundleScanner, HumbleBundleScanner>();
 
         return services;
     }

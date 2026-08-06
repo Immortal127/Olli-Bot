@@ -6,7 +6,7 @@ public interface IMessageRepository
 {
     Task AddAsync(Message message, CancellationToken ct);
 
-    Task DeleteAsync(Message message, CancellationToken ct );
+    Task DeleteAsync(Message message, CancellationToken ct);
 
     Task<Message?> GetByIdAsync(int id, ulong guildId, CancellationToken ct);
 

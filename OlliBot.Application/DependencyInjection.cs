@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OlliBot.Application.EmoteRanking.Commands;
+using OlliBot.Application.HumbleBundle;
 using OlliBot.Application.Messages.Commands;
 using OlliBot.Application.Messages.Queries;
 
@@ -18,6 +19,8 @@ public static class DependencyInjection
 
         services.AddTransient<UpdateEmoteRankingHandler>();
         services.AddTransient<ClearEmoteRankingHandler>();
+
+        services.AddTransient<GetAllHumbleBundlesHandler>();
 
         return services;
     }

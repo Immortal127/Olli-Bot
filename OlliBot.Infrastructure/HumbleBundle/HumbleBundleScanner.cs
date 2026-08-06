@@ -1,19 +1,19 @@
 ﻿using Microsoft.Playwright;
 using OlliBot.Application.HumbleBundle;
+using OlliBot.Application.HumbleBundle.Models;
 using OlliBot.Domain.Enums;
-using OlliBot.Domain.Models;
 
-namespace OlliBot.Bot.Services;
+namespace OlliBot.Infrastructure.HumbleBundle;
 public class HumbleBundleScanner : IHumbleBundleScanner
 {
-    public async Task<ScanHumbleBundleResult> ScanAsync(HumbleBundleType bundleType, CancellationToken ct)
+    public async Task<List<ScannedHumbleBundle>> ScanAsync(HumbleBundleType bundleType, CancellationToken ct)
     {
         IPlaywright pw = await Playwright.CreateAsync();
         IBrowser browser = await pw.Chromium.LaunchAsync();
         IBrowserContext context = await browser.NewContextAsync();
         IPage page = await context.NewPageAsync();
 
-        var type = bundleType switch
+        string type = bundleType switch
         {
             HumbleBundleType.Game => "games",
             HumbleBundleType.Book => "books",
@@ -26,14 +26,14 @@ public class HumbleBundleScanner : IHumbleBundleScanner
         ILocator bundles = page.Locator(".full-tile-view.one-third.bundle");
         int bundleCount = await bundles.CountAsync();
 
-        var humbleBundles = new List<HumbleBundle>();
+        var humbleBundles = new List<ScannedHumbleBundle>();
 
         for (int i = 0; i < bundleCount; i++)
         {
             ILocator bundle = bundles.Nth(i);
             string bundleName = await bundle.Locator(".name").InnerHTMLAsync();
             // Will need to adjust this when considering other types of bundles i.e books, software
-            var humbleBundle = new HumbleBundle
+            var humbleBundle = new ScannedHumbleBundle
             {
                 Name = bundleName,
                 BundleType = bundleType,
@@ -43,6 +43,7 @@ public class HumbleBundleScanner : IHumbleBundleScanner
             try
             {
                 await GetBundleDetails(context, href, humbleBundle);
+                humbleBundles.Add(humbleBundle);
             }
             catch (Exception)
             {
@@ -50,10 +51,10 @@ public class HumbleBundleScanner : IHumbleBundleScanner
             }
         }
         await context.CloseAsync();
-        return new ;
+        return humbleBundles;
     }
 
-    public async Task<HumbleBundle> GetBundleDetails(IBrowserContext context, string href, HumbleBundle bundle)
+    public async Task<ScannedHumbleBundle> GetBundleDetails(IBrowserContext context, string href, ScannedHumbleBundle bundle)
     {
         IPage page = await context.NewPageAsync();
         await page.GotoAsync("https://www.humblebundle.com" + href);
@@ -63,7 +64,7 @@ public class HumbleBundleScanner : IHumbleBundleScanner
 
         for (int tier = 0; tier < tierCount; tier++)
         {
-            var bundleTier = new HumbleBundleTier
+            var bundleTier = new ScannedHumbleBundleTier
             {
                 Tier = tier,
             };
@@ -103,7 +104,7 @@ public class HumbleBundleScanner : IHumbleBundleScanner
                 string extraInfo = await bundleItems.Nth(item).Locator(".extra-info.fine-print").InnerTextAsync();
 
                 // Might need to look into what happens if there is no extra info when calling the InnerTextAsync method
-                var bundleItem = new HumbleBundleItem
+                var bundleItem = new ScannedHumbleBundleItem
                 {
                     ItemName = title,
                     //ExtraInfo = await extraInfo.InnerTextAsync(),

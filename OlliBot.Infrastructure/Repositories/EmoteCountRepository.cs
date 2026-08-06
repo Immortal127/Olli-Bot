@@ -9,7 +9,7 @@ internal class EmoteCountRepository(OlliBotDbContext db) : IEmoteCountRepository
 {
     public async Task ClearGuildStateAsync(ulong guildId, CancellationToken ct)
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await db.Database.BeginTransactionAsync(ct);
 
         await db.EmoteCounts
             .Where(e => e.GuildId == guildId)
@@ -122,7 +122,7 @@ internal class EmoteCountRepository(OlliBotDbContext db) : IEmoteCountRepository
     List<EmoteCount> storedCounts,
     DateTime updatedAtUtc)
     {
-        Dictionary<ulong, EmoteCount> storedByEmoteId =
+        var storedByEmoteId =
             storedCounts.ToDictionary(
                 count => count.EmoteId);
 
@@ -161,7 +161,7 @@ internal class EmoteCountRepository(OlliBotDbContext db) : IEmoteCountRepository
         EmoteRankingState state,
         List<LastChannelMessage> storedCheckpoints)
     {
-        Dictionary<ulong, LastChannelMessage> storedByChannelId =
+        var storedByChannelId =
             storedCheckpoints.ToDictionary(
                 checkpoint => checkpoint.ChannelId);
 

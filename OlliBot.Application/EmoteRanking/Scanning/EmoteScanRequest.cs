@@ -1,6 +1,4 @@
-﻿using OlliBot.Domain.Entities;
-
-namespace OlliBot.Application.EmoteRanking.Scanning;
+﻿namespace OlliBot.Application.EmoteRanking.Scanning;
 public record EmoteScanRequest(
     ulong GuildId,
     IReadOnlyDictionary<ulong, ulong> StartingCheckpoints);

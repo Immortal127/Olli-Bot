@@ -2,7 +2,6 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Application.EmoteRanking.Commands;
-using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Utilities;
 
 namespace OlliBot.Bot.Modules.Commands;
@@ -15,7 +14,7 @@ public class EmotesCommands(
     ClearEmoteRankingHandler clearHandler) : InteractionModuleBase<SocketInteractionContext>
 {
     [SlashCommand("scan", "Scan emote rankings")]
-    public async Task UpdateAndDisplayEmoteRankingsAsync([Summary("Reset the emote rankings before scanning")] bool reset = false)
+    public async Task UpdateAndDisplayEmoteRankingsAsync([Summary("Reset")] bool reset = false)
     {
         try
         {
@@ -24,7 +23,7 @@ public class EmotesCommands(
 
             if (reset)
             {
-                var clearResult = await clearHandler.HandleAsync(new ClearEmoteRankingCommand(Context.Guild.Id, ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator)));
+                ClearEmoteRankingResult clearResult = await clearHandler.HandleAsync(new ClearEmoteRankingCommand(Context.Guild.Id, ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator)));
                 if (!clearResult.Success)
                 {
                     await Context.Interaction.RespondAsync(clearResult.Message, ephemeral: true);
@@ -42,7 +41,7 @@ public class EmotesCommands(
             await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
             // call the update handler here
-            var result = await updateHandler.HandleAsync(new UpdateEmoteRankingCommand(Context.Guild.Id));
+            UpdateEmoteRankingResult result = await updateHandler.HandleAsync(new UpdateEmoteRankingCommand(Context.Guild.Id));
             if (result.Counts == null || !result.Success)
             {
                 await Context.Channel.SendMessageAsync(result.Message);
@@ -65,7 +64,7 @@ public class EmotesCommands(
     {
         try
         {
-            var result = await clearHandler.HandleAsync(new ClearEmoteRankingCommand(Context.Guild.Id, ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator)));
+            ClearEmoteRankingResult result = await clearHandler.HandleAsync(new ClearEmoteRankingCommand(Context.Guild.Id, ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator)));
             await Context.Interaction.RespondAsync(result.Message, ephemeral: true);
         }
         catch (Exception e)

@@ -17,11 +17,11 @@ public sealed class EmoteCountScanner(
             ?? throw new InvalidOperationException(
                 $"Guild with ID {request.GuildId} was not found.");
 
-        Dictionary<ulong, GuildEmote> guildEmotes = guild.Emotes.ToDictionary(emote => emote.Id);
+        var guildEmotes = guild.Emotes.ToDictionary(emote => emote.Id);
 
         ITextChannel[] textChannels = (await guild.GetTextChannelsAsync()).ToArray();
 
-        Dictionary<ulong, int> newCounts = guildEmotes.Keys.ToDictionary(emoteId => emoteId, _ => 0);
+        var newCounts = guildEmotes.Keys.ToDictionary(emoteId => emoteId, _ => 0);
 
         Dictionary<ulong, ulong> updatedCheckpoints = [];
 
@@ -50,7 +50,7 @@ public sealed class EmoteCountScanner(
             {
                 ct.ThrowIfCancellationRequested();
 
-                List<IMessage> messages =
+                var messages =
                     (await channel
                         .GetMessagesAsync(
                             cursorMessageId,
