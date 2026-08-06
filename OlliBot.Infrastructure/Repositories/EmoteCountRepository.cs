@@ -9,12 +9,17 @@ internal class EmoteCountRepository(OlliBotDbContext db) : IEmoteCountRepository
 {
     public async Task ClearGuildStateAsync(ulong guildId, CancellationToken ct)
     {
-        IQueryable<EmoteCount> guildEmoteEntries = db.EmoteCounts.Where(e => e.GuildId == guildId);
-        IQueryable<LastChannelMessage> guildLastMessageEntries = db.LastChannelMessages.Where(e => e.GuildId == guildId);
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-        db.EmoteCounts.RemoveRange(guildEmoteEntries);
-        db.LastChannelMessages.RemoveRange(guildLastMessageEntries);
-        await db.SaveChangesAsync(ct);
+        await db.EmoteCounts
+            .Where(e => e.GuildId == guildId)
+            .ExecuteDeleteAsync(ct);
+
+        await db.LastChannelMessages
+            .Where(e => e.GuildId == guildId)
+            .ExecuteDeleteAsync(ct);
+
+        await transaction.CommitAsync(ct);
     }
 
     public async Task<LastChannelMessage?> GetLastMessageForChannel(ulong guildId, ulong channelId, CancellationToken ct)

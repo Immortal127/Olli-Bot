@@ -9,17 +9,13 @@ public class UpdateEmoteRankingHandler(IEmoteCountRepository repository, IEmoteC
     {
         try
         {
-            // 1. Load existing counts and scanning checkpoints.
             EmoteRankingState existingState = await repository
                 .GetGuildStateAsync(command.GuildId, ct);
 
-            // 2. Scan Discord starting from those checkpoints.
             var scanRequest = new EmoteScanRequest(
                 GuildId: command.GuildId,
                 StartingCheckpoints:
-                    existingState.ChannelCheckpoints,
-                IgnoredAuthorId:
-                    1111); //hard coded for now
+                    existingState.ChannelCheckpoints);
 
             EmoteScanResult scanResult =
                 await emoteScanner.ScanAsync(

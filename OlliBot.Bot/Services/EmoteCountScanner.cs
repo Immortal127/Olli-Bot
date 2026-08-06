@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using OlliBot.Application.EmoteRanking.Scanning;
 
 namespace OlliBot.Bot.Services;
@@ -22,9 +21,14 @@ public sealed class EmoteCountScanner(
 
         ITextChannel[] textChannels = (await guild.GetTextChannelsAsync()).ToArray();
 
-        Dictionary<ulong, int> newCounts = guild.Emotes.ToDictionary(emote => emote.Id, _ => 0);
+        Dictionary<ulong, int> newCounts = guildEmotes.Keys.ToDictionary(emoteId => emoteId, _ => 0);
 
         Dictionary<ulong, ulong> updatedCheckpoints = [];
+
+        var requestOptions = new RequestOptions
+        {
+            CancelToken = ct
+        };
 
         foreach (ITextChannel channel in textChannels)
         {
@@ -35,55 +39,29 @@ public sealed class EmoteCountScanner(
                 channel.Id,
                 request.GuildId);
 
-            IMessage? lastMessage = null;
-
-            if (request.StartingCheckpoints.TryGetValue(
+            ulong cursorMessageId =
+                request.StartingCheckpoints.TryGetValue(
                     channel.Id,
-                    out ulong checkpointMessageId))
-            {
-                lastMessage =
-                    await channel.GetMessageAsync(
-                        checkpointMessageId);
-
-                /*
-                 * Do not silently scan from the beginning if the saved
-                 * checkpoint was deleted. Existing counts would then be
-                 * combined with the complete message history, causing
-                 * duplicate counts.
-                 */
-                if (lastMessage is null)
-                {
-                    throw new InvalidOperationException(
-                        $"Checkpoint message {checkpointMessageId} " +
-                        $"for channel {channel.Id} no longer exists. " +
-                        "The rankings must be rebuilt.");
-                }
-            }
+                    out ulong checkpointMessageId)
+                        ? checkpointMessageId
+                        : 0;
 
             while (true)
             {
                 ct.ThrowIfCancellationRequested();
 
-                IEnumerable<IMessage> fetchedMessages =
-                    await (
-                        lastMessage is null
-                            ? channel
-                                .GetMessagesAsync(
-                                    0,
-                                    Direction.After,
-                                    100)
-                                .FlattenAsync()
-                            : channel
-                                .GetMessagesAsync(
-                                    lastMessage,
-                                    Direction.After,
-                                    100)
-                                .FlattenAsync());
-
                 List<IMessage> messages =
-                    fetchedMessages.ToList();
+                    (await channel
+                        .GetMessagesAsync(
+                            cursorMessageId,
+                            Direction.After,
+                            100,
+                            CacheMode.AllowDownload,
+                            requestOptions)
+                        .FlattenAsync())
+                    .ToList();
 
-                // Discord returns the page newest-to-oldest.
+                // Discord returns the page newest-to-oldest, so we reverse the order.
                 messages.Reverse();
 
                 if (messages.Count == 0)
@@ -93,14 +71,13 @@ public sealed class EmoteCountScanner(
 
                 foreach (IMessage message in messages)
                 {
-                    if (message.Author.Id ==
-                        discordClient.CurrentUser.Id)
+                    // Skip messages sent by the bot itself
+                    if (message.Author.Id == discordClient.CurrentUser.Id)
                     {
                         continue;
                     }
 
-                    foreach ((ulong emoteId, GuildEmote emote) in
-                             guildEmotes)
+                    foreach ((ulong emoteId, GuildEmote emote) in guildEmotes)
                     {
                         bool usedInContent =
                             message.Content.Contains(
@@ -119,13 +96,12 @@ public sealed class EmoteCountScanner(
                     }
                 }
 
-                lastMessage = messages[^1];
+                cursorMessageId = messages[^1].Id;
             }
 
-            if (lastMessage is not null)
+            if (cursorMessageId != 0)
             {
-                updatedCheckpoints[channel.Id] =
-                    lastMessage.Id;
+                updatedCheckpoints[channel.Id] = cursorMessageId;
             }
         }
 

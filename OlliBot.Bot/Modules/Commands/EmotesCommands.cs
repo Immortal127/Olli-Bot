@@ -1,5 +1,6 @@
 using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using OlliBot.Application.EmoteRanking.Commands;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Utilities;
@@ -7,26 +8,28 @@ using OlliBot.Bot.Utilities;
 namespace OlliBot.Bot.Modules.Commands;
 
 [RequireContext(ContextType.Guild)]
+[Group("emoterank", "Commands for emote ranking")]
 public class EmotesCommands(
-    //IEmoteRankingService emoteService,
-    UpdateEmoteRankingHandler updateHandler,
     ILogger<EmotesCommands> logger,
-    UpdateEmoteRankingHandler clearHandler) : InteractionModuleBase<SocketInteractionContext>
+    UpdateEmoteRankingHandler updateHandler,
+    ClearEmoteRankingHandler clearHandler) : InteractionModuleBase<SocketInteractionContext>
 {
-    [SlashCommand("emoterank", "Emote rankings")]
-    public async Task SendEmoteRankings(
-    [Choice("true", 1)]
-    [Choice("false", 0)]
-    [Summary("Reset", "Reset the emote ranking database.")] bool reset = false)
+    [SlashCommand("scan", "Scan emote rankings")]
+    public async Task UpdateAndDisplayEmoteRankingsAsync([Summary("Reset the emote rankings before scanning")] bool reset = false)
     {
         try
         {
             //All custom emotes in a server
             IReadOnlyCollection<GuildEmote> emotes = Context.Guild.Emotes;
 
-            if (reset == true)
+            if (reset)
             {
-                UpdateEmoteRankingResult _ = await clearHandler.HandleAsync(new UpdateEmoteRankingCommand(Context.Guild.Id));
+                var clearResult = await clearHandler.HandleAsync(new ClearEmoteRankingCommand(Context.Guild.Id, ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator)));
+                if (!clearResult.Success)
+                {
+                    await Context.Interaction.RespondAsync(clearResult.Message, ephemeral: true);
+                    return;
+                }
             }
 
             if (emotes.Count == 0)
@@ -36,7 +39,6 @@ public class EmotesCommands(
             }
 
             //All channels in a guild that can receive messages
-
             await Context.Interaction.RespondAsync("Bot is working on counting emotes", ephemeral: true);
 
             // call the update handler here
@@ -55,6 +57,23 @@ public class EmotesCommands(
             logger.LogError(e,
                 "An error occurred while handling emote ranking for {GuildId}",
                 Context.Guild.Id);
+        }
+    }
+
+    [SlashCommand("clear", "Clear emote rankings")]
+    public async Task ClearEmoteRankingsAsync()
+    {
+        try
+        {
+            var result = await clearHandler.HandleAsync(new ClearEmoteRankingCommand(Context.Guild.Id, ((SocketGuildUser)Context.User).GuildPermissions.Has(GuildPermission.Administrator)));
+            await Context.Interaction.RespondAsync(result.Message, ephemeral: true);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+                "An error occurred while clearing emote ranking for {GuildId}",
+                Context.Guild.Id);
+            await Context.Interaction.RespondAsync("An error occurred while clearing emote rankings.", ephemeral: true);
         }
     }
 }

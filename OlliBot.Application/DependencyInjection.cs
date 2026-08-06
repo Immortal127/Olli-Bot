@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.AddTransient<UpdateMessageHandler>();
 
         services.AddTransient<UpdateEmoteRankingHandler>();
+        services.AddTransient<ClearEmoteRankingHandler>();
 
         return services;
     }
