@@ -3,6 +3,7 @@ using Discord.Interactions;
 using OlliBot.Application.HumbleBundle;
 using OlliBot.Application.HumbleBundle.Models;
 using OlliBot.Domain.Enums;
+using System.Text;
 
 namespace OlliBot.Bot.Modules.Commands;
 
@@ -12,30 +13,54 @@ public class HumbleBundleCommands(GetAllHumbleBundlesHandler getAllHandler) : In
     [SlashCommand("all", "Humble Bundles")]
     public async Task GetHumbleBundles(HumbleBundleType humbleBundleType)
     {
+        await RespondAsync("Retrieving Humble Bundles...", ephemeral: true);
         // Get humble bundles
-        var result = await getAllHandler.HandleAsync(new ScanHumbleBundleCommand(humbleBundleType));
+        ScanHumbleBundleResult result = await getAllHandler.HandleAsync(new ScanHumbleBundleCommand(humbleBundleType));
 
         // Build embeds for each bundle 
-        Embed embed = new EmbedBuilder()
-            .Build();
 
         // Send found humbles to user / text channel
-        foreach (var bundle in result.ScannedBundles)
+        foreach (ScannedHumbleBundle bundle in result.ScannedBundles)
         {
-            await RespondAsync(embed: BuildHumbleBundleEmbed(bundle));
+            await Context.Channel.SendMessageAsync(embed: CreateHumbleBundleEmbed(bundle));
         }
     }
 
-    private Embed BuildHumbleBundleEmbed(ScannedHumbleBundle bundle)
+    private Embed CreateHumbleBundleEmbed(ScannedHumbleBundle bundle)
     {
-        var embedBuilder = new EmbedBuilder()
+        string description = new StringBuilder()
+            .Append($"**Expires:** {TimestampTag.FormatFromDateTime(bundle.ExpiryDate, TimestampTagStyles.ShortDateTime)} ({TimestampTag.FormatFromDateTime(bundle.ExpiryDate, TimestampTagStyles.Relative)})")
+            .AppendLine()
+            .AppendLine()
+            .Append(bundle.ShortDescription)
+            .AppendLine()
+            .AppendLine()
+            .Append($"**{bundle.Note}**")
+            .ToString();
+
+        EmbedBuilder embedBuilder = new EmbedBuilder()
             .WithTitle(bundle.Name)
-            .WithDescription($"Expires on: {bundle.ExpiryDate.ToShortDateString()}")
-            .WithColor(Color.Blue);
-        foreach (var tier in bundle.BundleTiers)
+            .WithUrl(bundle.Url)
+            .WithImageUrl(bundle.ImageUrl)
+            .WithDescription(description)
+            .WithColor(Color.Blue)
+            .WithCurrentTimestamp();
+
+        foreach (ScannedHumbleBundleTier tier in bundle.BundleTiers)
         {
-            embedBuilder.AddField(tier.Price.ToString(), string.Join("\n", tier.HumbleBundleItems), inline: false);
+            string items = string.Join(
+                "\n",
+                tier.HumbleBundleItems.Select(item =>
+                    string.IsNullOrWhiteSpace(item.ExtraInfo)
+                        ? $"• {item.ItemName}"
+                        : $"• {item.ItemName} *({item.ExtraInfo})*"));
+
+            embedBuilder.AddField(
+                $"Tier {tier.Tier} - Pay at least {tier.Price:C}",
+                items,
+                inline: false);
         }
+
         return embedBuilder.Build();
     }
 }

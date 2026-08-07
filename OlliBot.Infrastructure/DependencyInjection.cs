@@ -19,7 +19,6 @@ public static class DependencyInjection
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IEmoteCountRepository, EmoteCountRepository>();
 
-
         services.AddTransient<DatabaseInitializer>();
 
         services.AddTransient<IHumbleBundleScanner, HumbleBundleScanner>();
