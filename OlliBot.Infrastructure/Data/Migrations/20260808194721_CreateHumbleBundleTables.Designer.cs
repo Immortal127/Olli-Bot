@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OlliBot.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using OlliBot.Infrastructure.Data;
 namespace OlliBot.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(OlliBotDbContext))]
-    partial class OlliBotDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260808194721_CreateHumbleBundleTables")]
+    partial class CreateHumbleBundleTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.18");

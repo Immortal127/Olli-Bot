@@ -4,12 +4,12 @@ using Discord.WebSocket;
 using OlliBot.Application.EmoteRanking.Commands;
 using OlliBot.Bot.Utilities;
 
-namespace OlliBot.Bot.Modules.Commands;
+namespace OlliBot.Bot.Modules;
 
 [RequireContext(ContextType.Guild)]
 [Group("emoterank", "Commands for emote ranking")]
-public class EmotesCommands(
-    ILogger<EmotesCommands> logger,
+public class EmoteRankingSlashCommands(
+    ILogger<EmoteRankingSlashCommands> logger,
     UpdateEmoteRankingHandler updateHandler,
     ClearEmoteRankingHandler clearHandler) : InteractionModuleBase<SocketInteractionContext>
 {

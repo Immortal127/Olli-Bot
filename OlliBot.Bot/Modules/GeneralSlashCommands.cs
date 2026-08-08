@@ -1,9 +1,9 @@
 using Discord;
 using Discord.Interactions;
 
-namespace OlliBot.Bot.Modules.Commands;
+namespace OlliBot.Bot.Modules;
 
-public class BasicCommands : InteractionModuleBase<SocketInteractionContext>
+public class GeneralSlashCommands : InteractionModuleBase<SocketInteractionContext>
 {
     [SlashCommand("avatar", "Get the avatar of the specified user")]
     public async Task Avatar([Summary("user", "Specified user")] IUser? user = null)

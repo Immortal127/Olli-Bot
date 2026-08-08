@@ -10,6 +10,10 @@ public class OlliBotDbContext : DbContext
     public DbSet<EmoteCount> EmoteCounts => Set<EmoteCount>();
     public DbSet<LastChannelMessage> LastChannelMessages => Set<LastChannelMessage>();
 
+    public DbSet<Domain.Entities.HumbleBundle> HumbleBundles => Set<Domain.Entities.HumbleBundle>();
+
+    public DbSet<HumbleBundleSubscriber> HumbleBundleSubscribers => Set<HumbleBundleSubscriber>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         => modelBuilder.ApplyConfigurationsFromAssembly(typeof(OlliBotDbContext).Assembly);
 }

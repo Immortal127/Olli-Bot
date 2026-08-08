@@ -7,12 +7,12 @@ using OlliBot.Bot.Mappers;
 using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
 
-namespace OlliBot.Bot.Modules.Commands;
+namespace OlliBot.Bot.Modules;
 
 [RequireContext(ContextType.Guild)]
 [Group("db", "Commands to interact with the message database")]
-public class DatabaseCommands(
-    ILogger<DatabaseCommands> logger,
+public class MessageLibrarySlashCommands(
+    ILogger<MessageLibrarySlashCommands> logger,
     AddMessageHandler addMessageHandler,
     AddMessageCommandMapper addMessageMapper,
     CallMessageHandler callMessageHandler,

@@ -18,8 +18,8 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger) : IHumble
 
         string type = bundleType switch
         {
-            HumbleBundleType.Game => "games",
-            HumbleBundleType.Book => "books",
+            HumbleBundleType.Games => "games",
+            HumbleBundleType.Books => "books",
             HumbleBundleType.Software => "software",
             _ => "games"
         };
@@ -157,8 +157,6 @@ element => {
                 await tierFilter.ClickAsync();
 
             ILocator bundleItems = page.Locator(".tier-item-view");
-            //var tierHeader = page.Locator(".tier-header.js-tier-header");
-            //await Task.Delay(160);
 
             if (tier != 0)
             {
@@ -167,7 +165,6 @@ element => {
 
             string priceHeader = await page.Locator(".tier-header.js-tier-header").First.InnerTextAsync();
 
-            //bundleTier.Price = priceHeader;
             bundleTier.Price = ExtractPrice(priceHeader);
 
             int itemCount = await bundleItems.CountAsync();

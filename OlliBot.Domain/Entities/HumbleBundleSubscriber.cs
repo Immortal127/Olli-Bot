@@ -9,4 +9,5 @@ public class HumbleBundleSubscriber
     public ulong? GuildId { get; set; }
     public HumbleBundleSubscriberType SubscriberType { get; set; }
     public HumbleBundleType SubscriptionType { get; set; }
+    public ulong? RoleId { get; set; }
 }

@@ -1,11 +1,13 @@
 using Discord;
 using Discord.Interactions;
 
-namespace OlliBot.Bot.Modules.Commands;
+namespace OlliBot.Bot.Modules;
 
 [RequireUserPermission(GuildPermission.Administrator)]
 [RequireContext(ContextType.Guild)]
-public class AdminCommands(ILogger<AdminCommands> logger) : InteractionModuleBase<SocketInteractionContext>
+public class ModerationSlashCommands(
+    ILogger<ModerationSlashCommands> logger,
+    IDiscordClient discordClient) : InteractionModuleBase<SocketInteractionContext>
 {
     [SlashCommand("purge", "Purge a number of messages from a user in a text channel")]
     public async Task Purge([Summary("user", "Specified user")] IUser user, [Summary("amount", "amount of messages to delete")] int amount)
@@ -14,7 +16,7 @@ public class AdminCommands(ILogger<AdminCommands> logger) : InteractionModuleBas
         {
             await Context.Interaction.DeferAsync(ephemeral: true);
 
-            if (amount > 20)
+            if (discordClient.CurrentUser.Id != user.Id && amount > 20)
             {
                 await Context.Interaction.ModifyOriginalResponseAsync(msg =>
                 {
@@ -33,14 +35,13 @@ public class AdminCommands(ILogger<AdminCommands> logger) : InteractionModuleBas
 
             //Messages older than 14 days can't be bulk deleted so we split old and recent messages into two data collections and delete them using appropriate methods
 
-            //Messages older than 13.5 days
+            //Messages older than 14 days
             IEnumerable<IMessage> oldMessages = from m in delMessages where (DateTimeOffset.UtcNow - m.Timestamp).TotalDays >= 14 select m;
 
             //Every other message in delMessages not in oldMessages
             IEnumerable<IMessage> recentMessages = delMessages.Except(oldMessages);
 
             var textChannel = (ITextChannel)Context.Channel;
-
 
             int delMessageCount = 0;
 

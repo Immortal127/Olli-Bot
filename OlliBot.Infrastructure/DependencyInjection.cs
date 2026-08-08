@@ -11,15 +11,23 @@ namespace OlliBot.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration cfg)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration cfg)
     {
-        services.AddDbContext<OlliBotDbContext>(o =>
-            o.UseSqlite(cfg.GetConnectionString("DefaultConnection") ?? "Data Source=ServersData.db"));
+        string connectionString =
+            cfg.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException(
+                "Connection string 'DefaultConnection' was not configured.");
+
+        services.AddDbContext<OlliBotDbContext>(options =>
+            options.UseSqlite(connectionString));
 
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IEmoteCountRepository, EmoteCountRepository>();
+        services.AddScoped<IHumbleBundleRepository, HumbleBundleRepository>();
 
-        services.AddTransient<DatabaseInitializer>();
+        services.AddScoped<DatabaseInitializer>();
 
         services.AddTransient<IHumbleBundleScanner, HumbleBundleScanner>();
 

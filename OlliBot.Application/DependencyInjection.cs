@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddTransient<ClearEmoteRankingHandler>();
 
         services.AddTransient<GetAllHumbleBundlesHandler>();
+        services.AddTransient<AddHumbleBundleSubscriberHandler>();
 
         return services;
     }

@@ -12,9 +12,12 @@ public class ScannedHumbleBundle
     {
         get
         {
-            int TruncationLimit = 150;
+            int lineLimit = 70; // Number of characters discord can fit per line in an embed
+            int lineCount = 3; // Number of lines we want in each HB embed
 
-            return Description.Length > TruncationLimit ? Description[..TruncationLimit] + "..." : Description;
+            int TruncationLimit = lineCount * lineLimit;
+
+            return Description.Length > TruncationLimit ? Description[..TruncationLimit].Trim() + "..." : Description;
         }
     }
     public string Url { get; set; }

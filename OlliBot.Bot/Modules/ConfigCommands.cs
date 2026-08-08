@@ -1,4 +1,4 @@
-using DSharpPlus;
+sing DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;

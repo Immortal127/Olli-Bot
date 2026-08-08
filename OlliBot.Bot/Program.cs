@@ -48,7 +48,7 @@ internal class Program
             Log.Information(middle);
             Log.Information(border);
 
-            using (IServiceScope scope = host.Services.CreateScope())
+            await using (AsyncServiceScope scope = host.Services.CreateAsyncScope())
             {
                 DatabaseInitializer initializer =
                     scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
