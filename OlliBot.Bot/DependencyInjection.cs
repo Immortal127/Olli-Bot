@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OlliBot.Application.EmoteRanking.Scanning;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Mappers;
@@ -129,6 +130,16 @@ internal static class DependencyInjection
         services.AddQuartzHostedService(options =>
         {
             options.WaitForJobsToComplete = true;
+        });
+
+        return services;
+    }
+
+    internal static IServiceCollection ConfigureWindowService(this IServiceCollection services)
+    {
+        services.AddWindowsService(options =>
+        {
+            options.ServiceName = "OlliBot";
         });
 
         return services;

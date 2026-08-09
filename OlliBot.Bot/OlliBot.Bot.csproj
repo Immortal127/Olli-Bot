@@ -24,6 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.18" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.18" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.18" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.18" />
     <PackageReference Include="Quartz" Version="3.19.1" />
@@ -38,10 +39,6 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Logs\" />
   </ItemGroup>
 
   <ItemGroup>
