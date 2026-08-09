@@ -32,6 +32,7 @@ internal class Program
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddBotServices();
         builder.Services.AddDiscordServices(builder.Configuration);
+        builder.Services.AddScheduling(builder.Configuration);
 
         #endregion
 

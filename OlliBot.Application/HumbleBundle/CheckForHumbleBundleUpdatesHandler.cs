@@ -1,0 +1,95 @@
+﻿using Microsoft.Extensions.Logging;
+using OlliBot.Application.HumbleBundle.Models;
+using OlliBot.Application.Interfaces;
+
+namespace OlliBot.Application.HumbleBundle;
+public class CheckForHumbleBundleUpdatesHandler(
+    ILogger<CheckForHumbleBundleUpdatesHandler> logger,
+    IHumbleBundleRepository humbleBundleRepository,
+    IHumbleBundleScanner humbleBundleScanner)
+{
+    //needs to scan hb
+    // check against known bundles
+    // save the new bundles to the database
+    // Send dm to subscribers of the bundle type
+    public async Task<CheckForHumbleBundleUpdatesResult> HandleAsync(CheckForHumbleBundleUpdatesCommand command, CancellationToken ct = default)
+    {
+        IReadOnlyCollection<ScannedHumbleBundle> scannedBundles = await humbleBundleScanner.ScanAsync(command.BundleType, ct);
+
+        IReadOnlyList<Domain.Entities.HumbleBundle> knownBundles = await humbleBundleRepository.GetCurrentBundlesAsync(command.BundleType, ct);
+
+        var knownUrls = knownBundles
+            .Select(bundle => bundle.Url)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        ScannedHumbleBundle[] newBundles = scannedBundles
+            .Where(bundle => !knownUrls.Contains(bundle.Url))
+            .ToArray();
+
+        await CheckForExpiredBundles(scannedBundles, knownBundles, ct);
+
+        if (newBundles.Length == 0)
+        {
+            return new CheckForHumbleBundleUpdatesResult(true, "No new bundles found", [], []);
+        }
+
+        logger.LogInformation(
+            "Humble Bundle scan found {NewBundleCount} new bundles for {BundleType}",
+            newBundles.Length,
+            command.BundleType);
+
+        await SaveNewBundles(newBundles, ct);
+
+        IReadOnlyList<Domain.Entities.HumbleBundleSubscriber> subscribers = await humbleBundleRepository.GetSubscribersAsync(command.BundleType, ct);
+
+        var result = new CheckForHumbleBundleUpdatesResult(
+            true,
+            $"Found {newBundles.Length} new bundles for {command.BundleType}",
+            newBundles,
+            subscribers);
+
+        return result;
+    }
+
+    private async Task SaveNewBundles(ScannedHumbleBundle[] newBundles, CancellationToken ct)
+    {
+        Domain.Entities.HumbleBundle[] entities = newBundles
+            .Select(MapToEntity)
+            .ToArray();
+
+        await humbleBundleRepository.AddBundlesAsync(
+            entities,
+            ct);
+    }
+
+    private async Task CheckForExpiredBundles(IReadOnlyCollection<ScannedHumbleBundle> scannedBundles, IReadOnlyList<Domain.Entities.HumbleBundle> knownBundles, CancellationToken ct)
+    {
+        var scannedUrls = scannedBundles
+            .Select(bundle => bundle.Url)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Domain.Entities.HumbleBundle[] expiredBundles = knownBundles
+            .Where(bundle => !scannedUrls.Contains(bundle.Url))
+            .ToArray();
+
+        if (expiredBundles.Length > 0)
+        {
+            await humbleBundleRepository.DeleteBundlesAsync(
+                expiredBundles,
+                ct);
+        }
+    }
+
+    private static Domain.Entities.HumbleBundle MapToEntity(
+    ScannedHumbleBundle bundle)
+    {
+        return new Domain.Entities.HumbleBundle
+        {
+            Name = bundle.Name,
+            BundleType = bundle.BundleType,
+            ExpiryDate = bundle.ExpiryDate,
+            Url = bundle.Url,
+            DateSeen = DateTime.UtcNow
+        };
+    }
+}

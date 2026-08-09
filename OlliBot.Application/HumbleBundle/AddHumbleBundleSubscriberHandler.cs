@@ -16,6 +16,12 @@ public class AddHumbleBundleSubscriberHandler(ILogger<AddHumbleBundleSubscriberH
             RoleId = command.RoleId
         };
 
+        if (await humbleBundleRepository.SubscriberExistsAsync(subscriber.DiscordId, subscriber.SubscriptionType, ct))
+        {
+            logger.LogInformation("Subscriber with DiscordId {DiscordId} and SubscriptionType {SubscriptionType} already exists.", subscriber.DiscordId, subscriber.SubscriptionType);
+            return new AddHumbleBundleSubscriberResult(false, "Subscriber already exists.");
+        }
+
         await humbleBundleRepository.AddSubscriberAsync(subscriber, ct);
 
         return new AddHumbleBundleSubscriberResult(true, "Subscriber added successfully.");

@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 namespace OlliBot.Infrastructure.HumbleBundle;
 public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger) : IHumbleBundleScanner
 {
-    public async Task<IEnumerable<ScannedHumbleBundle>> ScanAsync(HumbleBundleType bundleType, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ScannedHumbleBundle>> ScanAsync(HumbleBundleType bundleType, CancellationToken ct)
     {
         using IPlaywright pw = await Playwright.CreateAsync();
         await using IBrowser browser = await pw.Chromium.LaunchAsync();

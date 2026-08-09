@@ -6,13 +6,14 @@ public interface IHumbleBundleRepository
 {
     Task AddBundlesAsync(IReadOnlyList<Domain.Entities.HumbleBundle> bundles, CancellationToken ct);
 
-    Task<IReadOnlyList<Domain.Entities.HumbleBundle>> GetCurrentBundlesAsync(HumbleBundleType bundleType);
+    Task<IReadOnlyList<Domain.Entities.HumbleBundle>> GetCurrentBundlesAsync(HumbleBundleType bundleType, CancellationToken ct);
 
-    Task<IReadOnlyList<HumbleBundleSubscriber>> GetCurrentSubscribersAsync(HumbleBundleType bundleType);
+    Task<IReadOnlyList<HumbleBundleSubscriber>> GetSubscribersAsync(HumbleBundleType bundleType, CancellationToken ct);
 
     Task AddSubscriberAsync(HumbleBundleSubscriber subscriber, CancellationToken ct);
 
     Task DeleteStaleSubscribersAsync(CancellationToken ct);
 
-    Task DeleteExpiredBundlesAsync(IReadOnlyList<Domain.Entities.HumbleBundle> bundles, CancellationToken ct);
+    Task DeleteBundlesAsync(IReadOnlyList<Domain.Entities.HumbleBundle> bundles, CancellationToken ct);
+    Task<bool> SubscriberExistsAsync(ulong discordId, HumbleBundleType subscriptionType, CancellationToken ct);
 }

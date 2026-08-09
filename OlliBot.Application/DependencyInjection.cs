@@ -22,6 +22,7 @@ public static class DependencyInjection
 
         services.AddTransient<GetAllHumbleBundlesHandler>();
         services.AddTransient<AddHumbleBundleSubscriberHandler>();
+        services.AddTransient<CheckForHumbleBundleUpdatesHandler>();
 
         return services;
     }
