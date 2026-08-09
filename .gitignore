@@ -408,3 +408,4 @@ config.json
 /OlliBot.Bot/TestDatabase.db
 /OlliBot.Bot/TestDatabase.db-shm
 /OlliBot.Bot/TestDatabase.db-wal
+/OlliBot.Bot/appsettings.Production.json

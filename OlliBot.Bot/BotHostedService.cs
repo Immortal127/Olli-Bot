@@ -57,7 +57,7 @@ public class BotHostedService(
     {
         try
         {
-            string token = configuration["DiscordBotToken"] ?? throw new InvalidOperationException("DiscordBotToken is not configured");
+            string token = configuration["Discord:BotToken"] ?? throw new InvalidOperationException("DiscordBotToken is not configured");
 
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
