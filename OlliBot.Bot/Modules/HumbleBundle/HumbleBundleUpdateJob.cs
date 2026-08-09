@@ -16,107 +16,108 @@ internal class HumbleBundleUpdateJob(
         CancellationToken ct = context.CancellationToken;
 
         logger.LogInformation("Scheduled Humble Bundle update started.");
-
-        try
+        foreach (var bundleType in Enum.GetValues<Domain.Enums.HumbleBundleType>())
         {
-            Domain.Enums.HumbleBundleType bundleType = Domain.Enums.HumbleBundleType.Games;
 
-            var command = new CheckForHumbleBundleUpdatesCommand(bundleType);
-
-            CheckForHumbleBundleUpdatesResult result = await handler.HandleAsync(command, ct);
-            if (!result.Success)
+            try
             {
-                logger.LogError(
-                    "Scheduled Humble Bundle update failed: {Message}",
-                    result.Message);
-            }
+                var command = new CheckForHumbleBundleUpdatesCommand(bundleType);
 
-            if (!result.ScannedBundles.Any())
-            {
-                logger.LogInformation("Scheduled Humble Bundle update found no new bundles of type {type}", bundleType);
-
-                return;
-            }
-
-            IEnumerable<Domain.Entities.HumbleBundleSubscriber> userSubscribers = result.Subscribers.Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.User);
-            IEnumerable<Domain.Entities.HumbleBundleSubscriber> channelSubscribers = result.Subscribers.Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.Channel);
-
-            foreach (Application.HumbleBundle.Models.ScannedHumbleBundle bundle in result.ScannedBundles)
-            {
-                Embed embed = HumbleBundleEmbedBuilder.CreateHumbleBundleEmbed(bundle);
-
-                foreach (Domain.Entities.HumbleBundleSubscriber? subscriber in userSubscribers)
+                CheckForHumbleBundleUpdatesResult result = await handler.HandleAsync(command, ct);
+                if (!result.Success)
                 {
-                    IUser discordUser = await discordClient.GetUserAsync(subscriber.DiscordId);
-
-                    await discordUser.SendMessageAsync(embed: embed);
+                    logger.LogError(
+                        "Scheduled Humble Bundle update failed: {Message}",
+                        result.Message);
                 }
 
-                foreach (Domain.Entities.HumbleBundleSubscriber? subscriber in channelSubscribers)
+                if (!result.ScannedBundles.Any())
                 {
-                    if (subscriber.GuildId is null)
+                    logger.LogInformation("Scheduled Humble Bundle update found no new bundles of type {type}", bundleType);
+
+                    return;
+                }
+
+                IEnumerable<Domain.Entities.HumbleBundleSubscriber> userSubscribers = result.Subscribers.Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.User);
+                IEnumerable<Domain.Entities.HumbleBundleSubscriber> channelSubscribers = result.Subscribers.Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.Channel);
+
+                foreach (Application.HumbleBundle.Models.ScannedHumbleBundle bundle in result.ScannedBundles)
+                {
+                    Embed embed = HumbleBundleEmbedBuilder.CreateHumbleBundleEmbed(bundle);
+
+                    foreach (Domain.Entities.HumbleBundleSubscriber? subscriber in userSubscribers)
                     {
-                        logger.LogWarning(
-                            "Discord channel subscriber {SubscriberId} has no guild ID.",
-                            subscriber.Id);
-                        continue;
+                        IUser discordUser = await discordClient.GetUserAsync(subscriber.DiscordId);
+
+                        await discordUser.SendMessageAsync(embed: embed);
                     }
 
-                    IGuild guild = await discordClient.GetGuildAsync(subscriber.GuildId.Value, CacheMode.AllowDownload, new RequestOptions
+                    foreach (Domain.Entities.HumbleBundleSubscriber? subscriber in channelSubscribers)
                     {
-                        CancelToken = ct
-                    });
+                        if (subscriber.GuildId is null)
+                        {
+                            logger.LogWarning(
+                                "Discord channel subscriber {SubscriberId} has no guild ID.",
+                                subscriber.Id);
+                            continue;
+                        }
 
-                    IChannel? channel = await guild.GetChannelAsync(
-                        subscriber.DiscordId,
-                        CacheMode.AllowDownload,
-                        new RequestOptions
+                        IGuild guild = await discordClient.GetGuildAsync(subscriber.GuildId.Value, CacheMode.AllowDownload, new RequestOptions
                         {
                             CancelToken = ct
                         });
 
-                    string roleMention = string.Empty;
-                    if (subscriber.RoleId.HasValue)
-                    {
-                        IRole role = guild.GetRole(subscriber.RoleId.Value);
-                        roleMention = $"\n\n<@&{role.Id}>";
+                        IChannel? channel = await guild.GetChannelAsync(
+                            subscriber.DiscordId,
+                            CacheMode.AllowDownload,
+                            new RequestOptions
+                            {
+                                CancelToken = ct
+                            });
 
-                        // save this for later, maybe worth considering in future
+                        string roleMention = string.Empty;
+                        if (subscriber.RoleId.HasValue)
+                        {
+                            IRole role = guild.GetRole(subscriber.RoleId.Value);
+                            roleMention = $"\n\n<@&{role.Id}>";
 
-                        //if (role is not null)
-                        //{
-                        //    embed.Description += $"\n\n<@&{role.Id}>"; // Mention the role in the embed description
-                        //}
+                            // save this for later, maybe worth considering in future
+
+                            //if (role is not null)
+                            //{
+                            //    embed.Description += $"\n\n<@&{role.Id}>"; // Mention the role in the embed description
+                            //}
+                        }
+
+                        if (channel is not IMessageChannel messageChannel)
+                        {
+                            logger.LogWarning(
+                                "Discord channel {ChannelId} was not found or cannot receive messages.",
+                                subscriber.DiscordId);
+
+                            return;
+                        }
+
+                        await messageChannel.SendMessageAsync(embed: embed, text: roleMention);
                     }
-
-                    if (channel is not IMessageChannel messageChannel)
-                    {
-                        logger.LogWarning(
-                            "Discord channel {ChannelId} was not found or cannot receive messages.",
-                            subscriber.DiscordId);
-
-                        return;
-                    }
-
-                    await messageChannel.SendMessageAsync(embed: embed, text: roleMention);
                 }
             }
-        }
-        catch (OperationCanceledException)
-            when (ct.IsCancellationRequested)
-        {
-            logger.LogInformation(
-                "Scheduled Humble Bundle update was cancelled.");
+            catch (OperationCanceledException)
+                when (ct.IsCancellationRequested)
+            {
+                logger.LogInformation(
+                    "Scheduled Humble Bundle update was cancelled.");
 
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(
-                ex,
-                "Scheduled Humble Bundle update failed.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "Scheduled Humble Bundle update failed.");
 
-            throw new JobExecutionException(ex);
+                throw new JobExecutionException(ex);
+            }
         }
     }
 }

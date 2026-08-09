@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Playwright;
 using OlliBot.Application.HumbleBundle;
 using OlliBot.Application.HumbleBundle.Models;
@@ -7,7 +8,7 @@ using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace OlliBot.Infrastructure.HumbleBundle;
-public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger) : IHumbleBundleScanner
+public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfiguration config) : IHumbleBundleScanner
 {
     public async Task<IReadOnlyCollection<ScannedHumbleBundle>> ScanAsync(HumbleBundleType bundleType, CancellationToken ct)
     {
@@ -31,7 +32,7 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger) : IHumble
         logger.LogInformation("Found {BundleCount} bundles of type {BundleType}", bundleCount, bundleType);
 
         var tasks = new List<Task>();
-        const int MAX_CONCURRENCY = 10;
+        int MAX_CONCURRENCY = config.GetValue<int>("HumbleBundleScannerMaxConcurrency", 4);
         var semaphore = new SemaphoreSlim(MAX_CONCURRENCY);
 
         var humbleBundles = new ConcurrentBag<ScannedHumbleBundle>();
@@ -116,7 +117,11 @@ element => {
 }");
 
 
-        bundle.Note = await page.Locator("p.marketing-blurb span").First.InnerTextAsync();
+        ILocator noteLocator = page.Locator("p.marketing-blurb span").First;
+
+        bundle.Note = await noteLocator.CountAsync() > 0
+            ? await noteLocator.InnerTextAsync()
+            : string.Empty;
 
         string? imageUrl = await page.Locator("img.bundle-logo").First.GetAttributeAsync("src");
         bundle.ImageUrl = imageUrl ?? string.Empty;
