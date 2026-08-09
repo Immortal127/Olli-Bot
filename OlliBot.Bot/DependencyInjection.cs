@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OlliBot.Application.EmoteRanking.Scanning;
 using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Mappers;
