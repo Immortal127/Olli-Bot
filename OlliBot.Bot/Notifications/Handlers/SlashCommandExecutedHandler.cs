@@ -1,4 +1,5 @@
-﻿using Discord.Interactions;
+﻿using Discord;
+using Discord.Interactions;
 using MediatR;
 
 namespace OlliBot.Bot.Notifications.Handlers;
@@ -8,9 +9,9 @@ internal class SlashCommandExecutedHandler(ILogger<SlashCommandExecutedHandler> 
         SlashCommandExecutedNotification notification,
         CancellationToken cancellationToken)
     {
-        var result = notification.Result;
-        var ctx = notification.InteractionContext;
-        var slashInfo = notification.SlashCommandInfo;
+        IResult result = notification.Result;
+        IInteractionContext ctx = notification.InteractionContext;
+        SlashCommandInfo slashInfo = notification.SlashCommandInfo;
 
         if (result.IsSuccess)
         {

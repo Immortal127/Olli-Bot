@@ -28,9 +28,7 @@ public static class Helpers
         foreach ((ulong emoteId, int count) in
                  emoteCounts.OrderByDescending(entry => entry.Value))
         {
-            if (!emotesById.TryGetValue(
-                    emoteId,
-                    out GuildEmote? emote))
+            if (!emotesById.TryGetValue(emoteId, out GuildEmote? emote))
             {
                 // The emote may have been deleted after the scan.
                 continue;

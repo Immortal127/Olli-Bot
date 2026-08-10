@@ -6,7 +6,7 @@ using OlliBot.Domain.Entities;
 namespace OlliBot.Application.Messages.Queries;
 public class CallMessageHandler(
     ILogger<CallMessageHandler> logger,
-    IMessageRepository messageRepository) :IRequestHandler<CallMessageQuery, CallMessageResult>
+    IMessageRepository messageRepository) : IRequestHandler<CallMessageQuery, CallMessageResult>
 {
     public async Task<CallMessageResult> Handle(CallMessageQuery query, CancellationToken cancellationToken = default)
     {

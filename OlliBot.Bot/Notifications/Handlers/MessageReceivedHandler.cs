@@ -11,7 +11,7 @@ public class MessageReceivedHandler(
 {
     public async Task Handle(MessageReceivedNotification notification, CancellationToken cancellationToken)
     {
-        var message = notification.Message;
+        SocketMessage message = notification.Message;
 
         if (message.Channel.GetChannelType() == ChannelType.DM)
         {

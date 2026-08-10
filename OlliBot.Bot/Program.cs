@@ -41,7 +41,7 @@ internal class Program
         builder.Services.AddBotServices();
         builder.Services.AddDiscordServices(builder.Configuration);
         builder.Services.AddScheduling(builder.Configuration);
-        builder.Services.ConfigureWindowService();
+        builder.Services.ConfigureWindowsService();
 
         #endregion
 

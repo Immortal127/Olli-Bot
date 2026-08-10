@@ -6,7 +6,7 @@ using OlliBot.Bot.Notifications;
 
 namespace OlliBot.Bot;
 
-public class DiscordEventListener(DiscordSocketClient client, IServiceScopeFactory serviceScope)
+public class DiscordEventListener(IServiceScopeFactory serviceScope)
 {
     private readonly CancellationToken _cancellationToken = new CancellationTokenSource().Token;
 

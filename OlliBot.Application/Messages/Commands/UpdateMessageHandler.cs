@@ -4,7 +4,7 @@ using OlliBot.Domain.Enums;
 
 namespace OlliBot.Application.Messages.Commands;
 
-public class UpdateMessageHandler(IMessageRepository messageRepository) :IRequestHandler<UpdateMessageCommand, UpdateMessageResult>
+public class UpdateMessageHandler(IMessageRepository messageRepository) : IRequestHandler<UpdateMessageCommand, UpdateMessageResult>
 {
     public async Task<UpdateMessageResult> Handle(UpdateMessageCommand command, CancellationToken cancellationToken = default)
     {

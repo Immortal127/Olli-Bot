@@ -3,7 +3,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Application.EmoteRanking.Scanning;
 using OlliBot.Bot.Mappers;
-using OlliBot.Bot.Modules;
 using OlliBot.Bot.Modules.HumbleBundle;
 using OlliBot.Bot.Services;
 using Quartz;
@@ -39,9 +38,6 @@ internal static class DependencyInjection
                     GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.DirectMessages | GatewayIntents.GuildMembers,
                     //GatewayIntents = GatewayIntents.All
                 });
-
-                //DiscordLogService discordLogService = serviceProvider.GetRequiredService<DiscordLogService>();
-                //discordClient.MessageReceived +=
 
                 return discordClient;
             }
@@ -129,7 +125,7 @@ internal static class DependencyInjection
         return services;
     }
 
-    internal static IServiceCollection ConfigureWindowService(this IServiceCollection services)
+    internal static IServiceCollection ConfigureWindowsService(this IServiceCollection services)
     {
         services.AddWindowsService(options =>
         {
