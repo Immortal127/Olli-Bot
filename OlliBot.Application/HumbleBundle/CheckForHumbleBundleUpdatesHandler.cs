@@ -8,10 +8,6 @@ public class CheckForHumbleBundleUpdatesHandler(
     IHumbleBundleRepository humbleBundleRepository,
     IHumbleBundleScanner humbleBundleScanner)
 {
-    //needs to scan hb
-    // check against known bundles
-    // save the new bundles to the database
-    // Send dm to subscribers of the bundle type
     public async Task<CheckForHumbleBundleUpdatesResult> HandleAsync(CheckForHumbleBundleUpdatesCommand command, CancellationToken ct = default)
     {
         IReadOnlyCollection<ScannedHumbleBundle> scannedBundles = await humbleBundleScanner.ScanAsync(command.BundleType, ct);

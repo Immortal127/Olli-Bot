@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using MediatR;
 using OlliBot.Application.HumbleBundle;
 using OlliBot.Application.HumbleBundle.Models;
 using OlliBot.Domain.Enums;
@@ -8,16 +9,14 @@ namespace OlliBot.Bot.Modules.HumbleBundle;
 
 [Group("hb", "Humble bundle commands")]
 public class HumbleBundleSlashCommands(
-    GetAllHumbleBundlesHandler getAllHandler,
-    AddHumbleBundleSubscriberHandler addSubscriberHandler,
-    CheckForHumbleBundleUpdatesHandler checkHandler) : InteractionModuleBase<SocketInteractionContext>
+    ISender sender) : InteractionModuleBase<SocketInteractionContext>
 {
     [SlashCommand("all", "Get all Humble Bundles of a specific type")]
     public async Task GetHumbleBundles([Summary("Type")] HumbleBundleType humbleBundleType)
     {
         await RespondAsync("Retrieving Humble Bundles...", ephemeral: true);
         // Get humble bundles
-        ScanHumbleBundleResult result = await getAllHandler.HandleAsync(new ScanHumbleBundleCommand(humbleBundleType));
+        ScanHumbleBundleResult result = await sender.Send(new ScanHumbleBundleCommand(humbleBundleType));
 
         // Build embeds for each bundle 
         // Send found humbles to user / text channel
@@ -37,7 +36,7 @@ public class HumbleBundleSlashCommands(
     {
         var command = new AddHumbleBundleSubscriberCommand(humbleBundleType, Context.User.Id, HumbleBundleSubscriberType.User);
 
-        AddHumbleBundleSubscriberResult result = await addSubscriberHandler.HandleAsync(command);
+        AddHumbleBundleSubscriberResult result = await sender.Send(command);
 
         if (result.Success)
         {

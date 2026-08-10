@@ -1,3 +1,5 @@
-﻿namespace OlliBot.Application.EmoteRanking.Commands;
+﻿using MediatR;
 
-public record ClearEmoteRankingCommand(ulong GuildId, bool IsInvokedByAdmin);
+namespace OlliBot.Application.EmoteRanking.Commands;
+
+public record ClearEmoteRankingCommand(ulong GuildId, bool IsInvokedByAdmin) : IRequest<ClearEmoteRankingResult>;

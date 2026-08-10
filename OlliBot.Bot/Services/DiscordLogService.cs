@@ -1,7 +1,7 @@
 ﻿using Discord;
 
 namespace OlliBot.Bot.Services;
-internal class DiscordLogService(ILogger<DiscordLogService> logger)
+public class DiscordLogService(ILogger<DiscordLogService> logger)
 {
     public Task Log(LogMessage message)
     {

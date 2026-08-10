@@ -1,11 +1,12 @@
-﻿using OlliBot.Application.EmoteRanking.Models;
+﻿using MediatR;
+using OlliBot.Application.EmoteRanking.Models;
 using OlliBot.Application.EmoteRanking.Scanning;
 using OlliBot.Application.Interfaces;
 
 namespace OlliBot.Application.EmoteRanking.Commands;
-public class UpdateEmoteRankingHandler(IEmoteCountRepository repository, IEmoteCountScanner emoteScanner)
+public class UpdateEmoteRankingHandler(IEmoteCountRepository repository, IEmoteCountScanner emoteScanner) : IRequestHandler<UpdateEmoteRankingCommand, UpdateEmoteRankingResult>
 {
-    public async Task<UpdateEmoteRankingResult> HandleAsync(UpdateEmoteRankingCommand command, CancellationToken ct = default)
+    public async Task<UpdateEmoteRankingResult> Handle(UpdateEmoteRankingCommand command, CancellationToken ct = default)
     {
         try
         {

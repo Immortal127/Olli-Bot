@@ -1,10 +1,11 @@
-﻿using OlliBot.Application.Interfaces;
+﻿using MediatR;
+using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Entities;
 
 namespace OlliBot.Application.Messages.Commands;
-public class DeleteMessageHandler(IMessageRepository messageRepository)
+public class DeleteMessageHandler(IMessageRepository messageRepository) : IRequestHandler<DeleteMessageCommand, DeleteMessageResult>
 {
-    public async Task<DeleteMessageResult> HandleAsync(DeleteMessageCommand command, CancellationToken cancellationToken = default)
+    public async Task<DeleteMessageResult> Handle(DeleteMessageCommand command, CancellationToken cancellationToken = default)
     {
         Message? message = await messageRepository.GetByIdAsync(command.DbID, command.GuildId, cancellationToken);
 

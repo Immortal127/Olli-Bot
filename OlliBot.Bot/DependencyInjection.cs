@@ -2,7 +2,6 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Application.EmoteRanking.Scanning;
-using OlliBot.Bot.Interfaces;
 using OlliBot.Bot.Mappers;
 using OlliBot.Bot.Modules;
 using OlliBot.Bot.Modules.HumbleBundle;
@@ -16,14 +15,10 @@ internal static class DependencyInjection
 {
     internal static IServiceCollection AddBotServices(this IServiceCollection services)
     {
-        services.AddTransient<IMessageFactory, MessageFactory>();
         services.AddTransient<AddMessageCommandMapper>();
-
-        services.AddTransient<BotInitialization>();
-        services.AddSingleton<InteractionHandler>();
-        services.AddSingleton<BotEventHandler>();
         services.AddHostedService<BotHostedService>();
 
+        services.AddSingleton<DiscordEventListener>();
 
         services.AddTransient<IEmoteCountScanner, EmoteCountScanner>();
         return services;
@@ -45,8 +40,8 @@ internal static class DependencyInjection
                     //GatewayIntents = GatewayIntents.All
                 });
 
-                DiscordLogService discordLogService = serviceProvider.GetRequiredService<DiscordLogService>();
-                discordClient.Log += discordLogService.Log;
+                //DiscordLogService discordLogService = serviceProvider.GetRequiredService<DiscordLogService>();
+                //discordClient.MessageReceived +=
 
                 return discordClient;
             }

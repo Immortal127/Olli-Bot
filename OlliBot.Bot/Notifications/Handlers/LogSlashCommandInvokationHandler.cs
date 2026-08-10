@@ -1,31 +1,13 @@
-﻿using Discord.Interactions;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
+using MediatR;
 using System.Text;
 
-namespace OlliBot.Bot.Modules;
-
-public class InteractionHandler(
-    InteractionService interactionService,
-    ILogger<BotHostedService> logger,
-    DiscordSocketClient client,
-    IServiceProvider serviceProvider)
+namespace OlliBot.Bot.Notifications.Handlers;
+internal class LogSlashCommandInvokationHandler(ILogger<LogSlashCommandInvokationHandler> logger) : INotificationHandler<InteractionCreatedNotification>
 {
-    public async Task HandleInteraction(SocketInteraction arg)
+    public Task Handle(InteractionCreatedNotification notification, CancellationToken cancellationToken)
     {
-        try
-        {
-            var context = new SocketInteractionContext(client, arg);
-            await interactionService.ExecuteCommandAsync(context, serviceProvider);
-        }
-        catch (Exception ex)
-        {
-            logger.LogCritical(ex, "Error handling interaction.");
-        }
-    }
-
-    public Task OnSlashInvoked(SocketInteraction interaction)
-    {
-        var command = interaction as SocketSlashCommand;
+        var command = notification.Interaction as SocketSlashCommand;
 
         var logMessage = new StringBuilder();
 

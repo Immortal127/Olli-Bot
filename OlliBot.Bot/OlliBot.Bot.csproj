@@ -49,4 +49,8 @@
     <ProjectReference Include="..\OlliBot.Domain\OlliBot.Domain.csproj" />
     <ProjectReference Include="..\OlliBot.Infrastructure\OlliBot.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
+  </ItemGroup>
 </Project>

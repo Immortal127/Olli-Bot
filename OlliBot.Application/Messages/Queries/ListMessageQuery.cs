@@ -1,3 +1,7 @@
-﻿namespace OlliBot.Application.Messages.Queries;
+﻿using MediatR;
 
-public record ListMessageQuery(ulong GuildId, ulong? UserId);
+namespace OlliBot.Application.Messages.Queries;
+
+public record ListMessageQuery(
+    ulong GuildId,
+    ulong? UserId) : IRequest<ListMessageResult>;

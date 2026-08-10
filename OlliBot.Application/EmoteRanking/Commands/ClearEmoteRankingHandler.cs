@@ -1,10 +1,11 @@
-﻿using OlliBot.Application.Interfaces;
+﻿using MediatR;
+using OlliBot.Application.Interfaces;
 
 namespace OlliBot.Application.EmoteRanking.Commands;
 
-public class ClearEmoteRankingHandler(IEmoteCountRepository emoteCountRepository)
+public class ClearEmoteRankingHandler(IEmoteCountRepository emoteCountRepository) : IRequestHandler<ClearEmoteRankingCommand, ClearEmoteRankingResult>
 {
-    public async Task<ClearEmoteRankingResult> HandleAsync(ClearEmoteRankingCommand command, CancellationToken ct = default)
+    public async Task<ClearEmoteRankingResult> Handle(ClearEmoteRankingCommand command, CancellationToken ct = default)
     {
         if (!command.IsInvokedByAdmin)
         {

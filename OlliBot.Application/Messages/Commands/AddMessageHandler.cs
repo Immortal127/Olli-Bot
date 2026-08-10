@@ -1,12 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Entities;
 
 namespace OlliBot.Application.Messages.Commands;
 
-public class AddMessageHandler(ILogger<AddMessageHandler> logger, IMessageRepository messageRepository)
+public class AddMessageHandler(
+    ILogger<AddMessageHandler> logger,
+    IMessageRepository messageRepository) : IRequestHandler<AddMessageCommand, AddMessageResult>
 {
-    public async Task<AddMessageResult> HandleAsync(AddMessageCommand command, CancellationToken cancellationToken = default)
+    public async Task<AddMessageResult> Handle(AddMessageCommand command, CancellationToken cancellationToken = default)
     {
         var message = new Message
         {

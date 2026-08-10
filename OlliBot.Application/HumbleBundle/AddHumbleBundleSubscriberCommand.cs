@@ -1,4 +1,5 @@
-﻿using OlliBot.Domain.Enums;
+﻿using MediatR;
+using OlliBot.Domain.Enums;
 
 namespace OlliBot.Application.HumbleBundle;
 public record AddHumbleBundleSubscriberCommand(
@@ -6,4 +7,4 @@ public record AddHumbleBundleSubscriberCommand(
     ulong SubscriberId,
     HumbleBundleSubscriberType HumbleBundleSubscriberType,
     ulong? GuildId = null,
-    ulong? RoleId = null);
+    ulong? RoleId = null) : IRequest<AddHumbleBundleSubscriberResult>;

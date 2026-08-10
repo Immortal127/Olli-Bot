@@ -1,3 +1,7 @@
-﻿namespace OlliBot.Application.Messages.Queries;
+﻿using MediatR;
 
-public sealed record CallMessageQuery(string Query, ulong GuildId);
+namespace OlliBot.Application.Messages.Queries;
+
+public sealed record CallMessageQuery(
+    string Query,
+    ulong GuildId) : IRequest<CallMessageResult>;

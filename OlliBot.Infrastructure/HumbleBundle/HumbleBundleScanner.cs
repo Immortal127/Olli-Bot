@@ -13,7 +13,10 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfigur
     public async Task<IReadOnlyCollection<ScannedHumbleBundle>> ScanAsync(HumbleBundleType bundleType, CancellationToken ct)
     {
         using IPlaywright pw = await Playwright.CreateAsync();
-        await using IBrowser browser = await pw.Chromium.LaunchAsync();
+        await using IBrowser browser = await pw.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
+        {
+            Headless = false
+        });
         await using IBrowserContext context = await browser.NewContextAsync();
         IPage page = await context.NewPageAsync();
 

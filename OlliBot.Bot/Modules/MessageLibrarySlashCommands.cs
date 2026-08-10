@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using MediatR;
 using OlliBot.Application.Messages.Commands;
 using OlliBot.Application.Messages.Queries;
 using OlliBot.Bot.Mappers;
@@ -13,12 +14,8 @@ namespace OlliBot.Bot.Modules;
 [Group("db", "Commands to interact with the message database")]
 public class MessageLibrarySlashCommands(
     ILogger<MessageLibrarySlashCommands> logger,
-    AddMessageHandler addMessageHandler,
     AddMessageCommandMapper addMessageMapper,
-    CallMessageHandler callMessageHandler,
-    DeleteMessageHandler deleteMessageHandler,
-    ListMessageHandler listMessageHandler,
-    UpdateMessageHandler updateMessageHandler) : InteractionModuleBase<SocketInteractionContext>
+    ISender sender) : InteractionModuleBase<SocketInteractionContext>
 {
 
     //Command to add entries to database
@@ -50,7 +47,7 @@ public class MessageLibrarySlashCommands(
             addCommand = addMessageMapper.Map(messageEntry, title, Context, messageTypeString, originUser);
         }
 
-        AddMessageResult addResult = await addMessageHandler.HandleAsync(addCommand);
+        AddMessageResult addResult = await sender.Send(addCommand);
 
         await RespondAsync(addResult.Message, ephemeral: true);
     }
@@ -59,7 +56,7 @@ public class MessageLibrarySlashCommands(
     [SlashCommand("call", "Call entry by ID from the database")]
     public async Task CallMessage([Summary("Query", "Message ID or Title")] string query)
     {
-        CallMessageResult callResult = await callMessageHandler.HandleAsync(new CallMessageQuery(query, Context.Guild.Id));
+        CallMessageResult callResult = await sender.Send(new CallMessageQuery(query, Context.Guild.Id));
 
         if (!callResult.Success || callResult.Message is null)
         {
@@ -100,7 +97,7 @@ public class MessageLibrarySlashCommands(
     public async Task DeleteEntry(
         [Summary("Id", "Database ID")] int dbId)
     {
-        DeleteMessageResult deleteResult = await deleteMessageHandler.HandleAsync(
+        DeleteMessageResult deleteResult = await sender.Send(
             new DeleteMessageCommand(
                 dbId,
                 Context.Guild.Id,
@@ -119,7 +116,7 @@ public class MessageLibrarySlashCommands(
         [Choice("Other", "Other")]
         [Summary("Type", "Updated type")] string? messageTypeString = null)
     {
-        UpdateMessageResult updateResult = await updateMessageHandler.HandleAsync(
+        UpdateMessageResult updateResult = await sender.Send(
             new UpdateMessageCommand(
                 dbId,
                 Context.Guild.Id,
@@ -134,7 +131,7 @@ public class MessageLibrarySlashCommands(
     [SlashCommand("list", "List entries in database")]
     public async Task ListEntries([Summary("User", "list entries from a specific user")] SocketUser? user = null)
     {
-        ListMessageResult listResult = await listMessageHandler.HandleAsync(new ListMessageQuery(Context.Guild.Id, user?.Id));
+        ListMessageResult listResult = await sender.Send(new ListMessageQuery(Context.Guild.Id, user?.Id));
 
         if (listResult.Messages.Count == 0)
         {

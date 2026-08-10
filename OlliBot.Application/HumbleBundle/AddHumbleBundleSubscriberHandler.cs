@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Entities;
 
 namespace OlliBot.Application.HumbleBundle;
-public class AddHumbleBundleSubscriberHandler(ILogger<AddHumbleBundleSubscriberHandler> logger, IHumbleBundleRepository humbleBundleRepository)
+public class AddHumbleBundleSubscriberHandler(ILogger<AddHumbleBundleSubscriberHandler> logger, IHumbleBundleRepository humbleBundleRepository) : IRequestHandler<AddHumbleBundleSubscriberCommand, AddHumbleBundleSubscriberResult>
 {
-    public async Task<AddHumbleBundleSubscriberResult> HandleAsync(AddHumbleBundleSubscriberCommand command, CancellationToken ct = default)
+    public async Task<AddHumbleBundleSubscriberResult> Handle(AddHumbleBundleSubscriberCommand command, CancellationToken ct = default)
     {
         var subscriber = new HumbleBundleSubscriber
         {

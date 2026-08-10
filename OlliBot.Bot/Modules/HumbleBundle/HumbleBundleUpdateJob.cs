@@ -16,7 +16,7 @@ internal class HumbleBundleUpdateJob(
         CancellationToken ct = context.CancellationToken;
 
         logger.LogInformation("Scheduled Humble Bundle update started.");
-        foreach (var bundleType in Enum.GetValues<Domain.Enums.HumbleBundleType>())
+        foreach (Domain.Enums.HumbleBundleType bundleType in Enum.GetValues<Domain.Enums.HumbleBundleType>())
         {
 
             try

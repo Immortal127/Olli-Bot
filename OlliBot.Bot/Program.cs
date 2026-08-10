@@ -28,6 +28,14 @@ internal class Program
             .ReadFrom.Configuration(builder.Configuration)
             .ReadFrom.Services(services));
 
+        builder.Services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssemblyContaining<ApplicationAssemblyMarker>();
+            cfg.RegisterServicesFromAssemblyContaining<BotAssemblyMarker>();
+
+            cfg.LicenseKey = builder.Configuration["MediatR:LicenceKey"];
+        });
+
         builder.Services.AddApplication(builder.Configuration);
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddBotServices();

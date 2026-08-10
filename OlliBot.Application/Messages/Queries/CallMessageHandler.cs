@@ -1,11 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Entities;
 
 namespace OlliBot.Application.Messages.Queries;
-public class CallMessageHandler(ILogger<CallMessageHandler> logger, IMessageRepository messageRepository)
+public class CallMessageHandler(
+    ILogger<CallMessageHandler> logger,
+    IMessageRepository messageRepository) :IRequestHandler<CallMessageQuery, CallMessageResult>
 {
-    public async Task<CallMessageResult> HandleAsync(CallMessageQuery query, CancellationToken cancellationToken = default)
+    public async Task<CallMessageResult> Handle(CallMessageQuery query, CancellationToken cancellationToken = default)
     {
         try
         {

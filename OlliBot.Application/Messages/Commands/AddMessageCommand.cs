@@ -1,4 +1,5 @@
-﻿using OlliBot.Domain.Enums;
+﻿using MediatR;
+using OlliBot.Domain.Enums;
 
 namespace OlliBot.Application.Messages.Commands;
 
@@ -11,4 +12,4 @@ public sealed record AddMessageCommand(
     ulong AuthorId,
     ulong OriginUserId,
     MessageEntityType MessageType,
-    List<string> AttachmentUrls);
+    List<string> AttachmentUrls) : IRequest<AddMessageResult>;

@@ -1,6 +1,8 @@
-﻿namespace OlliBot.Application.Messages.Commands;
+﻿using MediatR;
+
+namespace OlliBot.Application.Messages.Commands;
 public record DeleteMessageCommand(
     int DbID,
     ulong GuildId,
     ulong InvokerUserId,
-    bool InvokedByAdmin);
+    bool InvokedByAdmin) : IRequest<DeleteMessageResult>;

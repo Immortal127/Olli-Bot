@@ -1,11 +1,12 @@
-﻿using OlliBot.Application.Interfaces;
+﻿using MediatR;
+using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Enums;
 
 namespace OlliBot.Application.Messages.Commands;
 
-public class UpdateMessageHandler(IMessageRepository messageRepository)
+public class UpdateMessageHandler(IMessageRepository messageRepository) :IRequestHandler<UpdateMessageCommand, UpdateMessageResult>
 {
-    public async Task<UpdateMessageResult> HandleAsync(UpdateMessageCommand command, CancellationToken cancellationToken = default)
+    public async Task<UpdateMessageResult> Handle(UpdateMessageCommand command, CancellationToken cancellationToken = default)
     {
         Domain.Entities.Message? message = await messageRepository.GetByIdAsync(command.DbID, command.GuildId, cancellationToken);
 

@@ -1,16 +1,16 @@
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
+using MediatR;
 using System.Reflection;
 
-namespace OlliBot.Bot.Modules;
-
-public class BotInitialization(
-    ILogger<BotHostedService> logger,
+namespace OlliBot.Bot.Notifications.Handlers;
+internal class ClientReadyHandler(
+    ILogger<ClientReadyNotification> logger,
     InteractionService interaction,
     IServiceProvider serviceProvider,
-    IDiscordClient client)
+    IDiscordClient client) : INotificationHandler<ClientReadyNotification>
 {
-    public async Task InitializationTasks()
+    public async Task Handle(ClientReadyNotification notification, CancellationToken cancellationToken)
     {
         logger.LogInformation("Initialization tasks running...");
         logger.LogInformation("Bot ID: {BotId}", client.CurrentUser.Id);
