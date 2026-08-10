@@ -15,7 +15,7 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfigur
         using IPlaywright pw = await Playwright.CreateAsync();
         await using IBrowser browser = await pw.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
         {
-            Headless = false
+            Headless = true
         });
         await using IBrowserContext context = await browser.NewContextAsync();
         IPage page = await context.NewPageAsync();
