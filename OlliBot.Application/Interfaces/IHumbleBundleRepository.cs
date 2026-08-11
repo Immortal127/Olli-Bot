@@ -12,8 +12,9 @@ public interface IHumbleBundleRepository
 
     Task AddSubscriberAsync(HumbleBundleSubscriber subscriber, CancellationToken ct);
 
-    Task DeleteStaleSubscribersAsync(CancellationToken ct);
+    Task DeleteStaleChannelSubscribersAsync(IEnumerable<HumbleBundleSubscriber> subscribers, CancellationToken ct);
 
     Task DeleteBundlesAsync(IReadOnlyList<Domain.Entities.HumbleBundle> bundles, CancellationToken ct);
+
     Task<bool> SubscriberExistsAsync(ulong discordId, HumbleBundleType subscriptionType, CancellationToken ct);
 }

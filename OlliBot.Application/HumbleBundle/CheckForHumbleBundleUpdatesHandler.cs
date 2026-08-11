@@ -1,14 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using OlliBot.Application.HumbleBundle.Models;
 using OlliBot.Application.Interfaces;
+using OlliBot.Domain.Entities;
 
 namespace OlliBot.Application.HumbleBundle;
 public class CheckForHumbleBundleUpdatesHandler(
     ILogger<CheckForHumbleBundleUpdatesHandler> logger,
     IHumbleBundleRepository humbleBundleRepository,
-    IHumbleBundleScanner humbleBundleScanner)
+    IHumbleBundleScanner humbleBundleScanner,
+    IDiscordSubscriberValidater subscriberValidater) : IRequestHandler<CheckForHumbleBundleUpdatesCommand, CheckForHumbleBundleUpdatesResult>
 {
-    public async Task<CheckForHumbleBundleUpdatesResult> HandleAsync(CheckForHumbleBundleUpdatesCommand command, CancellationToken ct = default)
+    public async Task<CheckForHumbleBundleUpdatesResult> Handle(CheckForHumbleBundleUpdatesCommand command, CancellationToken ct = default)
     {
         IReadOnlyCollection<ScannedHumbleBundle> scannedBundles = await humbleBundleScanner.ScanAsync(command.BundleType, ct);
 
@@ -24,6 +27,7 @@ public class CheckForHumbleBundleUpdatesHandler(
 
         await CheckForExpiredBundles(scannedBundles, knownBundles, ct);
 
+
         if (newBundles.Length == 0)
         {
             return new CheckForHumbleBundleUpdatesResult(true, "No new bundles found", [], []);
@@ -37,6 +41,7 @@ public class CheckForHumbleBundleUpdatesHandler(
         await SaveNewBundles(newBundles, ct);
 
         IReadOnlyList<Domain.Entities.HumbleBundleSubscriber> subscribers = await humbleBundleRepository.GetSubscribersAsync(command.BundleType, ct);
+        await CheckForStaleSubscribers(subscribers.Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.Channel), ct);
 
         var result = new CheckForHumbleBundleUpdatesResult(
             true,
@@ -45,6 +50,16 @@ public class CheckForHumbleBundleUpdatesHandler(
             subscribers);
 
         return result;
+    }
+
+    private async Task CheckForStaleSubscribers(IEnumerable<HumbleBundleSubscriber> subscribers, CancellationToken ct)
+    {
+        var staleSubscribers = subscriberValidater.FindStaleSubscribers(subscribers);
+
+        if (staleSubscribers.Any())
+        {
+            await humbleBundleRepository.DeleteStaleChannelSubscribersAsync(staleSubscribers, ct);
+        }
     }
 
     private async Task SaveNewBundles(ScannedHumbleBundle[] newBundles, CancellationToken ct)

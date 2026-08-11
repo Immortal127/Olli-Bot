@@ -11,18 +11,18 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration cfg)
     {
 
-        services.AddTransient<AddMessageHandler>();
-        services.AddTransient<CallMessageHandler>();
-        services.AddTransient<DeleteMessageHandler>();
-        services.AddTransient<ListMessageHandler>();
-        services.AddTransient<UpdateMessageHandler>();
+        //services.AddTransient<AddMessageHandler>();
+        //services.AddTransient<CallMessageHandler>();
+        //services.AddTransient<DeleteMessageHandler>();
+        //services.AddTransient<ListMessageHandler>();
+        //services.AddTransient<UpdateMessageHandler>();
 
-        services.AddTransient<UpdateEmoteRankingHandler>();
-        services.AddTransient<ClearEmoteRankingHandler>();
+        //services.AddTransient<UpdateEmoteRankingHandler>();
+        //services.AddTransient<ClearEmoteRankingHandler>();
 
-        services.AddTransient<GetAllHumbleBundlesHandler>();
-        services.AddTransient<AddHumbleBundleSubscriberHandler>();
-        services.AddTransient<CheckForHumbleBundleUpdatesHandler>();
+        //services.AddTransient<GetAllHumbleBundlesHandler>();
+        //services.AddTransient<AddHumbleBundleSubscriberHandler>();
+        //services.AddTransient<CheckForHumbleBundleUpdatesHandler>();
 
         return services;
     }

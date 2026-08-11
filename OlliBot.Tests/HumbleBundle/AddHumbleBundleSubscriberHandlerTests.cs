@@ -10,8 +10,8 @@ public class AddHumbleBundleSubscriberHandlerTests
     [Fact]
     public async Task AddHumbleBundleSubscriberHandler_Handle_WithAlreadyRegisteredUserSubscriber_ReturnsFalseResult()
     {
-        var loggerMock = Substitute.For<ILogger<AddHumbleBundleSubscriberHandler>>();
-        var repositoryMock = Substitute.For<IHumbleBundleRepository>();
+        ILogger<AddHumbleBundleSubscriberHandler> loggerMock = Substitute.For<ILogger<AddHumbleBundleSubscriberHandler>>();
+        IHumbleBundleRepository repositoryMock = Substitute.For<IHumbleBundleRepository>();
 
         repositoryMock.SubscriberExistsAsync(
             Arg.Any<ulong>(),
@@ -38,7 +38,7 @@ public class AddHumbleBundleSubscriberHandlerTests
             1111111,
             HumbleBundleSubscriberType.User);
 
-        var result = await sut.Handle(command, TestContext.Current.CancellationToken);
+        AddHumbleBundleSubscriberResult result = await sut.Handle(command, TestContext.Current.CancellationToken);
 
         Assert.False(result.Success);
     }

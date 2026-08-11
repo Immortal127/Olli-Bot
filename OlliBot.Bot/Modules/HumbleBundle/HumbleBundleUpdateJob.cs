@@ -1,4 +1,5 @@
 ﻿using Discord;
+using MediatR;
 using OlliBot.Application.HumbleBundle;
 using Quartz;
 using System.Data;
@@ -7,7 +8,7 @@ namespace OlliBot.Bot.Modules.HumbleBundle;
 
 [DisallowConcurrentExecution]
 internal class HumbleBundleUpdateJob(
-    CheckForHumbleBundleUpdatesHandler handler,
+    ISender sender,
     ILogger<HumbleBundleUpdateJob> logger,
     IDiscordClient discordClient) : IJob
 {
@@ -23,7 +24,7 @@ internal class HumbleBundleUpdateJob(
             {
                 var command = new CheckForHumbleBundleUpdatesCommand(bundleType);
 
-                CheckForHumbleBundleUpdatesResult result = await handler.HandleAsync(command, ct);
+                CheckForHumbleBundleUpdatesResult result = await sender.Send(command, ct);
                 if (!result.Success)
                 {
                     logger.LogError(

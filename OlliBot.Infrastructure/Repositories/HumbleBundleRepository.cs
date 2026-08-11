@@ -13,9 +13,10 @@ public class HumbleBundleRepository(OlliBotDbContext db) : IHumbleBundleReposito
         await db.SaveChangesAsync(ct);
     }
 
-    public Task DeleteStaleSubscribersAsync(CancellationToken ct)
+    public async Task DeleteStaleChannelSubscribersAsync(IEnumerable<HumbleBundleSubscriber> subscribers, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        db.HumbleBundleSubscribers.RemoveRange(subscribers);
+        await db.SaveChangesAsync(ct);
     }
 
     public async Task<IReadOnlyList<Domain.Entities.HumbleBundle>> GetCurrentBundlesAsync(HumbleBundleType bundleType, CancellationToken ct)

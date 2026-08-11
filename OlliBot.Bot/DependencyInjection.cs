@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using OlliBot.Application.EmoteRanking.Scanning;
+using OlliBot.Application.HumbleBundle;
 using OlliBot.Bot.Mappers;
 using OlliBot.Bot.Modules.HumbleBundle;
 using OlliBot.Bot.Services;
@@ -20,6 +21,7 @@ internal static class DependencyInjection
         services.AddSingleton<DiscordEventListener>();
 
         services.AddTransient<IEmoteCountScanner, EmoteCountScanner>();
+        services.AddTransient<IDiscordSubscriberValidater, DiscordSubscriberValidater>();
         return services;
     }
 
