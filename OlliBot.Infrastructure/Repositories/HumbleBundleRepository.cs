@@ -7,9 +7,10 @@ using OlliBot.Infrastructure.Data;
 namespace OlliBot.Infrastructure.Repositories;
 public class HumbleBundleRepository(OlliBotDbContext db) : IHumbleBundleRepository
 {
-    public Task DeleteBundlesAsync(IReadOnlyList<Domain.Entities.HumbleBundle> bundles, CancellationToken ct)
+    public async Task DeleteBundlesAsync(IReadOnlyList<Domain.Entities.HumbleBundle> bundles, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        db.HumbleBundles.RemoveRange(bundles);
+        await db.SaveChangesAsync(ct);
     }
 
     public Task DeleteStaleSubscribersAsync(CancellationToken ct)

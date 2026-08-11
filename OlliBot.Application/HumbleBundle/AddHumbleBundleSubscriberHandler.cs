@@ -4,7 +4,9 @@ using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Entities;
 
 namespace OlliBot.Application.HumbleBundle;
-public class AddHumbleBundleSubscriberHandler(ILogger<AddHumbleBundleSubscriberHandler> logger, IHumbleBundleRepository humbleBundleRepository) : IRequestHandler<AddHumbleBundleSubscriberCommand, AddHumbleBundleSubscriberResult>
+public class AddHumbleBundleSubscriberHandler(
+    ILogger<AddHumbleBundleSubscriberHandler> logger,
+    IHumbleBundleRepository humbleBundleRepository) : IRequestHandler<AddHumbleBundleSubscriberCommand, AddHumbleBundleSubscriberResult>
 {
     public async Task<AddHumbleBundleSubscriberResult> Handle(AddHumbleBundleSubscriberCommand command, CancellationToken ct = default)
     {

@@ -70,6 +70,7 @@ public class CheckForHumbleBundleUpdatesHandler(
 
         if (expiredBundles.Length > 0)
         {
+            logger.LogInformation("{BundleCount} Bundles are expired", expiredBundles.Length);
             await humbleBundleRepository.DeleteBundlesAsync(
                 expiredBundles,
                 ct);

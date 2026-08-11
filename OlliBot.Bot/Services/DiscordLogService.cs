@@ -1,10 +1,16 @@
 ﻿using Discord;
+using Discord.WebSocket;
 
 namespace OlliBot.Bot.Services;
 public class DiscordLogService(ILogger<DiscordLogService> logger)
 {
     public Task Log(LogMessage message)
     {
+        if (message.Exception is GatewayReconnectException)
+        {
+            return Task.CompletedTask;
+        }
+
         logger.Log(
             ConvertLogSeverity(message.Severity),
             message.Exception,

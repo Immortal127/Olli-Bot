@@ -34,8 +34,7 @@ internal class HumbleBundleUpdateJob(
                 if (!result.ScannedBundles.Any())
                 {
                     logger.LogInformation("Scheduled Humble Bundle update found no new bundles of type {type}", bundleType);
-
-                    return;
+                    continue;
                 }
 
                 IEnumerable<Domain.Entities.HumbleBundleSubscriber> userSubscribers = result.Subscribers.Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.User);
