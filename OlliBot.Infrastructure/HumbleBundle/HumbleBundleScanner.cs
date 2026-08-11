@@ -105,10 +105,19 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfigur
     {
         string bundleUrl = "https://www.humblebundle.com" + href;
         IPage page = await context.NewPageAsync();
-        await page.GotoAsync(bundleUrl);
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await page.GotoAsync(bundleUrl, new PageGotoOptions
+        {
+            WaitUntil = WaitUntilState.DOMContentLoaded
+        });
 
         bundle.Url = bundleUrl;
+
+        await page.Locator("p.marketing-blurb").WaitForAsync(new LocatorWaitForOptions
+        {
+            Timeout = 10000
+        });
+
         //await RemoveCookiesBannerAsync(page);
         await AcceptCookiesAsync(page);
 
@@ -225,14 +234,22 @@ element => {
 
     private static async Task AcceptCookiesAsync(IPage page)
     {
-        ILocator acceptButton = page.GetByRole(AriaRole.Button, new()
-        {
-            Name = "Accept"
-        });
+        ILocator acceptButton =
+            page.Locator("#onetrust-accept-btn-handler");
 
-        if (await acceptButton.IsVisibleAsync())
+        try
         {
+            await acceptButton.WaitForAsync(new LocatorWaitForOptions
+            {
+                State = WaitForSelectorState.Visible,
+                Timeout = 5000
+            });
+
             await acceptButton.ClickAsync();
+        }
+        catch (TimeoutException)
+        {
+            // OneTrust didn't appear.
         }
     }
 }

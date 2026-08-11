@@ -7,12 +7,12 @@ public class DiscordSubscriberValidater(DiscordSocketClient client) : IDiscordSu
 {
     public IEnumerable<HumbleBundleSubscriber> FindStaleSubscribers(IEnumerable<HumbleBundleSubscriber> subscribers)
     {
-        HashSet<ulong> channelIds = client.Guilds
+        var channelIds = client.Guilds
             .SelectMany(guild => guild.Channels)
             .Select(channel => channel.Id)
             .ToHashSet();
 
-        var staleSubscribers = subscribers.Where(s => channelIds.Add(s.DiscordId));
+        IEnumerable<HumbleBundleSubscriber> staleSubscribers = subscribers.Where(s => channelIds.Add(s.DiscordId));
 
         return staleSubscribers;
     }

@@ -11,7 +11,7 @@ public class CheckForHumbleBundleUpdatesHandler(
     IHumbleBundleScanner humbleBundleScanner,
     IDiscordSubscriberValidater subscriberValidater) : IRequestHandler<CheckForHumbleBundleUpdatesCommand, CheckForHumbleBundleUpdatesResult>
 {
-    public async Task<CheckForHumbleBundleUpdatesResult> Handle(CheckForHumbleBundleUpdatesCommand command, CancellationToken ct = default)
+    public async Task<CheckForHumbleBundleUpdatesResult> Handle(CheckForHumbleBundleUpdatesCommand command, CancellationToken ct)
     {
         IReadOnlyCollection<ScannedHumbleBundle> scannedBundles = await humbleBundleScanner.ScanAsync(command.BundleType, ct);
 
@@ -41,7 +41,7 @@ public class CheckForHumbleBundleUpdatesHandler(
         await SaveNewBundles(newBundles, ct);
 
         IReadOnlyList<Domain.Entities.HumbleBundleSubscriber> subscribers = await humbleBundleRepository.GetSubscribersAsync(command.BundleType, ct);
-        await CheckForStaleSubscribers(subscribers.Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.Channel), ct);
+        subscribers = await RemoveStaleSubscribersAsync(subscribers, ct);
 
         var result = new CheckForHumbleBundleUpdatesResult(
             true,
@@ -52,14 +52,30 @@ public class CheckForHumbleBundleUpdatesHandler(
         return result;
     }
 
-    private async Task CheckForStaleSubscribers(IEnumerable<HumbleBundleSubscriber> subscribers, CancellationToken ct)
+    private async Task<IReadOnlyList<HumbleBundleSubscriber>> RemoveStaleSubscribersAsync(
+        IReadOnlyList<HumbleBundleSubscriber> subscribers,
+        CancellationToken ct)
     {
-        var staleSubscribers = subscriberValidater.FindStaleSubscribers(subscribers);
+        IEnumerable<HumbleBundleSubscriber> staleSubscribers = subscriberValidater
+            .FindStaleSubscribers(subscribers
+            .Where(s => s.SubscriberType == Domain.Enums.HumbleBundleSubscriberType.Channel));
 
-        if (staleSubscribers.Any())
+        if (!staleSubscribers.Any())
         {
-            await humbleBundleRepository.DeleteStaleChannelSubscribersAsync(staleSubscribers, ct);
+            return subscribers;
         }
+
+        await humbleBundleRepository.DeleteStaleChannelSubscribersAsync(
+            staleSubscribers,
+            ct);
+
+        var staleSubscriberIds = staleSubscribers
+            .Select(subscriber => subscriber.Id)
+            .ToHashSet();
+
+        return subscribers
+            .Where(subscriber => !staleSubscriberIds.Contains(subscriber.Id))
+            .ToArray();
     }
 
     private async Task SaveNewBundles(ScannedHumbleBundle[] newBundles, CancellationToken ct)
