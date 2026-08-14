@@ -111,7 +111,8 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfigur
             WaitUntil = WaitUntilState.DOMContentLoaded
         });
 
-        bundle.Url = bundleUrl;
+        var uri = new Uri(page.Url);
+        bundle.Url = uri.GetLeftPart(UriPartial.Path);
 
         await page.Locator("p.marketing-blurb").WaitForAsync(new LocatorWaitForOptions
         {
