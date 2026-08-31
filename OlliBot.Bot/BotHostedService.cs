@@ -35,7 +35,7 @@ public sealed class BotHostedService(
         //client.InteractionCreated += discordEventListener.OnSlashInvoked;
 
         client.MessageReceived -= discordEventListener.OnMessageReceivedAsync;
-        interaction.SlashCommandExecuted -= discordEventListener.OnSlashCommandExecuted;
+        interaction.SlashCommandExecuted -= discordEventListener.OnCommandExecuted;
     }
 
     private void SubscribeToDiscordEvents()
@@ -47,7 +47,7 @@ public sealed class BotHostedService(
         //client.InteractionCreated += interactionHandler.OnSlashInvoked;
 
         client.MessageReceived += discordEventListener.OnMessageReceivedAsync;
-        interaction.SlashCommandExecuted += discordEventListener.OnSlashCommandExecuted;
+        interaction.InteractionExecuted += discordEventListener.OnCommandExecuted;
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

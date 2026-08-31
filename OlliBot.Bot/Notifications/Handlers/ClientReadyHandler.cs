@@ -21,7 +21,19 @@ internal class ClientReadyHandler(
 
         foreach (SlashCommandInfo slashCommand in interaction.SlashCommands.ToList())
         {
-            logger.LogInformation("Registered {SlashCommand}...", slashCommand.Name);
+            logger.LogInformation("Registered Slash Command: {SlashCommand}", slashCommand.Name);
+        }
+
+        foreach (ContextCommandInfo contextCommand in interaction.ContextCommands.ToList())
+        {
+            logger.LogInformation("Registered Context Command: {ContextCommand}", contextCommand.Name);
+        }
+
+        foreach (ModalCommandInfo modalCommand in interaction.ModalCommands)
+        {
+            logger.LogInformation(
+                "Registered Modal Command: {ModalCommand}",
+                modalCommand.Name);
         }
 
         await Task.CompletedTask;

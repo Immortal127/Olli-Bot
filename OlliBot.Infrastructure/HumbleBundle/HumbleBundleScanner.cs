@@ -85,7 +85,7 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfigur
             BundleType = bundleType,
         };
 
-        string? href = await bundle.GetAttributeAsync("href");
+        string href = await bundle.GetAttributeAsync("href") ?? throw new Exception();
         try
         {
             await GetBundleDetails(context, href, humbleBundle);

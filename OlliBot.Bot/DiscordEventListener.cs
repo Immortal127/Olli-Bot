@@ -34,8 +34,8 @@ public class DiscordEventListener(IServiceScopeFactory serviceScope)
         return Mediator.Publish(new ClientReadyNotification(), _cancellationToken);
     }
 
-    internal Task OnSlashCommandExecuted(SlashCommandInfo info, IInteractionContext context, IResult result)
+    internal Task OnCommandExecuted(ICommandInfo info, IInteractionContext context, IResult result)
     {
-        return Mediator.Publish(new SlashCommandExecutedNotification(info, context, result), _cancellationToken);
+        return Mediator.Publish(new CommandExecutedNotification(info, context, result), _cancellationToken);
     }
 }

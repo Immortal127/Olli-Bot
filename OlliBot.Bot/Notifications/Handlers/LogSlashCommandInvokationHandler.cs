@@ -20,7 +20,7 @@ internal class LogSlashCommandInvokationHandler(ILogger<LogSlashCommandInvokatio
 
         if (command.Data.Options.Count != 0)
         {
-            logMessage.Append("(");
+            logMessage.Append('(');
             foreach (SocketSlashCommandDataOption? option in command.Data.Options.Where(option => option != null))
             {
                 logMessage.Append($"{option.Name}:{option.Value}, ");

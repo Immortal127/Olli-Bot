@@ -4,7 +4,7 @@ using MediatR;
 
 namespace OlliBot.Bot.Notifications;
 
-internal record SlashCommandExecutedNotification(
-    SlashCommandInfo SlashCommandInfo,
+internal record CommandExecutedNotification(
+    ICommandInfo CommandInfo,
     IInteractionContext InteractionContext,
     IResult Result) : INotification;

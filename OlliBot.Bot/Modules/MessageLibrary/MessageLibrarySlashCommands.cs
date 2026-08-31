@@ -8,7 +8,7 @@ using OlliBot.Bot.Mappers;
 using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
 
-namespace OlliBot.Bot.Modules;
+namespace OlliBot.Bot.Modules.MessageLibrary;
 
 [RequireContext(ContextType.Guild)]
 [Group("db", "Commands to interact with the message database")]
@@ -139,7 +139,7 @@ public class MessageLibrarySlashCommands(
             return;
         }
         string idString = string.Join("\n", listResult.Messages.Select(m => m.Id));
-        string titleString = string.Join("\n", listResult.Messages.Select(m => m.Title ?? "N/A"));
+        string titleString = string.Join("\n", listResult.Messages.Select(m => string.IsNullOrWhiteSpace(m.Title) ? "N/A" : m.Title));
         string typeString = string.Join("\n", listResult.Messages.Select(m => m.MessageType.ToString()));
         string authorString = string.Join("\n", listResult.Messages.Select(m => m.Author));
 

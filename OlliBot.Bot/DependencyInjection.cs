@@ -54,7 +54,10 @@ internal static class DependencyInjection
         {
             DiscordSocketClient discordClient = serviceProvider.GetRequiredService<DiscordSocketClient>();
 
-            var interaction = new InteractionService(discordClient.Rest);
+            var interaction = new InteractionService(discordClient.Rest, new InteractionServiceConfig
+            {
+                UseCompiledLambda = true,
+            });
 
             return interaction;
         });

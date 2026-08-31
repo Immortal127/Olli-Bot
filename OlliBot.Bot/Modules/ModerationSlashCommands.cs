@@ -3,8 +3,7 @@ using Discord.Interactions;
 
 namespace OlliBot.Bot.Modules;
 
-[RequireUserPermission(GuildPermission.Administrator)]
-[RequireContext(ContextType.Guild)]
+[RequireDmOrGuildPermission(GuildPermission.Administrator)]
 public class ModerationSlashCommands(
     ILogger<ModerationSlashCommands> logger,
     IDiscordClient discordClient) : InteractionModuleBase<SocketInteractionContext>
@@ -41,21 +40,8 @@ public class ModerationSlashCommands(
             //Every other message in delMessages not in oldMessages
             IEnumerable<IMessage> recentMessages = delMessages.Except(oldMessages);
 
-            var textChannel = (ITextChannel)Context.Channel;
+            int delMessageCount = await DeleteMessages(delMessages, oldMessages, recentMessages);
 
-            int delMessageCount = 0;
-
-            if (recentMessages.Any())
-            {
-                delMessageCount += recentMessages.Count();
-                await textChannel.DeleteMessagesAsync(recentMessages);
-            }
-
-            foreach (IMessage m in oldMessages)
-            {
-                delMessageCount++;
-                await Context.Channel.DeleteMessageAsync(m);
-            }
             await Context.Interaction.ModifyOriginalResponseAsync(msg =>
             {
                 msg.Content = $"Deleted {delMessageCount} messages by {user}";
@@ -69,5 +55,42 @@ public class ModerationSlashCommands(
                 msg.Content = $"Error occured: {ex.Message}";
             });
         }
+    }
+
+    private async Task<int> DeleteMessages(IEnumerable<IMessage> delMessages, IEnumerable<IMessage> oldMessages, IEnumerable<IMessage> recentMessages)
+    {
+        int delMessageCount = 0;
+
+        if (Context.Channel is ITextChannel textChannel)
+        {
+            if (recentMessages.Any())
+            {
+                await textChannel.DeleteMessagesAsync(recentMessages);
+                delMessageCount += recentMessages.Count();
+            }
+
+            foreach (IMessage message in oldMessages)
+            {
+                await message.DeleteAsync();
+                delMessageCount++;
+            }
+        }
+        else if (Context.Channel is IDMChannel dmChannel)
+        {
+            // DMs do not support bulk deletion.
+            // A bot can only delete its own messages.
+            foreach (IMessage message in delMessages)
+            {
+                if (message.Author.Id != discordClient.CurrentUser.Id)
+                {
+                    continue;
+                }
+
+                await message.DeleteAsync();
+                delMessageCount++;
+            }
+        }
+
+        return delMessageCount;
     }
 }

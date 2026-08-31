@@ -3,19 +3,27 @@ using Discord.Interactions;
 using MediatR;
 
 namespace OlliBot.Bot.Notifications.Handlers;
-internal class SlashCommandExecutedHandler(ILogger<SlashCommandExecutedHandler> logger) : INotificationHandler<SlashCommandExecutedNotification>
+internal class SlashCommandExecutedHandler(ILogger<SlashCommandExecutedHandler> logger) : INotificationHandler<CommandExecutedNotification>
 {
     public async Task Handle(
-        SlashCommandExecutedNotification notification,
+        CommandExecutedNotification notification,
         CancellationToken cancellationToken)
     {
         IResult result = notification.Result;
         IInteractionContext ctx = notification.InteractionContext;
-        SlashCommandInfo slashInfo = notification.SlashCommandInfo;
+        ICommandInfo commandInfo = notification.CommandInfo;
+
+        string commandType = commandInfo switch
+        {
+            SlashCommandInfo => "Slash",
+            UserCommandInfo => "User",
+            MessageCommandInfo => "Message",
+            _ => "Unknown"
+        };
 
         if (result.IsSuccess)
         {
-            logger.LogInformation("Command '{Command}' completed without InteractionService errors", slashInfo.Name);
+            logger.LogInformation("{Type} Command '{Command}' completed without InteractionService errors", commandType, commandInfo.Name);
         }
         else if (!result.IsSuccess)
         {
