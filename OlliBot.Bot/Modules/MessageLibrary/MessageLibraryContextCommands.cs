@@ -3,7 +3,6 @@ using Discord.Interactions;
 using MediatR;
 using OlliBot.Application.Messages.Commands;
 using OlliBot.Bot.Mappers;
-using OlliBot.Bot.Utilities;
 using ContextType = Discord.Interactions.ContextType;
 using RequireContextAttribute = Discord.Interactions.RequireContextAttribute;
 
@@ -20,9 +19,9 @@ public class MessageLibraryContextCommands(
     [MessageCommand("Add Message")]
     public async Task AddMessageAsync(IMessage message)
     {
-        if (message.IsAuthorOlliBot(client))
+        if (message.Author.IsBot)
         {
-            await RespondAsync("Cannot store messages sent by OlliBot", ephemeral: true);
+            await RespondAsync("Cannot store messages sent by Bots", ephemeral: true);
             return;
         }
 
