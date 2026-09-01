@@ -53,4 +53,26 @@ public class HumbleBundleRepository(OlliBotDbContext db) : IHumbleBundleReposito
             .AsNoTracking()
             .AnyAsync(sub => sub.DiscordId == discordId && sub.SubscriptionType == subscriptionType, ct);
     }
+
+    public async Task<IReadOnlyList<HumbleBundleSubscriber>> GetSubscriptions(ulong discordId, CancellationToken ct)
+    {
+        return await db.HumbleBundleSubscribers
+            .AsNoTracking()
+            .Where(sub => sub.DiscordId == discordId)
+            .ToListAsync(ct);
+    }
+
+    public async Task<int> RemoveSubscriberAsync(
+        ulong discordId,
+        HumbleBundleType bundleType,
+        HumbleBundleSubscriberType subscriberType,
+        CancellationToken ct)
+    {
+        return await db.HumbleBundleSubscribers
+            .Where(sub =>
+                sub.DiscordId == discordId &&
+                sub.SubscriptionType == bundleType &&
+                sub.SubscriberType == subscriberType)
+            .ExecuteDeleteAsync(ct);
+    }
 }

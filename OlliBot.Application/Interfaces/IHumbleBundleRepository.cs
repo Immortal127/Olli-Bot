@@ -17,4 +17,7 @@ public interface IHumbleBundleRepository
     Task DeleteBundlesAsync(IReadOnlyList<Domain.Entities.HumbleBundle> bundles, CancellationToken ct);
 
     Task<bool> SubscriberExistsAsync(ulong discordId, HumbleBundleType subscriptionType, CancellationToken ct);
+
+    Task<IReadOnlyList<HumbleBundleSubscriber>> GetSubscriptions(ulong discordId, CancellationToken ct);
+    Task<int> RemoveSubscriberAsync(ulong discordId, HumbleBundleType humbleBundleType, HumbleBundleSubscriberType subscriberType, CancellationToken cancellationToken);
 }

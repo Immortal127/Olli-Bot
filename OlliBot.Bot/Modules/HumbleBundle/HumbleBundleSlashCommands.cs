@@ -1,4 +1,5 @@
-﻿using Discord.Interactions;
+﻿using Discord;
+using Discord.Interactions;
 using MediatR;
 using OlliBot.Application.HumbleBundle;
 using OlliBot.Application.HumbleBundle.Models;
@@ -32,20 +33,104 @@ public class HumbleBundleSlashCommands(
     }
 
     [SlashCommand("subscribe", "Subscribe for Humble Bundle updates")]
-    public async Task SubscribeForHumbleBundleUpdates([Summary("Type")] HumbleBundleType humbleBundleType)
+    public async Task ManageSubscriptions()
     {
-        var command = new AddHumbleBundleSubscriberCommand(humbleBundleType, Context.User.Id, HumbleBundleSubscriberType.User);
+        var subscriptions = await sender.Send(new GetUserHumbleBundleSubscriptionsQuery(Context.User.Id));
 
-        AddHumbleBundleSubscriberResult result = await sender.Send(command);
+        var subscriptionList = subscriptions.HumbleBundleTypes;
 
-        if (result.Success)
+        var selectMenu = new SelectMenuBuilder()
+            .WithCustomId("bundle_types")
+            .WithPlaceholder("Select bundle types to subscribe to")
+            .WithMinValues(0)
+            .WithMaxValues(3)
+            .AddOption(
+                HumbleBundleType.Games.ToString(),
+                "games",
+                isDefault: subscriptionList.Contains(HumbleBundleType.Games))
+            .AddOption(
+                HumbleBundleType.Software.ToString(),
+                "software",
+                isDefault: subscriptionList.Contains(HumbleBundleType.Software))
+            .AddOption(
+                HumbleBundleType.Books.ToString(),
+                "books",
+                isDefault: subscriptionList.Contains(HumbleBundleType.Books));
+        var components = new ComponentBuilderV2()
+            .WithTextDisplay("## Select bundle types to subscribe to")
+            .WithActionRow(
+                new ActionRowBuilder()
+                    .WithSelectMenu(selectMenu))
+            .Build();
+
+        await RespondAsync(
+            components: components,
+            flags: MessageFlags.Ephemeral | MessageFlags.ComponentsV2);
+    }
+
+    [ComponentInteraction("bundle_types", ignoreGroupNames: true)]
+    public async Task UpdateBundleSubscriptionsAsync(string[] bundleTypesString)
+    {
+        HumbleBundleType[] selectedBundleTypes = bundleTypesString
+            .Select(x => Enum.Parse<HumbleBundleType>(x, ignoreCase: true))
+            .ToArray();
+
+        var currentSubscriptions = await sender.Send(
+            new GetUserHumbleBundleSubscriptionsQuery(Context.User.Id));
+
+        HumbleBundleType[] subscriptionsToAdd = selectedBundleTypes
+            .Except(currentSubscriptions.HumbleBundleTypes)
+            .ToArray();
+
+        HumbleBundleType[] subscriptionsToRemove = currentSubscriptions.HumbleBundleTypes
+            .Except(selectedBundleTypes)
+            .ToArray();
+
+        var messages = new List<string>();
+
+        foreach (var bundleType in subscriptionsToAdd)
         {
-            await RespondAsync($"Successfully subscribed to {humbleBundleType} Humble Bundle updates.", ephemeral: true);
+            var command = new AddHumbleBundleSubscriberCommand(
+                bundleType,
+                Context.User.Id,
+                HumbleBundleSubscriberType.User);
+
+            AddHumbleBundleSubscriberResult result = await sender.Send(command);
+
+            if (result.Success)
+            {
+                messages.Add($"Subscribed to {bundleType} Humble Bundle updates.");
+            }
+            else
+            {
+                messages.Add(
+                    $"Failed to subscribe to {bundleType}: {result.Message}");
+            }
         }
-        else
+
+        foreach (var bundleType in subscriptionsToRemove)
         {
-            await RespondAsync($"Failed to subscribe to {humbleBundleType} Humble Bundle updates: {result.Message}", ephemeral: true);
+            var command = new RemoveHumbleBundleSubscriberCommand(
+                bundleType,
+                Context.User.Id,
+                HumbleBundleSubscriberType.User);
+
+            RemoveHumbleBundleSubscriberResult result = await sender.Send(command);
+
+            if (result.Success)
+            {
+                messages.Add($"Unsubscribed from {bundleType} Humble Bundle updates.");
+            }
+            else
+            {
+                messages.Add(
+                    $"Failed to unsubscribe from {bundleType}: {result.Message}");
+            }
         }
+
+        await RespondAsync(
+            string.Join(Environment.NewLine, messages),
+            ephemeral: true);
     }
 
     //[SlashCommand("scan-silently", "Silently scan for Humble Bundle updates")]
@@ -56,13 +141,8 @@ public class HumbleBundleSlashCommands(
     //    CheckForHumbleBundleUpdatesResult result = await checkHandler.HandleAsync(new CheckForHumbleBundleUpdatesCommand(HumbleBundleType.Games));
     //}
 
-    public async Task ManageSubscriptions()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task RemoveSubscription()
-    {
-        throw new NotImplementedException();
-    }
+    //public async Task RemoveSubscription()
+    //{
+    //    throw new NotImplementedException();
+    //}
 }
