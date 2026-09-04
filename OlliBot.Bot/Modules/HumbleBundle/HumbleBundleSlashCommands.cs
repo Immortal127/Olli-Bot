@@ -5,7 +5,6 @@ using OlliBot.Application.HumbleBundle;
 using OlliBot.Application.HumbleBundle.Models;
 using OlliBot.Domain.Enums;
 
-
 namespace OlliBot.Bot.Modules.HumbleBundle;
 
 [Group("hb", "Humble bundle commands")]
@@ -27,9 +26,15 @@ public class HumbleBundleSlashCommands(
         }
     }
 
+    [SlashCommand("latest", "Get the latest Humble Bundle of a specific type")]
     public async Task GetLatestHumbleBundle([Summary("Type")] HumbleBundleType humbleBundleType)
     {
-        throw new NotImplementedException();
+        await RespondAsync("Retrieving latest Humble Bundle...", ephemeral: true);
+
+        // Get humble bundles
+        ScanHumbleBundleResult result = await sender.Send(new ScanHumbleBundleCommand(humbleBundleType));
+
+        await Context.Channel.SendMessageAsync(components: HumbleBundleEmbedBuilder.CreateHumbleBundleEmbedV2(result.ScannedBundles.First()));
     }
 
     [SlashCommand("subscribe", "Subscribe for Humble Bundle updates")]
@@ -41,7 +46,6 @@ public class HumbleBundleSlashCommands(
 
         var selectMenu = new SelectMenuBuilder()
             .WithCustomId("bundle_types")
-            .WithPlaceholder("Select bundle types to subscribe to")
             .WithMinValues(0)
             .WithMaxValues(3)
             .AddOption(
@@ -56,8 +60,9 @@ public class HumbleBundleSlashCommands(
                 HumbleBundleType.Books.ToString(),
                 "books",
                 isDefault: subscriptionList.Contains(HumbleBundleType.Books));
+
         var components = new ComponentBuilderV2()
-            .WithTextDisplay("## Select bundle types to subscribe to")
+            .WithTextDisplay("### Select bundle types to subscribe to")
             .WithActionRow(
                 new ActionRowBuilder()
                     .WithSelectMenu(selectMenu))

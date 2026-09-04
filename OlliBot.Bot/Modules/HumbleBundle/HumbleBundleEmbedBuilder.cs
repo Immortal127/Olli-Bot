@@ -44,6 +44,75 @@ internal static class HumbleBundleEmbedBuilder
         return embedBuilder.Build();
     }
 
+    internal static MessageComponent CreateHumbleBundleEmbedV2(ScannedHumbleBundle scannedHumbleBundle)
+    {
+        var builder = new ComponentBuilderV2();
+
+        var container = new ContainerBuilder();
+
+        var buttons = new ActionRowBuilder()
+            .WithButton(
+                label: "Delete Notification",
+                customId: $"delete_hb_notification:{scannedHumbleBundle.Url}",
+                style: ButtonStyle.Danger
+                //emote: new Emoji()
+                )
+            .WithButton(
+                label: "View Bundle",
+                //customId: $"view_hb_bundle:{scannedHumbleBundle.Url}",
+                url: scannedHumbleBundle.Url,
+                style: ButtonStyle.Link);
+
+
+        container
+            .WithTextDisplay(new TextDisplayBuilder()
+            {
+                Content = $"# **[{scannedHumbleBundle.Name}]({scannedHumbleBundle.Url})**"
+            })
+            .WithSeparator(spacing: SeparatorSpacingSize.Small)
+            .WithTextDisplay(new TextDisplayBuilder()
+            {
+                Content = $"### **Expires:** {TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.ShortDateTime)} ({TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.Relative)})\n\n{scannedHumbleBundle.ShortDescription}\n\n**{scannedHumbleBundle.Note.Trim()}**",
+            })
+            .WithSeparator();
+
+        //container.WithSection(new SectionBuilder().WithTextDisplay);
+
+        foreach (var tier in scannedHumbleBundle.BundleTiers.OrderBy(b => b.Tier))
+        {
+            container
+                .WithTextDisplay(new TextDisplayBuilder
+                {
+                    Content = $"Tier {tier.Tier} - Pay at least {tier.Price:C}"
+                })
+                .WithTextDisplay(new TextDisplayBuilder
+                {
+                    Content = BuildEmbedFieldText(tier.HumbleBundleItems)
+                });
+
+            //container.WithSection(tierSection);
+
+            if (tier != scannedHumbleBundle.BundleTiers.OrderBy(b => b.Tier).Last())
+            {
+                container.WithSeparator();
+            }
+        }
+
+        container
+            .WithMediaGallery(new MediaGalleryBuilder().AddItem(new MediaGalleryItemProperties
+            {
+                Media = new UnfurledMediaItemProperties
+                {
+                    Url = scannedHumbleBundle.ImageUrl
+                },
+                //Description = "Bundle Thumbnail"
+            }));
+
+        container.WithActionRow(buttons);
+
+        return builder.WithContainer(container).Build();
+    }
+
     private static string BuildEmbedFieldText(List<ScannedHumbleBundleItem> items)
     {
         const int maxLength = 1024;
