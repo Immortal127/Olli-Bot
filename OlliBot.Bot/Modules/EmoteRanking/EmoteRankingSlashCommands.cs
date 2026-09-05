@@ -6,7 +6,7 @@ using OlliBot.Application.EmoteRanking.ClearEmoteRanking;
 using OlliBot.Application.EmoteRanking.UpdateEmoteRanking;
 using OlliBot.Bot.Utilities;
 
-namespace OlliBot.Bot.Modules;
+namespace OlliBot.Bot.Modules.EmoteRanking;
 
 [RequireContext(ContextType.Guild)]
 [Group("emoterank", "Commands for emote ranking")]
