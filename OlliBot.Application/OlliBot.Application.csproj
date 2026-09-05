@@ -23,4 +23,8 @@
     <ProjectReference Include="..\OlliBot.Domain\OlliBot.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Abstractions\" />
+  </ItemGroup>
+
 </Project>

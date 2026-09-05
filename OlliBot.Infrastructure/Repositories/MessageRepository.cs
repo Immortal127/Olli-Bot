@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OlliBot.Application.Interfaces;
+using OlliBot.Application.Messages;
 using OlliBot.Domain.Entities;
 using OlliBot.Infrastructure.Data;
 

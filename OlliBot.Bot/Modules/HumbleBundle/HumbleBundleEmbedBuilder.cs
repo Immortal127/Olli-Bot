@@ -1,5 +1,6 @@
 ﻿using Discord;
 using OlliBot.Application.HumbleBundle.Models;
+using Quartz.Util;
 using System.Text;
 
 namespace OlliBot.Bot.Modules.HumbleBundle;
@@ -10,6 +11,7 @@ internal static class HumbleBundleEmbedBuilder
 
     static string bulletPoint => discordBulletPoint;
 
+    [Obsolete("Use CreateHumbleBundleComponentV2")]
     internal static Embed CreateHumbleBundleEmbed(ScannedHumbleBundle bundle)
     {
         string description = new StringBuilder()
@@ -44,35 +46,55 @@ internal static class HumbleBundleEmbedBuilder
         return embedBuilder.Build();
     }
 
-    internal static MessageComponent CreateHumbleBundleEmbedV2(ScannedHumbleBundle scannedHumbleBundle)
+    internal static MessageComponent CreateHumbleBundleComponentV2(ScannedHumbleBundle scannedHumbleBundle)
     {
         var builder = new ComponentBuilderV2();
 
-        var container = new ContainerBuilder();
+        var container = new ContainerBuilder().WithAccentColor(Color.Blue);
 
         var buttons = new ActionRowBuilder()
-            .WithButton(
-                label: "Delete Notification",
-                customId: $"delete_hb_notification:{scannedHumbleBundle.Url}",
-                style: ButtonStyle.Danger
-                //emote: new Emoji()
-                )
             .WithButton(
                 label: "View Bundle",
                 //customId: $"view_hb_bundle:{scannedHumbleBundle.Url}",
                 url: scannedHumbleBundle.Url,
-                style: ButtonStyle.Link);
+                style: ButtonStyle.Link)
+            .WithButton(
+                label: "Delete Notification",
+                customId: $"delete_hb_notification",
+                style: ButtonStyle.Danger,
+                emote: new Emoji("🗑️")
+                );
+        //.WithButton(
+        //    label: "Collapse / Expand Bundle",
+        //    style: ButtonStyle.Primary,
+        //    customId: "expand_bundle");
 
+        StringBuilder bundleDescription = new StringBuilder($"**Expires:** {TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.ShortDateTime)} ({TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.Relative)})");
+
+        if (!string.IsNullOrWhiteSpace(scannedHumbleBundle.ShortDescription))
+        {
+            bundleDescription.AppendLine();
+            bundleDescription.AppendLine();
+            bundleDescription.Append(scannedHumbleBundle.ShortDescription);
+        }
+
+        if (!string.IsNullOrWhiteSpace(scannedHumbleBundle.Note))
+        {
+            bundleDescription.AppendLine();
+            bundleDescription.AppendLine();
+            bundleDescription.Append($"**{scannedHumbleBundle.Note.Trim()}**");
+        }
 
         container
             .WithTextDisplay(new TextDisplayBuilder()
             {
-                Content = $"# **[{scannedHumbleBundle.Name}]({scannedHumbleBundle.Url})**"
+                Content = $"## **[{scannedHumbleBundle.Name}]({scannedHumbleBundle.Url})**"
             })
             .WithSeparator(spacing: SeparatorSpacingSize.Small)
             .WithTextDisplay(new TextDisplayBuilder()
             {
-                Content = $"### **Expires:** {TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.ShortDateTime)} ({TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.Relative)})\n\n{scannedHumbleBundle.ShortDescription}\n\n**{scannedHumbleBundle.Note.Trim()}**",
+                Content = bundleDescription.ToString()
+                //Content = $"**Expires:** {TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.ShortDateTime)} ({TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.Relative)})\n\n{scannedHumbleBundle.ShortDescription}\n\n{!string.IsNullOrWhiteSpace(scannedHumbleBundle.Note.Trim()) ? $"**{scannedHumbleBundle.Note.Trim()}**" }",
             })
             .WithSeparator();
 
@@ -83,19 +105,25 @@ internal static class HumbleBundleEmbedBuilder
             container
                 .WithTextDisplay(new TextDisplayBuilder
                 {
-                    Content = $"Tier {tier.Tier} - Pay at least {tier.Price:C}"
-                })
-                .WithTextDisplay(new TextDisplayBuilder
-                {
-                    Content = BuildEmbedFieldText(tier.HumbleBundleItems)
+                    Content = $"**Tier {tier.Tier} - Pay at least {tier.Price:C}**"
                 });
 
-            //container.WithSection(tierSection);
+            string items = BuildEmbedFieldText(tier.HumbleBundleItems);
 
-            if (tier != scannedHumbleBundle.BundleTiers.OrderBy(b => b.Tier).Last())
+            // This check is required because recently a bundle was released that had a 2nd tier
+            // where the only difference is that you get a 2nd copy of the same games in tier 1
+            // So the 2nd tier had no *new* items
+            container.WithTextDisplay(new TextDisplayBuilder
             {
-                container.WithSeparator();
-            }
+                Content = !string.IsNullOrWhiteSpace(items) ? items : $"{bulletPoint} No new items"
+            });
+
+            //container.WithSection(tierSection);
+            container.WithSeparator();
+            //if (tier != scannedHumbleBundle.BundleTiers.OrderBy(b => b.Tier).Last())
+            //{
+            //    container.WithSeparator();
+            //}
         }
 
         container
@@ -109,6 +137,9 @@ internal static class HumbleBundleEmbedBuilder
             }));
 
         container.WithActionRow(buttons);
+
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        container.WithTextDisplay($"-# <t:{timestamp}:R>");
 
         return builder.WithContainer(container).Build();
     }

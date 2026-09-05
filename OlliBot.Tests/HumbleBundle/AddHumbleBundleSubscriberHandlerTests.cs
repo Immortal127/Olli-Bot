@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
 using OlliBot.Application.HumbleBundle;
-using OlliBot.Application.Interfaces;
+using OlliBot.Application.HumbleBundle.AddHumbleBundleSubscriber;
 using OlliBot.Domain.Enums;
 
 namespace OlliBot.Tests.HumbleBundle;

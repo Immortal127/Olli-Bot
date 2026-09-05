@@ -88,7 +88,7 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfigur
         string href = await bundle.GetAttributeAsync("href") ?? throw new Exception();
         try
         {
-            await GetBundleDetails(context, href, humbleBundle);
+            await ParseBundle(context, href, humbleBundle);
             humbleBundles.Add(humbleBundle);
         }
         catch (Exception ex)
@@ -101,7 +101,7 @@ public class HumbleBundleScanner(ILogger<IHumbleBundleScanner> logger, IConfigur
         }
     }
 
-    public async Task<ScannedHumbleBundle> GetBundleDetails(IBrowserContext context, string href, ScannedHumbleBundle bundle)
+    private async Task<ScannedHumbleBundle> ParseBundle(IBrowserContext context, string href, ScannedHumbleBundle bundle)
     {
         string bundleUrl = "https://www.humblebundle.com" + href;
         IPage page = await context.NewPageAsync();
@@ -252,5 +252,27 @@ element => {
         {
             // OneTrust didn't appear.
         }
+    }
+
+    public async Task<ScannedHumbleBundle> GetBundleDetails(Domain.Entities.HumbleBundle bundle, CancellationToken ct)
+    {
+        using IPlaywright pw = await Playwright.CreateAsync();
+        await using IBrowser browser = await pw.Chromium.LaunchAsync(new BrowserTypeLaunchOptions()
+        {
+            Headless = true
+        });
+        await using IBrowserContext context = await browser.NewContextAsync();
+
+        var bundleScan = new ScannedHumbleBundle
+        {
+            Name = bundle.Name,
+            BundleType = bundle.BundleType,
+        };
+
+        var s = new Uri(bundle.Url);
+
+        var humbleBundle = await ParseBundle(context, s.LocalPath, bundleScan);
+
+        return humbleBundle;
     }
 }

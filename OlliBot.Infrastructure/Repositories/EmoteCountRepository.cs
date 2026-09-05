@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OlliBot.Application.EmoteRanking;
 using OlliBot.Application.EmoteRanking.Models;
-using OlliBot.Application.Interfaces;
 using OlliBot.Domain.Entities;
 using OlliBot.Infrastructure.Data;
 

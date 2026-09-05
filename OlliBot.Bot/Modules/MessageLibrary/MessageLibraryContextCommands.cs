@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using MediatR;
-using OlliBot.Application.Messages.Commands;
+using OlliBot.Application.Messages.AddMessage;
 using OlliBot.Bot.Mappers;
 using ContextType = Discord.Interactions.ContextType;
 using RequireContextAttribute = Discord.Interactions.RequireContextAttribute;

@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OlliBot.Application.EmoteRanking;
 using OlliBot.Application.HumbleBundle;
-using OlliBot.Application.Interfaces;
+using OlliBot.Application.Messages;
 using OlliBot.Infrastructure.Data;
 using OlliBot.Infrastructure.HumbleBundle;
 using OlliBot.Infrastructure.Repositories;

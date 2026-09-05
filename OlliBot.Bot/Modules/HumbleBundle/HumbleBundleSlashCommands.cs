@@ -1,8 +1,13 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using MediatR;
-using OlliBot.Application.HumbleBundle;
+using OlliBot.Application.HumbleBundle.AddHumbleBundleSubscriber;
+using OlliBot.Application.HumbleBundle.GetLatestHumbleBundle;
+using OlliBot.Application.HumbleBundle.GetUserHumbleBundleSubscriptions;
 using OlliBot.Application.HumbleBundle.Models;
+using OlliBot.Application.HumbleBundle.RemoveHumbleBundleSubscriber;
+using OlliBot.Application.HumbleBundle.ScanHumbleBundle;
 using OlliBot.Domain.Enums;
 
 namespace OlliBot.Bot.Modules.HumbleBundle;
@@ -22,7 +27,7 @@ public class HumbleBundleSlashCommands(
         // Send found humbles to user / text channel
         foreach (ScannedHumbleBundle bundle in result.ScannedBundles)
         {
-            await Context.Channel.SendMessageAsync(embed: HumbleBundleEmbedBuilder.CreateHumbleBundleEmbed(bundle));
+            await Context.Channel.SendMessageAsync(components: HumbleBundleEmbedBuilder.CreateHumbleBundleComponentV2(bundle));
         }
     }
 
@@ -32,9 +37,13 @@ public class HumbleBundleSlashCommands(
         await RespondAsync("Retrieving latest Humble Bundle...", ephemeral: true);
 
         // Get humble bundles
-        ScanHumbleBundleResult result = await sender.Send(new ScanHumbleBundleCommand(humbleBundleType));
-
-        await Context.Channel.SendMessageAsync(components: HumbleBundleEmbedBuilder.CreateHumbleBundleEmbedV2(result.ScannedBundles.First()));
+        GetLatestHumbleBundleResult result = await sender.Send(new GetLatestHumbleBundleQuery(humbleBundleType));
+        if (result.Bundle == null)
+        {
+            await Context.Channel.SendMessageAsync("No Humble Bundle found for the specified type.");
+            return;
+        }
+        await Context.Channel.SendMessageAsync(components: HumbleBundleEmbedBuilder.CreateHumbleBundleComponentV2(result.Bundle));
     }
 
     [SlashCommand("subscribe", "Subscribe for Humble Bundle updates")]
@@ -136,6 +145,16 @@ public class HumbleBundleSlashCommands(
         await RespondAsync(
             string.Join(Environment.NewLine, messages),
             ephemeral: true);
+    }
+
+    [ComponentInteraction("delete_hb_notification", ignoreGroupNames: true)]
+    public async Task DeleteNotification()
+    {
+        var componentInteraction = (SocketMessageComponent)Context.Interaction;
+
+        var message = componentInteraction.Message;
+
+        await message.DeleteAsync();
     }
 
     //[SlashCommand("scan-silently", "Silently scan for Humble Bundle updates")]

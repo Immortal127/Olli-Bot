@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OlliBot.Application.Interfaces;
+using OlliBot.Application.HumbleBundle;
 using OlliBot.Domain.Entities;
 using OlliBot.Domain.Enums;
 using OlliBot.Infrastructure.Data;
@@ -74,5 +74,14 @@ public class HumbleBundleRepository(OlliBotDbContext db) : IHumbleBundleReposito
                 sub.SubscriptionType == bundleType &&
                 sub.SubscriberType == subscriberType)
             .ExecuteDeleteAsync(ct);
+    }
+
+    public async Task<Domain.Entities.HumbleBundle?> GetLatestBundle(HumbleBundleType bundleType)
+    {
+        return await db.HumbleBundles
+            .AsNoTracking()
+            .Where(hb => hb.BundleType == bundleType)
+            .OrderByDescending(hb => hb.ExpiryDate)
+            .FirstOrDefaultAsync();
     }
 }

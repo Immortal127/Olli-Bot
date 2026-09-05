@@ -1,0 +1,4 @@
+﻿using MediatR;
+
+namespace OlliBot.Application.HumbleBundle.GetUserHumbleBundleSubscriptions;
+public record GetUserHumbleBundleSubscriptionsQuery(ulong DiscordId) : IRequest<GetUserHumbleBundleSubscriptionsResult>;

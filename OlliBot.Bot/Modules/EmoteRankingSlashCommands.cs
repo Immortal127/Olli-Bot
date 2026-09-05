@@ -2,7 +2,8 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using MediatR;
-using OlliBot.Application.EmoteRanking.Commands;
+using OlliBot.Application.EmoteRanking.ClearEmoteRanking;
+using OlliBot.Application.EmoteRanking.UpdateEmoteRanking;
 using OlliBot.Bot.Utilities;
 
 namespace OlliBot.Bot.Modules;

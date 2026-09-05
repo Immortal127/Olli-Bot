@@ -1,6 +1,6 @@
 ﻿using Discord;
 using MediatR;
-using OlliBot.Application.HumbleBundle;
+using OlliBot.Application.HumbleBundle.CheckForHumbleBundleUpdates;
 using Quartz;
 using System.Data;
 
@@ -43,13 +43,13 @@ internal class HumbleBundleUpdateJob(
 
                 foreach (Application.HumbleBundle.Models.ScannedHumbleBundle bundle in result.ScannedBundles)
                 {
-                    Embed embed = HumbleBundleEmbedBuilder.CreateHumbleBundleEmbed(bundle);
+                    var component = HumbleBundleEmbedBuilder.CreateHumbleBundleComponentV2(bundle);
 
                     foreach (Domain.Entities.HumbleBundleSubscriber? subscriber in userSubscribers)
                     {
                         IUser discordUser = await discordClient.GetUserAsync(subscriber.DiscordId);
 
-                        await discordUser.SendMessageAsync(embed: embed);
+                        await discordUser.SendMessageAsync(components: component);
                     }
 
                     foreach (Domain.Entities.HumbleBundleSubscriber? subscriber in channelSubscribers)
@@ -98,7 +98,7 @@ internal class HumbleBundleUpdateJob(
                             return;
                         }
 
-                        await messageChannel.SendMessageAsync(embed: embed, text: roleMention);
+                        await messageChannel.SendMessageAsync(components: component, text: roleMention);
                     }
                 }
             }
