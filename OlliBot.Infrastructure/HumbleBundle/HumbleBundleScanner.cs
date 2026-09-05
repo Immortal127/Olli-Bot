@@ -271,7 +271,7 @@ element => {
 
         var s = new Uri(bundle.Url);
 
-        var humbleBundle = await ParseBundle(context, s.LocalPath, bundleScan);
+        ScannedHumbleBundle humbleBundle = await ParseBundle(context, s.LocalPath, bundleScan);
 
         return humbleBundle;
     }

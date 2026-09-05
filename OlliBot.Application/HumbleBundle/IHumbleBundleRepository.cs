@@ -19,8 +19,8 @@ public interface IHumbleBundleRepository
     Task<bool> SubscriberExistsAsync(ulong discordId, HumbleBundleType subscriptionType, CancellationToken ct);
 
     Task<IReadOnlyList<HumbleBundleSubscriber>> GetSubscriptions(ulong discordId, CancellationToken ct);
-    
+
     Task<int> RemoveSubscriberAsync(ulong discordId, HumbleBundleType humbleBundleType, HumbleBundleSubscriberType subscriberType, CancellationToken cancellationToken);
-    
+
     Task<Domain.Entities.HumbleBundle?> GetLatestBundle(HumbleBundleType bundleType);
 }

@@ -1,6 +1,5 @@
 ﻿using Discord;
 using OlliBot.Application.HumbleBundle.Models;
-using Quartz.Util;
 using System.Text;
 
 namespace OlliBot.Bot.Modules.HumbleBundle;
@@ -50,9 +49,9 @@ internal static class HumbleBundleEmbedBuilder
     {
         var builder = new ComponentBuilderV2();
 
-        var container = new ContainerBuilder().WithAccentColor(Color.Blue);
+        ContainerBuilder container = new ContainerBuilder().WithAccentColor(Color.Blue);
 
-        var buttons = new ActionRowBuilder()
+        ActionRowBuilder buttons = new ActionRowBuilder()
             .WithButton(
                 label: "View Bundle",
                 //customId: $"view_hb_bundle:{scannedHumbleBundle.Url}",
@@ -69,7 +68,7 @@ internal static class HumbleBundleEmbedBuilder
         //    style: ButtonStyle.Primary,
         //    customId: "expand_bundle");
 
-        StringBuilder bundleDescription = new StringBuilder($"**Expires:** {TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.ShortDateTime)} ({TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.Relative)})");
+        var bundleDescription = new StringBuilder($"**Expires:** {TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.ShortDateTime)} ({TimestampTag.FormatFromDateTime(scannedHumbleBundle.ExpiryDate, TimestampTagStyles.Relative)})");
 
         if (!string.IsNullOrWhiteSpace(scannedHumbleBundle.ShortDescription))
         {
@@ -100,7 +99,7 @@ internal static class HumbleBundleEmbedBuilder
 
         //container.WithSection(new SectionBuilder().WithTextDisplay);
 
-        foreach (var tier in scannedHumbleBundle.BundleTiers.OrderBy(b => b.Tier))
+        foreach (ScannedHumbleBundleTier? tier in scannedHumbleBundle.BundleTiers.OrderBy(b => b.Tier))
         {
             container
                 .WithTextDisplay(new TextDisplayBuilder
@@ -138,7 +137,7 @@ internal static class HumbleBundleEmbedBuilder
 
         container.WithActionRow(buttons);
 
-        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         container.WithTextDisplay($"-# <t:{timestamp}:R>");
 
         return builder.WithContainer(container).Build();

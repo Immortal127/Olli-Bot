@@ -1,5 +1,4 @@
 ﻿using Discord.Interactions;
-using OlliBot.Domain.Enums;
 
 namespace OlliBot.Bot.Modules.MessageLibrary;
 public class AddMessageModal : IModal

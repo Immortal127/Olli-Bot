@@ -43,7 +43,7 @@ internal class HumbleBundleUpdateJob(
 
                 foreach (Application.HumbleBundle.Models.ScannedHumbleBundle bundle in result.ScannedBundles)
                 {
-                    var component = HumbleBundleEmbedBuilder.CreateHumbleBundleComponentV2(bundle);
+                    MessageComponent component = HumbleBundleEmbedBuilder.CreateHumbleBundleComponentV2(bundle);
 
                     foreach (Domain.Entities.HumbleBundleSubscriber? subscriber in userSubscribers)
                     {

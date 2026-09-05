@@ -13,7 +13,7 @@ internal class EmoteRankingUpdateJob(
     public async Task Execute(IJobExecutionContext context)
     {
         logger.LogInformation("Starting emote ranking update job.");
-        foreach (var guild in await discordClient.GetGuildsAsync())
+        foreach (IGuild? guild in await discordClient.GetGuildsAsync())
         {
             if (guild.Emotes.Count == 0)
             {

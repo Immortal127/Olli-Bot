@@ -14,7 +14,7 @@ internal class EmoteRankingClearJob(
     public async Task Execute(IJobExecutionContext context)
     {
         logger.LogInformation("Starting emote ranking clear job");
-        foreach (var guild in await discordClient.GetGuildsAsync())
+        foreach (IGuild? guild in await discordClient.GetGuildsAsync())
         {
             logger.LogInformation(
                 "Clearing emote ranking for guild {GuildId} ({GuildName})",

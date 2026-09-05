@@ -49,11 +49,11 @@ public class HumbleBundleSlashCommands(
     [SlashCommand("subscribe", "Subscribe for Humble Bundle updates")]
     public async Task ManageSubscriptions()
     {
-        var subscriptions = await sender.Send(new GetUserHumbleBundleSubscriptionsQuery(Context.User.Id));
+        GetUserHumbleBundleSubscriptionsResult subscriptions = await sender.Send(new GetUserHumbleBundleSubscriptionsQuery(Context.User.Id));
 
-        var subscriptionList = subscriptions.HumbleBundleTypes;
+        IReadOnlyCollection<HumbleBundleType> subscriptionList = subscriptions.HumbleBundleTypes;
 
-        var selectMenu = new SelectMenuBuilder()
+        SelectMenuBuilder selectMenu = new SelectMenuBuilder()
             .WithCustomId("bundle_types")
             .WithMinValues(0)
             .WithMaxValues(3)
@@ -70,7 +70,7 @@ public class HumbleBundleSlashCommands(
                 "books",
                 isDefault: subscriptionList.Contains(HumbleBundleType.Books));
 
-        var components = new ComponentBuilderV2()
+        MessageComponent components = new ComponentBuilderV2()
             .WithTextDisplay("### Select bundle types to subscribe to")
             .WithActionRow(
                 new ActionRowBuilder()
@@ -89,7 +89,7 @@ public class HumbleBundleSlashCommands(
             .Select(x => Enum.Parse<HumbleBundleType>(x, ignoreCase: true))
             .ToArray();
 
-        var currentSubscriptions = await sender.Send(
+        GetUserHumbleBundleSubscriptionsResult currentSubscriptions = await sender.Send(
             new GetUserHumbleBundleSubscriptionsQuery(Context.User.Id));
 
         HumbleBundleType[] subscriptionsToAdd = selectedBundleTypes
@@ -102,7 +102,7 @@ public class HumbleBundleSlashCommands(
 
         var messages = new List<string>();
 
-        foreach (var bundleType in subscriptionsToAdd)
+        foreach (HumbleBundleType bundleType in subscriptionsToAdd)
         {
             var command = new AddHumbleBundleSubscriberCommand(
                 bundleType,
@@ -122,7 +122,7 @@ public class HumbleBundleSlashCommands(
             }
         }
 
-        foreach (var bundleType in subscriptionsToRemove)
+        foreach (HumbleBundleType bundleType in subscriptionsToRemove)
         {
             var command = new RemoveHumbleBundleSubscriberCommand(
                 bundleType,
@@ -152,7 +152,7 @@ public class HumbleBundleSlashCommands(
     {
         var componentInteraction = (SocketMessageComponent)Context.Interaction;
 
-        var message = componentInteraction.Message;
+        SocketUserMessage message = componentInteraction.Message;
 
         await message.DeleteAsync();
     }

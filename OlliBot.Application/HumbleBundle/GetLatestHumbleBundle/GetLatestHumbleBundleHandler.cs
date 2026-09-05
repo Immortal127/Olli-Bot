@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using OlliBot.Domain.Entities;
 
 namespace OlliBot.Application.HumbleBundle.GetLatestHumbleBundle;
 public class GetLatestHumbleBundleHandler(
@@ -18,7 +17,7 @@ public class GetLatestHumbleBundleHandler(
             return new GetLatestHumbleBundleResult(null, false, $"No bundle found for type {request.BundleType}");
         }
 
-        var latestBundle = await humbleBundleScanner.GetBundleDetails(bundle, cancellationToken);
+        Models.ScannedHumbleBundle latestBundle = await humbleBundleScanner.GetBundleDetails(bundle, cancellationToken);
 
         return new GetLatestHumbleBundleResult(latestBundle, true, $"Successfully retrieved latest bundle for type {request.BundleType}");
     }
