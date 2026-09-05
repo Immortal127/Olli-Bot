@@ -2,6 +2,7 @@ using OlliBot.Application;
 using OlliBot.Infrastructure;
 using OlliBot.Infrastructure.Data;
 using Serilog;
+using Serilog.Events;
 
 namespace OlliBot.Bot;
 
@@ -24,9 +25,14 @@ internal class Program
 
         #region DI Setup
 
+        builder.Services.AddSingleton<DiscordAlertSink>();
+
         builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
             .ReadFrom.Configuration(builder.Configuration)
-            .ReadFrom.Services(services));
+            .ReadFrom.Services(services)
+            .WriteTo.Sink(
+                services.GetRequiredService<DiscordAlertSink>(),
+                restrictedToMinimumLevel: LogEventLevel.Error));
 
         builder.Services.AddMediatR(cfg =>
         {
